@@ -133,7 +133,6 @@ export default function IndustryKnowledgeAssessment() {
   const q = questions[current]
   const progress = ((current + 1) / questions.length) * 100
   const answeredCount = Object.keys(answers).length
-
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm">
@@ -219,4 +218,14 @@ export default function IndustryKnowledgeAssessment() {
                   answers[current] === undefined
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`
+                }`}
+              >
+                Next
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

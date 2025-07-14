@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, Users, MessageCircle, MapPin } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Users, MessageCircle, MapPin, UserPlus } from 'lucide-react'
 
 interface CommunityMember {
   id: string

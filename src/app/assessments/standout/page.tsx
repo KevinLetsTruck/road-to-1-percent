@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 const standoutRoles = [
   'Pioneer',
@@ -68,7 +68,7 @@ export default function StandoutAssessment() {
         return
       }
       router.push('/dashboard?message=Standout%202.0%20Assessment%20completed%20successfully!')
-    } catch (error) {
+    } catch {
       alert('There was an error submitting your assessment. Please try again.')
     } finally {
       setIsSubmitting(false)

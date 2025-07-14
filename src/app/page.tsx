@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { TrendingUp, Target, Users, Award, ArrowRight, CheckCircle } from 'lucide-react'
+import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
 
 export default function HomePage() {
   const features = [

@@ -173,7 +173,7 @@ export default function OperationalAssessment() {
         return
       }
       router.push('/dashboard?message=Operational%20Efficiency%20Assessment%20completed%20successfully!')
-    } catch (error) {
+    } catch {
       alert('There was an error submitting your assessment. Please try again.')
     } finally {
       setIsSubmitting(false)

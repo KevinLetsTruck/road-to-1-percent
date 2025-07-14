@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { TrendingUp, CheckCircle, AlertCircle } from 'lucide-react'
+import { TrendingUp, CheckCircle } from 'lucide-react'
 
 const assessmentWeights = {
   spi: 0.3,
@@ -21,7 +21,7 @@ function getCategory(score: number) {
   return { label: 'Not Ready Yet', color: 'red', desc: 'Foundational issues must be fixed. Plan for 12–18 months of preparation and support.' }
 }
 
-function getActionPlan(scores: any) {
+function getActionPlan(scores: Record<string, number>) {
   // Find lowest 2 areas
   const areas = [
     { key: 'spi', label: 'Financial Health', score: scores.spi },
@@ -112,9 +112,9 @@ function getActionPlan(scores: any) {
 
 export default function ResultsPage() {
   const [loading, setLoading] = useState(true)
-  const [scores, setScores] = useState<any>(null)
-  const [category, setCategory] = useState<any>(null)
-  const [actionPlan, setActionPlan] = useState<any[]>([])
+  const [scores, setScores] = useState<Record<string, number> | null>(null)
+  const [category, setCategory] = useState<{ label: string; color: string; desc: string } | null>(null)
+  const [actionPlan, setActionPlan] = useState<Array<{ label: string; goal: string; actions: string[]; timeline: string; score: number }>>([])
   const router = useRouter()
   const supabase = createClient()
 
@@ -197,9 +197,9 @@ export default function ResultsPage() {
       </nav>
       <main className="max-w-4xl mx-auto py-8 px-4">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h1 className="text-3xl font-bold mb-2">Your Overall Score: <span className={`text-${category.color}-600`}>{scores.overall}</span></h1>
-          <div className={`text-lg font-semibold mb-2 text-${category.color}-700`}>{category.label}</div>
-          <div className="mb-4 text-gray-700">{category.desc}</div>
+          <h1 className="text-3xl font-bold mb-2">Your Overall Score: <span className={`text-${category?.color}-600`}>{scores.overall}</span></h1>
+          <div className={`text-lg font-semibold mb-2 text-${category?.color}-700`}>{category?.label}</div>
+          <div className="mb-4 text-gray-700">{category?.desc}</div>
           <div className="flex flex-wrap gap-4 mb-4">
             <div className="bg-gray-100 rounded p-4 flex-1 min-w-[180px]">
               <div className="font-semibold text-gray-700 mb-1">Financial (SPI)</div>

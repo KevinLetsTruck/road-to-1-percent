@@ -123,7 +123,7 @@ export default function IndustryKnowledgeAssessment() {
         return
       }
       router.push('/dashboard?message=Industry%20Knowledge%20Assessment%20completed%20successfully!')
-    } catch (error) {
+    } catch {
       alert('There was an error submitting your assessment. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -219,14 +219,4 @@ export default function IndustryKnowledgeAssessment() {
                   answers[current] === undefined
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                Next
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-} 
+                }`

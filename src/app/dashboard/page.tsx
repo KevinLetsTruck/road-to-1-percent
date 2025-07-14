@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
-import { TrendingUp, Trophy, Target, Users, Calendar, Briefcase, Award, Heart, ArrowRight, Clock, AlertCircle, CheckCircle, Circle } from 'lucide-react'
+import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
@@ -158,8 +158,8 @@ export default function DashboardPage() {
             
             <p className="text-gray-600">
               {progressPercentage === 100 
-                ? "🎉 Congratulations! You've completed all assessments!" 
-                : `Keep going! You're ${Math.round(progressPercentage)}% of the way there.`
+                ? "🎉 Congratulations! You&apos;ve completed all assessments!" 
+                : `Keep going! You&apos;re ${Math.round(progressPercentage)}% of the way there.`
               }
             </p>
           </div>

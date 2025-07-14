@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, Calculator, TrendingUp, DollarSign, Home, Car, Briefcase, CreditCard, AlertCircle } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Briefcase, CreditCard, AlertCircle } from 'lucide-react'
 
 interface SPIFormData {
   cash_checking: number
@@ -139,8 +139,8 @@ export default function SPIAssessmentPage() {
       if (progressError) throw progressError
 
       router.push('/dashboard?message=SPI Assessment completed successfully!')
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      setError((error as Error).message)
     } finally {
       setSubmitting(false)
     }

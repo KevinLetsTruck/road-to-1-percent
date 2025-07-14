@@ -173,7 +173,7 @@ export default function CustomerServiceAssessment() {
         return
       }
       router.push('/dashboard?message=Customer%20Service%20Assessment%20completed%20successfully!')
-    } catch (error) {
+    } catch {
       alert('There was an error submitting your assessment. Please try again.')
     } finally {
       setIsSubmitting(false)

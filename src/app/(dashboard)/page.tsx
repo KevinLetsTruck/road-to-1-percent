@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
-import { TrendingUp } from 'lucide-react'
+import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 

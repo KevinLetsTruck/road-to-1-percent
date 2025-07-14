@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
-import { TrendingUp } from 'lucide-react'
+import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
@@ -81,7 +81,7 @@ export default function DashboardPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-8 text-white">
             <h1 className="text-3xl font-bold">Welcome to Road to 1%!</h1>
-            <p className="mt-2 text-indigo-100">You're on your journey to the 1%</p>
+            <p className="mt-2 text-indigo-100">You&apos;re on your journey to the 1%</p>
           </div>
         </div>
 

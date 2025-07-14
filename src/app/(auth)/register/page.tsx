@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { CheckCircle, ArrowRight, Mail, Lock, User, Phone } from 'lucide-react'
+import { CheckCircle, ArrowRight, Mail, Lock, Phone } from 'lucide-react'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -54,8 +54,12 @@ export default function RegisterPage() {
       
       // Show success message or redirect
       router.push('/login?message=Check your email to confirm your account')
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message)
+      } else {
+        setError('An unexpected error occurred.')
+      }
     } finally {
       setLoading(false)
     }

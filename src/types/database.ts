@@ -61,7 +61,7 @@ export interface Database {
           business_track_progress: number
           personal_track_progress: number
           health_track_progress: number
-          milestones_achieved: any[]
+          milestones_achieved: unknown[]
           program_start_date: string
           created_at: string
           updated_at: string

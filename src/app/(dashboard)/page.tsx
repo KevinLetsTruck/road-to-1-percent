@@ -1,5 +1,4 @@
 'use client'
-<div style={{background: 'red', color: 'white', padding: 10}}>DASHBOARD NO PARENTHESES</div>
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'

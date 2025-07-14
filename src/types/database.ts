@@ -43,6 +43,7 @@ export interface Database {
           user_id: string
           current_tier: UserTier
           spi_completed: boolean
+          spi_score?: number | null
           standout_completed: boolean
           standout_role_1?: string | null
           standout_role_2?: string | null
@@ -50,9 +51,13 @@ export interface Database {
           industry_knowledge_completed?: boolean | null
           industry_knowledge_score?: number | null
           leadership_completed: boolean
+          leadership_score?: number | null
           customer_service_completed: boolean
+          customer_service_score?: number | null
           operational_completed: boolean
+          operational_score?: number | null
           health_completed: boolean
+          health_score?: number | null
           business_track_progress: number
           personal_track_progress: number
           health_track_progress: number

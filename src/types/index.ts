@@ -1,5 +1,7 @@
 export * from './database'
 
+export type UserTier = 'Not Ready Yet' | 'Needs Preparation' | 'Almost Ready' | 'Ready to Launch'
+
 export interface SPIFormData {
   cashChecking: number
   savings: number

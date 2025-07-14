@@ -6,13 +6,12 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
-import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
-  const [progress, setProgress] = useState<UserProgress | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -32,7 +31,6 @@ export default function DashboardPage() {
           .select('*')
           .eq('user_id', user.id)
           .single()
-        setProgress(progressData)
       } catch {}
       setLoading(false)
     }

@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
   const [loading, setLoading] = useState(true)
   const [successMessage, setSuccessMessage] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -41,6 +42,21 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.log('No progress data found, user may be new')
+      }
+
+      // Check if user is admin
+      try {
+        const { data: userData } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+        
+        if (userData?.is_admin) {
+          setIsAdmin(true)
+        }
+      } catch (error) {
+        console.log('Error checking admin status')
       }
       
       // Check for success message in URL
@@ -104,6 +120,14 @@ export default function DashboardPage() {
               >
                 Insights
               </button>
+              {isAdmin && (
+                <button
+                  onClick={() => router.push('/admin')}
+                  className="text-[#f59e0b] hover:text-[#d97706] transition-colors font-medium"
+                >
+                  Admin
+                </button>
+              )}
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
               <button
                 onClick={handleSignOut}

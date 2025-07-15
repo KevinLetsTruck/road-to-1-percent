@@ -21,7 +21,6 @@ const standoutRoles = [
 // Based on Standout 2.0 research and entrepreneurship literature
 const roleCombinationScores: Record<string, Record<string, number>> = {
   'Pioneer': {
-    'Pioneer': 6, // Too much risk-taking, lacks balance
     'Influencer': 9, // Excellent: Innovation + persuasion
     'Stimulator': 8, // Good: Innovation + energy
     'Advisor': 7, // Good: Innovation + wisdom
@@ -34,7 +33,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
   },
   'Influencer': {
     'Pioneer': 9, // Excellent: Persuasion + innovation
-    'Influencer': 7, // Good but can be overwhelming
     'Stimulator': 8, // Good: Persuasion + energy
     'Advisor': 8, // Good: Persuasion + wisdom
     'Connector': 9, // Excellent: Persuasion + networking
@@ -47,7 +45,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
   'Stimulator': {
     'Pioneer': 8, // Good: Energy + innovation
     'Influencer': 8, // Good: Energy + persuasion
-    'Stimulator': 6, // Too much energy, lacks focus
     'Advisor': 7, // Good: Energy + wisdom
     'Connector': 8, // Good: Energy + networking
     'Provider': 6, // Moderate: Energy vs reliability
@@ -60,7 +57,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Pioneer': 7, // Good: Wisdom + innovation
     'Influencer': 8, // Good: Wisdom + persuasion
     'Stimulator': 7, // Good: Wisdom + energy
-    'Advisor': 6, // Too much analysis, lacks action
     'Connector': 8, // Good: Wisdom + networking
     'Provider': 8, // Good: Wisdom + reliability
     'Equalizer': 7, // Good: Wisdom + balance
@@ -73,7 +69,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Influencer': 9, // Excellent: Networking + persuasion
     'Stimulator': 8, // Good: Networking + energy
     'Advisor': 8, // Good: Networking + wisdom
-    'Connector': 6, // Too much networking, lacks execution
     'Provider': 7, // Good: Networking + reliability
     'Equalizer': 7, // Good: Networking + balance
     'Teacher': 8, // Good: Networking + education
@@ -86,7 +81,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Stimulator': 6, // Moderate: Reliability vs energy
     'Advisor': 8, // Good: Reliability + wisdom
     'Connector': 7, // Good: Reliability + networking
-    'Provider': 5, // Too much reliability, lacks risk-taking
     'Equalizer': 7, // Good: Reliability + balance
     'Teacher': 7, // Good: Reliability + education
     'Creator': 6, // Moderate: Reliability vs creativity
@@ -99,7 +93,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Advisor': 7, // Good: Balance + wisdom
     'Connector': 7, // Good: Balance + networking
     'Provider': 7, // Good: Balance + reliability
-    'Equalizer': 4, // Too much balance, lacks drive
     'Teacher': 7, // Good: Balance + education
     'Creator': 6, // Moderate: Balance vs creativity
     'Other': 5
@@ -112,7 +105,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Connector': 8, // Good: Education + networking
     'Provider': 7, // Good: Education + reliability
     'Equalizer': 7, // Good: Education + balance
-    'Teacher': 5, // Too much teaching, lacks execution
     'Creator': 7, // Good: Education + creation
     'Other': 6
   },
@@ -125,7 +117,6 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 6, // Moderate: Creation vs reliability
     'Equalizer': 6, // Moderate: Creation vs balance
     'Teacher': 7, // Good: Creation + education
-    'Creator': 5, // Too much creation, lacks execution
     'Other': 5
   },
   'Other': {
@@ -137,8 +128,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 5,
     'Equalizer': 5,
     'Teacher': 6,
-    'Creator': 5,
-    'Other': 4 // Generic combination, lacks specificity
+    'Creator': 5
   }
 }
 
@@ -184,6 +174,10 @@ export default function StandoutAssessment() {
     e.preventDefault()
     if (!role1 || !role2) {
       alert('Please select your top 2 Standout roles.')
+      return
+    }
+    if (role1 === role2) {
+      alert('Please select two different Standout roles.')
       return
     }
     setIsSubmitting(true)
@@ -302,9 +296,11 @@ export default function StandoutAssessment() {
                 required
               >
                 <option value="">Select your second role</option>
-                {standoutRoles.map(role => (
-                  <option key={role} value={role}>{role}</option>
-                ))}
+                {standoutRoles
+                  .filter(role => role !== role1) // Exclude the first role
+                  .map(role => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
               </select>
               {role2 && (
                 <p className="mt-2 text-sm text-gray-600">{roleDescriptions[role2]}</p>

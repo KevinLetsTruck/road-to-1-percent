@@ -47,13 +47,36 @@ export default function RegisterPage() {
             last_name: formData.lastName,
             phone: formData.phone,
           },
+          emailRedirectTo: `${window.location.origin}/login`,
         },
       })
 
       if (error) throw error
       
-      // Show success message or redirect
-      router.push('/login?message=Check your email to confirm your account')
+      // For now, let's create the profile and user progress immediately
+      // This bypasses email verification for development
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        // Create profile
+        await supabase.from('profiles').insert({
+          id: user.id,
+          email: formData.email,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone: formData.phone,
+        })
+        
+        // Create user progress record
+        await supabase.from('user_progress').insert({
+          user_id: user.id,
+        })
+        
+        // Redirect to dashboard
+        router.push('/dashboard?message=Account created successfully!')
+      } else {
+        router.push('/login?message=Account created! Please sign in.')
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message)

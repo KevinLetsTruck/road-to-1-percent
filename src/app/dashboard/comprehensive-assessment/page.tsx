@@ -988,16 +988,13 @@ export default function ComprehensiveAssessmentPage() {
   }
 
   const handleInputChange = (field: keyof ComprehensiveAssessmentData, value: number) => {
-    console.log('handleInputChange called:', field, value)
     if (value === -1) {
       // Handle calculator selections
       if (field === 'net_worth') {
-        console.log('Setting showNetWorthCalculator to true')
         setShowNetWorthCalculator(true)
         setShowSavingsCalculator(false)
         setFormData(prev => ({ ...prev, [field]: value }))
       } else if (field === 'monthly_savings') {
-        console.log('Setting showSavingsCalculator to true')
         setShowSavingsCalculator(true)
         setShowNetWorthCalculator(false)
         setFormData(prev => ({ ...prev, [field]: value }))

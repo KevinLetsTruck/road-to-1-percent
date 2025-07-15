@@ -12,6 +12,10 @@ interface ComprehensiveAssessmentData {
   // Current Situation
   current_situation: CurrentSituation
   
+  // Contextual Questions (for specific situations)
+  fleet_size: number | string // For Small Fleet
+  load_sources: string[] // For Carrier Authority and Small Fleet
+  
   // Financial Foundation (35 points)
   net_worth: number
   monthly_savings: number
@@ -362,6 +366,8 @@ export default function ComprehensiveAssessmentPage() {
   const [user, setUser] = useState<User | null>(null)
   const [formData, setFormData] = useState<ComprehensiveAssessmentData>({
     current_situation: 'Employee Driver',
+    fleet_size: 0,
+    load_sources: [],
     net_worth: 0,
     monthly_savings: 0,
     emergency_fund_months: 0,
@@ -513,6 +519,19 @@ export default function ComprehensiveAssessmentPage() {
     setFormData(prev => ({ ...prev, current_situation: situation }))
   }
 
+  const handleFleetSizeChange = (size: number) => {
+    setFormData(prev => ({ ...prev, fleet_size: size }))
+  }
+
+  const handleLoadSourceChange = (source: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      load_sources: checked 
+        ? [...prev.load_sources, source]
+        : prev.load_sources.filter(s => s !== source)
+    }))
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -593,6 +612,71 @@ export default function ComprehensiveAssessmentPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Contextual Questions Based on Situation */}
+              {(formData.current_situation === 'Small Fleet' || formData.current_situation === 'Carrier Authority') && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg">
+                  <h3 className="text-xl font-bold text-green-900 mb-3">📋 Additional Information</h3>
+                  
+                  {/* Fleet Size Question (Small Fleet only) */}
+                  {formData.current_situation === 'Small Fleet' && (
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold text-green-800 mb-3">How many trucks do you own?</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {[2, 3, 4, 5, 6, 7, 8, 9, 10, '10+'].map((size) => (
+                          <label key={size} className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                            formData.fleet_size === size 
+                              ? 'border-green-500 bg-green-100 shadow-md' 
+                              : 'border-gray-300 hover:border-green-300 hover:bg-green-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="fleet_size"
+                              value={size}
+                              checked={formData.fleet_size === size}
+                              onChange={() => handleFleetSizeChange(size as number)}
+                              className="mr-2 w-4 h-4 text-green-600"
+                            />
+                            <span className="font-medium text-gray-900">{size} {size === 1 ? 'Truck' : 'Trucks'}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Load Sources Question */}
+                  <div className="mb-4">
+                    <h4 className="text-lg font-semibold text-green-800 mb-3">Where do you get your loads? (Select all that apply)</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {[
+                        'Load Boards (DAT, Truckstop, etc.)',
+                        'Brokers',
+                        'Direct Customers',
+                        'Freight Forwarders',
+                        'Spot Market',
+                        'Contract Freight'
+                      ].map((source) => (
+                        <label key={source} className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-green-50 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.load_sources.includes(source)}
+                            onChange={(e) => handleLoadSourceChange(source, e.target.checked)}
+                            className="mr-3 w-4 h-4 text-green-600"
+                          />
+                          <span className="text-gray-900">{source}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {formData.load_sources.length > 0 && (
+                      <div className="mt-3 p-2 bg-green-100 rounded-lg">
+                        <p className="text-sm text-green-800">
+                          <strong>Selected sources:</strong> {formData.load_sources.join(', ')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />

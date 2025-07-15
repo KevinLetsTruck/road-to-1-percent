@@ -278,12 +278,12 @@ export default function AdminDashboard() {
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <div className="text-3xl font-bold text-gray-600">{stats.tierDistribution['90%']}</div>
                     <div className="text-sm text-gray-600">90% Tier</div>
-                    <div className="text-xs text-gray-500">Company Drivers</div>
+                    <div className="text-xs text-gray-500">Struggling (Drivers & O/Os)</div>
                   </div>
                   <div className="text-center p-4 bg-yellow-50 rounded-lg">
                     <div className="text-3xl font-bold text-[#f59e0b]">{stats.tierDistribution['9%']}</div>
                     <div className="text-sm text-gray-600">9% Tier</div>
-                    <div className="text-xs text-gray-500">Owner-Operators</div>
+                    <div className="text-xs text-gray-500">Building Success</div>
                   </div>
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-3xl font-bold text-[#1e3a8a]">{stats.tierDistribution['1%']}</div>

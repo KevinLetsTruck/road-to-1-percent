@@ -18,15 +18,15 @@ export default function ProgressTimeline({
   const tiers = [
     { 
       name: '90%', 
-      title: 'Company Driver', 
-      description: 'Struggling with limited income and no control',
+      title: 'Struggling', 
+      description: 'Drivers and O/Os struggling with income and control',
       color: 'bg-gray-400',
       textColor: 'text-gray-600',
       borderColor: 'border-gray-300'
     },
     { 
       name: '9%', 
-      title: 'Owner-Operator', 
+      title: 'Building Success', 
       description: 'Building business and gaining control',
       color: 'bg-[#f59e0b]',
       textColor: 'text-[#d97706]',
@@ -148,8 +148,8 @@ export default function ProgressTimeline({
             <div>
               <h3 className="font-semibold">Next Milestone</h3>
               <p className="text-yellow-100 text-sm">
-                {currentTier === '90%' && 'Complete all assessments to reach 9% tier'}
-                {currentTier === '9%' && 'Master business skills to reach 1% tier'}
+                {currentTier === '90%' && 'Complete all assessments to start building success'}
+                {currentTier === '9%' && 'Master business skills to reach elite status'}
               </p>
             </div>
             <Target className="h-8 w-8 text-yellow-100" />

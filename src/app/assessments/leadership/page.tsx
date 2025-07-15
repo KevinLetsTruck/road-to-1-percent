@@ -185,25 +185,29 @@ export default function LeadershipAssessment() {
 
       const overallScore = Math.round((totalScore / questionsAnswered) * 25) // Convert to percentage
 
-      // Save to database
-      const { error } = await supabase
-        .from('user_progress')
-        .update({
-          leadership_completed: true,
-          leadership_score: overallScore,
-          leadership_communication: categoryScores.Communication,
-          leadership_decision_making: categoryScores['Decision Making'],
-          leadership_team_management: categoryScores['Support Network Management'],
-          leadership_strategic_thinking: categoryScores['Strategic Thinking'],
-          leadership_personal_development: categoryScores['Personal Development'],
-          updated_at: new Date().toISOString()
+      // Use the generic assessment API route
+      const response = await fetch('/api/assessments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assessmentType: 'leadership',
+          score: overallScore,
+          additionalData: {
+            communication: categoryScores.Communication,
+            decision_making: categoryScores['Decision Making'],
+            team_management: categoryScores['Support Network Management'],
+            strategic_thinking: categoryScores['Strategic Thinking'],
+            personal_development: categoryScores['Personal Development']
+          }
         })
-        .eq('user_id', user.id)
-
-      if (error) {
-        console.error('Error saving assessment:', error)
-        alert('There was an error saving your assessment. Please try again.')
-        return
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Error saving assessment:', errorData)
+        throw new Error(errorData.error || 'Failed to save assessment')
       }
 
       // Redirect to dashboard with success message

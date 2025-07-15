@@ -195,7 +195,7 @@ export default function StandoutAssessment() {
       console.log('Data to save:', { role1, role2, entrepreneurialScore })
       
       // Use the generic assessment API route
-      const response = await fetch('/api/user-progress/assessment', {
+      const response = await fetch('/api/assessments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

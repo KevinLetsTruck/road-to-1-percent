@@ -110,17 +110,21 @@ export default function IndustryKnowledgeAssessment() {
         if (answers[i] === q.correct) score++
       })
       const percent = Math.round((score / questions.length) * 100)
-      const { error } = await supabase
-        .from('user_progress')
-        .update({
-          industry_knowledge_completed: true,
-          industry_knowledge_score: percent,
-          updated_at: new Date().toISOString()
+      // Use the generic assessment API route
+      const response = await fetch('/api/assessments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assessmentType: 'industry_knowledge',
+          score: percent
         })
-        .eq('user_id', user.id)
-      if (error) {
-        alert('There was an error saving your assessment. Please try again.')
-        return
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save assessment')
       }
       router.push('/dashboard?message=Industry%20Knowledge%20Assessment%20completed%20successfully!')
     } catch {

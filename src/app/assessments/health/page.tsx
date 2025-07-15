@@ -160,17 +160,21 @@ export default function HealthAssessment() {
         if (answers[i] === q.correct) score++
       })
       const percent = Math.round((score / questions.length) * 100)
-      const { error } = await supabase
-        .from('user_progress')
-        .update({
-          health_completed: true,
-          health_score: percent,
-          updated_at: new Date().toISOString()
+      // Use the generic assessment API route
+      const response = await fetch('/api/assessments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assessmentType: 'health',
+          score: percent
         })
-        .eq('user_id', user.id)
-      if (error) {
-        alert('There was an error saving your assessment. Please try again.')
-        return
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save assessment')
       }
       router.push('/dashboard?message=Health%20%26%20Wellness%20Assessment%20completed%20successfully!')
     } catch {

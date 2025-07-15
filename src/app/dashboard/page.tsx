@@ -246,6 +246,44 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Standout Assessment Section */}
+        <div className="px-4 py-6 sm:px-0">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="flex items-center mb-4">
+              <div className="text-3xl mr-3">🎯</div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Standout 2.0 Assessment</h2>
+                <p className="text-gray-600">Discover your unique strengths and how to leverage them in your trucking business</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <div className={`w-4 h-4 rounded-full mr-2 ${userProgress?.standout_completed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                  <span className="text-sm text-gray-600">
+                    {userProgress?.standout_completed ? 'Completed' : 'Not Started'}
+                  </span>
+                </div>
+                {userProgress?.standout_completed && (
+                  <div className="text-sm text-gray-600">
+                    Top Roles: {userProgress.standout_role_1} & {userProgress.standout_role_2}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => router.push('/assessments/standout')}
+                className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                  userProgress?.standout_completed 
+                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' 
+                    : 'bg-[#f59e0b] text-white hover:bg-[#d97706]'
+                }`}
+              >
+                {userProgress?.standout_completed ? 'Review Results' : 'Take Assessment'}
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   )

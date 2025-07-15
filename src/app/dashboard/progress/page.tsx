@@ -109,6 +109,15 @@ export default function ProgressPage() {
       score: progress?.support_systems_score || 0,
       path: '/dashboard/assessments/support-systems',
       icon: '🤝'
+    },
+    {
+      id: 'standout',
+      name: 'Standout 2.0',
+      description: 'Discover your unique strengths and personality roles',
+      completed: progress?.standout_completed || false,
+      score: progress?.standout_score || 0,
+      path: '/assessments/standout',
+      icon: '🎯'
     }
   ]
 
@@ -133,6 +142,9 @@ export default function ProgressPage() {
       case 'support-systems':
         maxScore = 10
         break
+      case 'standout':
+        maxScore = 10
+        break
     }
     const percentage = (score / maxScore) * 100
     if (percentage >= 80) return 'text-green-600'
@@ -151,6 +163,7 @@ export default function ProgressPage() {
       case 'risk-management':
         return 15
       case 'support-systems':
+      case 'standout':
         return 10
       default:
         return 100
@@ -271,19 +284,25 @@ export default function ProgressPage() {
                          }`}>
                            {assessment.description}
                          </p>
-                         {assessment.completed && assessment.score > 0 && (
+                         {assessment.completed && (
                            <div className="mt-1">
-                             <div className="flex items-center">
-                               <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                                 <div 
-                                   className="bg-[#f59e0b] h-2 rounded-full"
-                                   style={{ width: `${(assessment.score / getMaxScore(assessment.id)) * 100}%` }}
-                                 ></div>
+                             {assessment.id === 'standout' && progress?.standout_role_1 && progress?.standout_role_2 ? (
+                               <div className="text-xs text-green-600">
+                                 Top Roles: {progress.standout_role_1} & {progress.standout_role_2}
                                </div>
-                               <span className={`text-xs ${getScoreColor(assessment.id, assessment.score)}`}>
-                                 {assessment.score}/{getMaxScore(assessment.id)} ({getScoreLabel(assessment.id, assessment.score)})
-                               </span>
-                             </div>
+                             ) : assessment.score > 0 ? (
+                               <div className="flex items-center">
+                                 <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                   <div 
+                                     className="bg-[#f59e0b] h-2 rounded-full"
+                                     style={{ width: `${(assessment.score / getMaxScore(assessment.id)) * 100}%` }}
+                                   ></div>
+                                 </div>
+                                 <span className={`text-xs ${getScoreColor(assessment.id, assessment.score)}`}>
+                                   {assessment.score}/{getMaxScore(assessment.id)} ({getScoreLabel(assessment.id, assessment.score)})
+                                 </span>
+                               </div>
+                             ) : null}
                            </div>
                          )}
                        </div>

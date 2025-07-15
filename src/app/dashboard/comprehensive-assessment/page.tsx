@@ -670,7 +670,7 @@ export default function ComprehensiveAssessmentPage() {
                 
                 <div className="mb-6">
                   <a
-                    href="/assessments/standout"
+                    href="https://www.tmbc.com/standout-assessment/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"

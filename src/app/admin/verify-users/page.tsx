@@ -7,7 +7,6 @@ export default function VerifyUsersPage() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
 
   const handleVerifyUser = async (e: React.FormEvent) => {
     e.preventDefault()

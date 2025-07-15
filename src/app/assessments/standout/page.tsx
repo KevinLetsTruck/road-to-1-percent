@@ -57,17 +57,19 @@ export default function StandoutAssessment() {
       console.log('Attempting to save Standout assessment for user:', user.id)
       console.log('Data to save:', { role1, role2, fitScore })
       
-      // Try using a direct API call instead of Supabase client
-      const response = await fetch('/api/user-progress/standout', {
+      // Use the generic assessment API route
+      const response = await fetch('/api/user-progress/assessment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user.id,
-          role1,
-          role2,
-          fitScore
+          assessmentType: 'standout',
+          score: fitScore,
+          additionalData: {
+            role1,
+            role2
+          }
         })
       })
       

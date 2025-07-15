@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('API route called')
+    console.log('Standout API route called')
     const body = await request.json()
     console.log('Request body:', body)
     
@@ -21,36 +21,87 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     console.log('Supabase client created')
     
-    // Try to store the data in the user's profile instead
-    console.log('Attempting to update user profile with Standout data...')
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({
-        // Store Standout data in profile fields (we'll use existing fields)
-        first_name: role1, // Temporarily store role1 here
-        last_name: role2,  // Temporarily store role2 here
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId)
-    
-    console.log('Profile update result:', { data, error })
-    
-    if (error) {
-      console.error('Profile update error:', JSON.stringify(error, null, 2))
-      return NextResponse.json(
-        { error: `Profile update error: ${error.message}` },
-        { status: 500 }
-      )
+    // Check if user progress exists, create if it doesn't
+    const { data: existingProgress } = await supabase
+      .from('user_progress')
+      .select('id')
+      .eq('user_id', userId)
+      .single()
+
+    let updateData = {
+      standout_completed: true,
+      standout_role_1: role1,
+      standout_role_2: role2,
+      standout_score: fitScore,
+      updated_at: new Date().toISOString()
     }
-    
-    console.log('Success! Standout data stored in profile')
-    return NextResponse.json({ 
-      success: true, 
-      data,
-      message: 'Standout assessment completed (data stored in profile)',
-      roles: { role1, role2, fitScore },
-      note: 'Data temporarily stored in profile fields - will be moved to proper location later'
-    })
+
+    if (existingProgress) {
+      // Update existing progress
+      console.log('Updating existing user progress...')
+      const { data, error } = await supabase
+        .from('user_progress')
+        .update(updateData)
+        .eq('user_id', userId)
+        .select()
+        .single()
+      
+      if (error) {
+        console.error('Update error:', error)
+        return NextResponse.json(
+          { error: `Update error: ${error.message}` },
+          { status: 500 }
+        )
+      }
+      
+      console.log('Success! Standout data updated in user_progress')
+      return NextResponse.json({ 
+        success: true, 
+        data,
+        message: 'Standout assessment completed successfully'
+      })
+    } else {
+      // Create new progress record
+      console.log('Creating new user progress record...')
+      const { data, error } = await supabase
+        .from('user_progress')
+        .insert({
+          user_id: userId,
+          current_tier: '90%',
+          spi_completed: false,
+          standout_completed: true,
+          standout_role_1: role1,
+          standout_role_2: role2,
+          standout_score: fitScore,
+          leadership_completed: false,
+          customer_service_completed: false,
+          operational_completed: false,
+          health_completed: false,
+          business_track_progress: 0,
+          personal_track_progress: 0,
+          health_track_progress: 0,
+          milestones_achieved: [],
+          program_start_date: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Insert error:', error)
+        return NextResponse.json(
+          { error: `Insert error: ${error.message}` },
+          { status: 500 }
+        )
+      }
+      
+      console.log('Success! New user progress created with Standout data')
+      return NextResponse.json({ 
+        success: true, 
+        data,
+        message: 'Standout assessment completed successfully'
+      })
+    }
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json(

@@ -123,7 +123,7 @@ export default function SPIAssessmentPage() {
       const financialScore = calculateSPIScore(formData)
       const category = financialScore >= 28 ? 'Excellent' : financialScore >= 21 ? 'Good' : financialScore >= 14 ? 'Fair' : 'Needs Improvement'
 
-      // Save assessment data
+      // Save assessment data to spi_assessments table
       const { error: assessmentError } = await supabase
         .from('spi_assessments')
         .insert({
@@ -136,19 +136,22 @@ export default function SPIAssessmentPage() {
 
       if (assessmentError) throw assessmentError
 
-      // Update user progress
-      const { error: progressError } = await supabase
-        .from('user_progress')
-        .upsert({ 
-          user_id: user.id,
-          financial_foundation_completed: true,
-          financial_foundation_score: financialScore,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
+      // Update user progress using API route
+      const response = await fetch('/api/user-progress/assessment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assessmentType: 'financial_foundation',
+          score: financialScore
         })
+      })
 
-      if (progressError) throw progressError
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update progress')
+      }
 
       router.push('/dashboard?message=Financial Foundation Assessment completed successfully!')
     } catch (error: unknown) {

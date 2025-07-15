@@ -8,6 +8,7 @@ import { Database } from '@/types/database'
 import { TrendingUp, ArrowRight, CheckCircle, Award, Target, BarChart3 } from 'lucide-react'
 import ShieldLogo from '@/components/ui/ShieldLogo'
 import GradientShield from '@/components/ui/GradientShield'
+import SPIProgressChart from '@/components/charts/SPIProgressChart'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
@@ -249,109 +250,116 @@ export default function ProgressPage() {
               ></div>
             </div>
           </div>
-        </div>
 
-        {/* Assessment List */}
-        <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Assessment Progress</h2>
-            <div className="space-y-4">
-              {assessments.map((assessment) => (
-                <div 
-                  key={assessment.id}
-                  className={`border rounded-lg p-4 transition-all duration-200 ${
-                    assessment.completed 
-                      ? 'border-green-200 bg-green-50' 
-                      : 'border-gray-200 hover:border-[#1e3a8a] hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                                         <div className="flex items-center">
-                       <div className="text-2xl mr-3">{assessment.icon}</div>
-                       {assessment.completed ? (
-                         <CheckCircle className="h-6 w-6 text-green-600 mr-3" />
-                       ) : (
-                         <div className="h-6 w-6 rounded-full border-2 border-gray-300 mr-3"></div>
-                       )}
-                       <div>
-                         <h3 className={`font-semibold ${
-                           assessment.completed ? 'text-green-800' : 'text-gray-900'
-                         }`}>
-                           {assessment.name}
-                         </h3>
-                         <p className={`text-sm ${
-                           assessment.completed ? 'text-green-600' : 'text-gray-600'
-                         }`}>
-                           {assessment.description}
-                         </p>
-                         {assessment.completed && (
-                           <div className="mt-1">
-                             {assessment.id === 'standout' && progress?.standout_role_1 && progress?.standout_role_2 ? (
-                               <div className="text-xs text-green-600">
-                                 Top Roles: {progress.standout_role_1} & {progress.standout_role_2}
-                               </div>
-                             ) : assessment.score > 0 ? (
-                               <div className="flex items-center">
-                                 <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                                   <div 
-                                     className="bg-[#f59e0b] h-2 rounded-full"
-                                     style={{ width: `${(assessment.score / getMaxScore(assessment.id)) * 100}%` }}
-                                   ></div>
-                                 </div>
-                                 <span className={`text-xs ${getScoreColor(assessment.id, assessment.score)}`}>
-                                   {assessment.score}/{getMaxScore(assessment.id)} ({getScoreLabel(assessment.id, assessment.score)})
-                                 </span>
-                               </div>
-                             ) : null}
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                     <div className="flex items-center">
-                       {assessment.completed ? (
-                         <div className="text-right">
-                           <span className="text-green-600 font-medium">Completed</span>
-                           {assessment.score > 0 && (
-                             <div className={`text-sm ${getScoreColor(assessment.id, assessment.score)}`}>
-                               Score: {assessment.score}/{getMaxScore(assessment.id)}
-                             </div>
-                           )}
-                         </div>
-                       ) : (
-                         <button
-                           onClick={() => router.push(assessment.path)}
-                           className="bg-[#1e3a8a] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1e40af] transition-colors flex items-center"
-                         >
-                           Start
-                           <ArrowRight className="h-4 w-4 ml-1" />
-                         </button>
-                       )}
-                     </div>
-                  </div>
-                </div>
-              ))}
+          {/* SPI Progress Chart */}
+          {user && (
+            <div className="mb-8">
+              <SPIProgressChart userId={user.id} />
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Next Steps */}
-        {completedAssessments > 0 && (
+          {/* Assessment List */}
           <div className="px-4 py-6 sm:px-0">
-            <div className="bg-gradient-to-r from-[#f59e0b] to-[#d97706] rounded-lg shadow-lg p-6 text-white">
-              <div className="flex items-center mb-4">
-                <Award className="h-8 w-8 mr-3" />
-                <h2 className="text-xl font-bold">Next Steps</h2>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Assessment Progress</h2>
+              <div className="space-y-4">
+                {assessments.map((assessment) => (
+                  <div 
+                    key={assessment.id}
+                    className={`border rounded-lg p-4 transition-all duration-200 ${
+                      assessment.completed 
+                        ? 'border-green-200 bg-green-50' 
+                        : 'border-gray-200 hover:border-[#1e3a8a] hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-3">{assessment.icon}</div>
+                        {assessment.completed ? (
+                          <CheckCircle className="h-6 w-6 text-green-600 mr-3" />
+                        ) : (
+                          <div className="h-6 w-6 rounded-full border-2 border-gray-300 mr-3"></div>
+                        )}
+                        <div>
+                          <h3 className={`font-semibold ${
+                            assessment.completed ? 'text-green-800' : 'text-gray-900'
+                          }`}>
+                            {assessment.name}
+                          </h3>
+                          <p className={`text-sm ${
+                            assessment.completed ? 'text-green-600' : 'text-gray-600'
+                          }`}>
+                            {assessment.description}
+                          </p>
+                          {assessment.completed && (
+                            <div className="mt-1">
+                              {assessment.id === 'standout' && progress?.standout_role_1 && progress?.standout_role_2 ? (
+                                <div className="text-xs text-green-600">
+                                  Top Roles: {progress.standout_role_1} & {progress.standout_role_2}
+                                </div>
+                              ) : assessment.score > 0 ? (
+                                <div className="flex items-center">
+                                  <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div 
+                                      className="bg-[#f59e0b] h-2 rounded-full"
+                                      style={{ width: `${(assessment.score / getMaxScore(assessment.id)) * 100}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className={`text-xs ${getScoreColor(assessment.id, assessment.score)}`}>
+                                    {assessment.score}/{getMaxScore(assessment.id)} ({getScoreLabel(assessment.id, assessment.score)})
+                                  </span>
+                                </div>
+                              ) : null}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        {assessment.completed ? (
+                          <div className="text-right">
+                            <span className="text-green-600 font-medium">Completed</span>
+                            {assessment.score > 0 && (
+                              <div className={`text-sm ${getScoreColor(assessment.id, assessment.score)}`}>
+                                Score: {assessment.score}/{getMaxScore(assessment.id)}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => router.push(assessment.path)}
+                            className="bg-[#1e3a8a] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1e40af] transition-colors flex items-center"
+                          >
+                            Start
+                            <ArrowRight className="h-4 w-4 ml-1" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <p className="mb-4">Great progress! Keep moving forward to reach the 1%.</p>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="bg-white text-[#f59e0b] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Back to Dashboard
-              </button>
             </div>
           </div>
-        )}
+
+          {/* Next Steps */}
+          {completedAssessments > 0 && (
+            <div className="px-4 py-6 sm:px-0">
+              <div className="bg-gradient-to-r from-[#f59e0b] to-[#d97706] rounded-lg shadow-lg p-6 text-white">
+                <div className="flex items-center mb-4">
+                  <Award className="h-8 w-8 mr-3" />
+                  <h2 className="text-xl font-bold">Next Steps</h2>
+                </div>
+                <p className="mb-4">Great progress! Keep moving forward to reach the 1%.</p>
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="bg-white text-[#f59e0b] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  Back to Dashboard
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   )

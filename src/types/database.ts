@@ -60,6 +60,7 @@ export interface Database {
           // Legacy fields (keeping for backward compatibility)
           spi_completed: boolean
           spi_score?: number | null
+          strength_combination?: string | null
           standout_completed: boolean
           standout_role_1?: string | null
           standout_role_2?: string | null
@@ -106,6 +107,41 @@ export interface Database {
           emergency_fund_months: number
           overall_spi_score: number
           category: string | null
+          assessment_date: string
+          created_at: string
+        }
+      }
+      comprehensive_assessments: {
+        Row: {
+          id: string
+          user_id: string
+          net_worth: number
+          monthly_savings: number
+          emergency_fund_months: number
+          debt_to_income_ratio: number
+          business_capital: number
+          credit_score: number
+          rate_understanding: number
+          cost_analysis: number
+          customer_knowledge: number
+          industry_trends: number
+          strategic_planning: number
+          pioneer_strength: number
+          creator_strength: number
+          innovator_strength: number
+          connector_strength: number
+          advisor_strength: number
+          contingency_planning: number
+          insurance_optimization: number
+          business_continuity: number
+          risk_assessment: number
+          family_alignment: number
+          professional_network: number
+          mentorship: number
+          industry_reputation: number
+          total_spi_score: number
+          tier: string
+          strength_combination: string
           assessment_date: string
           created_at: string
         }

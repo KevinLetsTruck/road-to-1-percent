@@ -21,40 +21,23 @@ export default function DashboardPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  // Simple test to ensure console logging works
-  console.log('🎯 Dashboard component rendered, user:', user?.email, 'authLoading:', authLoading)
-
-  // Separate effect for admin check
+  // Check admin status
   useEffect(() => {
     if (!user || authLoading) return
 
-    console.log('🔍 Starting admin check for user:', user.id)
-    
     const checkAdminStatus = async () => {
       try {
-        console.log('=== ADMIN DEBUG START ===')
-        console.log('Checking admin status for user:', user.id)
-        
-        const { data: userData, error } = await supabase
+        const { data: userData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single()
         
-        console.log('Full user data:', userData)
-        console.log('Admin check result:', userData?.is_admin)
-        console.log('Error if any:', error)
-        
         if (userData?.is_admin === true) {
-          console.log('✅ User is admin, setting isAdmin to true')
           setIsAdmin(true)
-        } else {
-          console.log('❌ User is not admin, isAdmin remains false')
-          console.log('is_admin value:', userData?.is_admin, 'type:', typeof userData?.is_admin)
         }
-        console.log('=== ADMIN DEBUG END ===')
       } catch (error) {
-        console.log('🚨 Error checking admin status:', error)
+        console.error('Error checking admin status:', error)
       }
     }
 
@@ -154,10 +137,6 @@ export default function DashboardPage() {
                 </button>
               )}
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
-              {/* Temporary debug info */}
-              <span className="text-xs text-gray-500 bg-yellow-100 px-2 py-1 rounded">
-                Admin: {isAdmin ? 'Yes' : 'No'} | User ID: {user.id.slice(0, 8)}...
-              </span>
               <button
                 onClick={handleSignOut}
                 className="bg-[#f59e0b] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#d97706] transition-colors"

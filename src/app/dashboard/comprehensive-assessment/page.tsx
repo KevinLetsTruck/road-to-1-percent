@@ -101,7 +101,69 @@ export default function ComprehensiveAssessmentPage() {
       retirement_savings: { 'None': 0, 'Some': 3, 'Well-funded': 5 }
     }
 
+    // Market Intelligence (20 points)
+    const marketScores = {
+      industry_trends: { 'Not aware': 0, 'Somewhat aware': 2, 'Very aware': 5 },
+      competitor_analysis: { 'None': 0, 'Basic': 2, 'Comprehensive': 5 },
+      market_research: { 'None': 0, 'Occasional': 2, 'Regular': 5 },
+      networking: { 'Minimal': 0, 'Moderate': 2, 'Extensive': 5 }
+    }
+
+    // Personal Strengths (20 points)
+    const strengthScores = {
+      leadership_skills: { 'Beginner': 1, 'Intermediate': 3, 'Advanced': 5 },
+      communication: { 'Basic': 1, 'Good': 3, 'Excellent': 5 },
+      problem_solving: { 'Reactive': 1, 'Proactive': 3, 'Strategic': 5 },
+      adaptability: { 'Low': 1, 'Moderate': 3, 'High': 5 }
+    }
+
+    // Risk Management (15 points)
+    const riskScores = {
+      risk_assessment: { 'None': 0, 'Basic': 2, 'Comprehensive': 5 },
+      contingency_planning: { 'None': 0, 'Some': 2, 'Extensive': 5 },
+      legal_compliance: { 'Minimal': 0, 'Good': 2, 'Excellent': 5 }
+    }
+
+    // Support Systems (10 points)
+    const supportScores = {
+      mentorship: { 'None': 0, 'Informal': 2, 'Formal': 5 },
+      professional_network: { 'Small': 0, 'Moderate': 2, 'Large': 5 }
+    }
+
+    // Calculate scores for each dimension
     Object.entries(financialScores).forEach(([field, scores]) => {
+      const value = formData[field as keyof typeof formData]
+      if (value && scores[value as keyof typeof scores]) {
+        totalScore += scores[value as keyof typeof scores]
+      }
+      maxScore += Math.max(...Object.values(scores))
+    })
+
+    Object.entries(marketScores).forEach(([field, scores]) => {
+      const value = formData[field as keyof typeof formData]
+      if (value && scores[value as keyof typeof scores]) {
+        totalScore += scores[value as keyof typeof scores]
+      }
+      maxScore += Math.max(...Object.values(scores))
+    })
+
+    Object.entries(strengthScores).forEach(([field, scores]) => {
+      const value = formData[field as keyof typeof formData]
+      if (value && scores[value as keyof typeof scores]) {
+        totalScore += scores[value as keyof typeof scores]
+      }
+      maxScore += Math.max(...Object.values(scores))
+    })
+
+    Object.entries(riskScores).forEach(([field, scores]) => {
+      const value = formData[field as keyof typeof formData]
+      if (value && scores[value as keyof typeof scores]) {
+        totalScore += scores[value as keyof typeof scores]
+      }
+      maxScore += Math.max(...Object.values(scores))
+    })
+
+    Object.entries(supportScores).forEach(([field, scores]) => {
       const value = formData[field as keyof typeof formData]
       if (value && scores[value as keyof typeof scores]) {
         totalScore += scores[value as keyof typeof scores]
@@ -266,6 +328,304 @@ export default function ComprehensiveAssessmentPage() {
                       <option value="<30%">Less than 30%</option>
                       <option value="30-50%">30-50%</option>
                       <option value=">50%">More than 50%</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      What is your credit score range?
+                    </label>
+                    <select
+                      value={formData.credit_score}
+                      onChange={(e) => handleInputChange('credit_score', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="300-579">300-579 (Poor)</option>
+                      <option value="580-669">580-669 (Fair)</option>
+                      <option value="670-739">670-739 (Good)</option>
+                      <option value="740-799">740-799 (Very Good)</option>
+                      <option value="800-850">800-850 (Excellent)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      What type of insurance coverage do you have?
+                    </label>
+                    <select
+                      value={formData.insurance_coverage}
+                      onChange={(e) => handleInputChange('insurance_coverage', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">None</option>
+                      <option value="Basic">Basic coverage</option>
+                      <option value="Comprehensive">Comprehensive coverage</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How would you describe your retirement savings?
+                    </label>
+                    <select
+                      value={formData.retirement_savings}
+                      onChange={(e) => handleInputChange('retirement_savings', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">None</option>
+                      <option value="Some">Some savings</option>
+                      <option value="Well-funded">Well-funded</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Market Intelligence Section */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                  <Brain className="w-5 h-5 mr-2 text-blue-600" />
+                  Market Intelligence (20 points)
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How aware are you of industry trends in trucking?
+                    </label>
+                    <select
+                      value={formData.industry_trends}
+                      onChange={(e) => handleInputChange('industry_trends', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Not aware">Not aware</option>
+                      <option value="Somewhat aware">Somewhat aware</option>
+                      <option value="Very aware">Very aware</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How do you analyze your competitors?
+                    </label>
+                    <select
+                      value={formData.competitor_analysis}
+                      onChange={(e) => handleInputChange('competitor_analysis', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">No analysis</option>
+                      <option value="Basic">Basic analysis</option>
+                      <option value="Comprehensive">Comprehensive analysis</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How often do you conduct market research?
+                    </label>
+                    <select
+                      value={formData.market_research}
+                      onChange={(e) => handleInputChange('market_research', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">Never</option>
+                      <option value="Occasional">Occasionally</option>
+                      <option value="Regular">Regularly</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How extensive is your professional networking?
+                    </label>
+                    <select
+                      value={formData.networking}
+                      onChange={(e) => handleInputChange('networking', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Minimal">Minimal</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="Extensive">Extensive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Personal Strengths Section */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                  <Target className="w-5 h-5 mr-2 text-purple-600" />
+                  Personal Strengths (20 points)
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How would you rate your leadership skills?
+                    </label>
+                    <select
+                      value={formData.leadership_skills}
+                      onChange={(e) => handleInputChange('leadership_skills', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How would you rate your communication skills?
+                    </label>
+                    <select
+                      value={formData.communication}
+                      onChange={(e) => handleInputChange('communication', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Basic">Basic</option>
+                      <option value="Good">Good</option>
+                      <option value="Excellent">Excellent</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How do you approach problem-solving?
+                    </label>
+                    <select
+                      value={formData.problem_solving}
+                      onChange={(e) => handleInputChange('problem_solving', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Reactive">Reactive</option>
+                      <option value="Proactive">Proactive</option>
+                      <option value="Strategic">Strategic</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How adaptable are you to change?
+                    </label>
+                    <select
+                      value={formData.adaptability}
+                      onChange={(e) => handleInputChange('adaptability', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Low">Low</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Risk Management Section */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                  <Shield className="w-5 h-5 mr-2 text-red-600" />
+                  Risk Management (15 points)
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How comprehensive is your risk assessment process?
+                    </label>
+                    <select
+                      value={formData.risk_assessment}
+                      onChange={(e) => handleInputChange('risk_assessment', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">None</option>
+                      <option value="Basic">Basic</option>
+                      <option value="Comprehensive">Comprehensive</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How extensive is your contingency planning?
+                    </label>
+                    <select
+                      value={formData.contingency_planning}
+                      onChange={(e) => handleInputChange('contingency_planning', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">None</option>
+                      <option value="Some">Some planning</option>
+                      <option value="Extensive">Extensive planning</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How would you rate your legal compliance knowledge?
+                    </label>
+                    <select
+                      value={formData.legal_compliance}
+                      onChange={(e) => handleInputChange('legal_compliance', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Minimal">Minimal</option>
+                      <option value="Good">Good</option>
+                      <option value="Excellent">Excellent</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Support Systems Section */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-orange-600" />
+                  Support Systems (10 points)
+                </h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Do you have a mentor or advisor?
+                    </label>
+                    <select
+                      value={formData.mentorship}
+                      onChange={(e) => handleInputChange('mentorship', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="None">No mentor</option>
+                      <option value="Informal">Informal mentor</option>
+                      <option value="Formal">Formal mentor</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      How large is your professional network?
+                    </label>
+                    <select
+                      value={formData.professional_network}
+                      onChange={(e) => handleInputChange('professional_network', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="Small">Small (0-10 contacts)</option>
+                      <option value="Moderate">Moderate (11-50 contacts)</option>
+                      <option value="Large">Large (50+ contacts)</option>
                     </select>
                   </div>
                 </div>

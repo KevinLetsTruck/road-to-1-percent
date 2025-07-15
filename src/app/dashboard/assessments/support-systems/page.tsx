@@ -12,21 +12,41 @@ interface Question {
 }
 
 const supportSystemsQuestions: Question[] = [
-  // Customer Service
+  // Family & Spousal Support
   {
     id: 1,
+    category: 'Family & Spousal Support',
+    question: 'How involved is your spouse/family in understanding and supporting your trucking business?',
+    options: ['Not very involved', 'Somewhat involved', 'Actively involved and supportive', 'Fully engaged partner in the business']
+  },
+  {
+    id: 2,
+    category: 'Family & Spousal Support',
+    question: 'How do you communicate with your family about business decisions and financial matters?',
+    options: ['Keep business separate from family', 'Share basic information when needed', 'Regular family discussions about business', 'Full transparency and family involvement in decisions']
+  },
+  {
+    id: 3,
+    category: 'Family & Spousal Support',
+    question: 'How does your family support your business goals and growth plans?',
+    options: ['Family has concerns about business risks', 'Family is neutral about business decisions', 'Family is supportive of business goals', 'Family actively participates in business planning']
+  },
+
+  // Customer Service
+  {
+    id: 4,
     category: 'Customer Service',
     question: 'How do you handle customer complaints and service issues?',
     options: ['React when problems arise', 'Address issues promptly', 'Proactively prevent problems', 'Exceed expectations and delight customers']
   },
   {
-    id: 2,
+    id: 5,
     category: 'Customer Service',
     question: 'How do you communicate with customers about their shipments and deliveries?',
     options: ['Minimal communication', 'Basic updates when needed', 'Regular proactive communication', 'Comprehensive communication and transparency']
   },
   {
-    id: 3,
+    id: 6,
     category: 'Customer Service',
     question: 'How do you build and maintain relationships with your customers?',
     options: ['Focus on transactions', 'Provide good service', 'Build trust and rapport', 'Create long-term partnerships']
@@ -34,19 +54,19 @@ const supportSystemsQuestions: Question[] = [
 
   // Networking & Relationships
   {
-    id: 4,
+    id: 7,
     category: 'Networking & Relationships',
     question: 'How do you build relationships with other trucking professionals and industry contacts?',
     options: ['Work independently', 'Basic networking when needed', 'Regular networking and relationship building', 'Active industry leader and connector']
   },
   {
-    id: 5,
+    id: 8,
     category: 'Networking & Relationships',
     question: 'How do you leverage your network for business opportunities and support?',
     options: ['Rarely use network', 'Sometimes ask for help', 'Regularly tap into network', 'Actively create opportunities through network']
   },
   {
-    id: 6,
+    id: 9,
     category: 'Networking & Relationships',
     question: 'How do you give back to your network and support other professionals?',
     options: ['Focus on my own business', 'Help when asked', 'Regularly support others', 'Actively mentor and support community']
@@ -54,19 +74,19 @@ const supportSystemsQuestions: Question[] = [
 
   // Vendor & Partner Relationships
   {
-    id: 7,
+    id: 10,
     category: 'Vendor & Partner Relationships',
     question: 'How do you manage relationships with vendors, suppliers, and service providers?',
     options: ['Basic transactional relationships', 'Maintain good working relationships', 'Build strategic partnerships', 'Create collaborative business relationships']
   },
   {
-    id: 8,
+    id: 11,
     category: 'Vendor & Partner Relationships',
     question: 'How do you negotiate and work with brokers and dispatchers?',
     options: ['Accept what\'s offered', 'Basic negotiation', 'Strategic negotiation and relationship building', 'Create win-win partnerships']
   },
   {
-    id: 9,
+    id: 12,
     category: 'Vendor & Partner Relationships',
     question: 'How do you handle conflicts or disagreements with business partners?',
     options: ['Avoid conflicts', 'Address issues when necessary', 'Proactively resolve conflicts', 'Use conflicts to strengthen relationships']
@@ -74,42 +94,22 @@ const supportSystemsQuestions: Question[] = [
 
   // Support Infrastructure
   {
-    id: 10,
+    id: 13,
     category: 'Support Infrastructure',
     question: 'How do you ensure you have reliable backup and support systems in place?',
     options: ['Handle problems as they come', 'Have basic backup plans', 'Maintain comprehensive support systems', 'Build robust infrastructure and contingency plans']
   },
   {
-    id: 11,
+    id: 14,
     category: 'Support Infrastructure',
     question: 'How do you manage communication and coordination with your support team?',
     options: ['Minimal coordination needed', 'Basic communication systems', 'Regular coordination and updates', 'Advanced communication and collaboration systems']
   },
   {
-    id: 12,
+    id: 15,
     category: 'Support Infrastructure',
     question: 'How do you ensure quality control and consistency in your service delivery?',
     options: ['Basic quality standards', 'Regular quality checks', 'Comprehensive quality management', 'Continuous improvement and excellence']
-  },
-
-  // Community & Industry Involvement
-  {
-    id: 13,
-    category: 'Community & Industry Involvement',
-    question: 'How involved are you in trucking industry associations and groups?',
-    options: ['Not involved', 'Basic membership', 'Active participation', 'Leadership and advocacy']
-  },
-  {
-    id: 14,
-    category: 'Community & Industry Involvement',
-    question: 'How do you contribute to the trucking community and industry?',
-    options: ['Focus on my own business', 'Support when asked', 'Regular community involvement', 'Active leadership and contribution']
-  },
-  {
-    id: 15,
-    category: 'Community & Industry Involvement',
-    question: 'How do you stay connected with industry trends and best practices?',
-    options: ['Basic awareness', 'Some industry engagement', 'Regular learning and networking', 'Active industry leadership and innovation']
   }
 ]
 
@@ -157,11 +157,11 @@ export default function SupportSystemsAssessment() {
 
       // Calculate scores by category
       const categoryScores: { [key: string]: number } = {
+        'Family & Spousal Support': 0,
         'Customer Service': 0,
         'Networking & Relationships': 0,
         'Vendor & Partner Relationships': 0,
-        'Support Infrastructure': 0,
-        'Community & Industry Involvement': 0
+        'Support Infrastructure': 0
       }
 
       let totalScore = 0
@@ -234,7 +234,7 @@ export default function SupportSystemsAssessment() {
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Support Systems Assessment</h1>
               <p className="text-gray-600">
-                This assessment evaluates your customer service approach, networking abilities, relationship management, support infrastructure, and community involvement. Strong support systems are essential for sustainable business growth and success.
+                This assessment evaluates your family and spousal support, customer service approach, networking abilities, relationship management, and support infrastructure. Strong support systems, especially family involvement, are crucial for sustainable business growth and success.
               </p>
             </div>
 

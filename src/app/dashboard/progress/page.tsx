@@ -104,7 +104,7 @@ export default function ProgressPage() {
     {
       id: 'support-systems',
       name: 'Support Systems',
-      description: 'Customer Service, Networking & Support Infrastructure',
+      description: 'Family Support, Customer Service & Networking',
       completed: progress?.support_systems_completed || false,
       score: progress?.support_systems_score || 0,
       path: '/dashboard/assessments/support-systems',

@@ -136,7 +136,7 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
       { value: 3, label: 'I analyze benefits, hours, and work conditions', description: 'Strategic thinking' },
       { value: 4, label: 'I evaluate career growth and long-term opportunities', description: 'Career intelligence' }
     ] : [
-      { value: 0, label: 'I accept whatever dispatch offers', description: 'Employee thinking' },
+      { value: 0, label: 'I accept whatever rate is offered', description: 'No evaluation' },
       { value: 1, label: 'I look at total pay for the run', description: 'Basic awareness' },
       { value: 2, label: 'I compare rate per mile to my costs', description: 'Cost-conscious' },
       { value: 3, label: 'I analyze deadhead, loading time, fuel costs', description: 'Strategic thinking' },
@@ -653,7 +653,6 @@ export default function ComprehensiveAssessmentPage() {
                         'Brokers',
                         'Direct Customers',
                         'Freight Forwarders',
-                        'Spot Market',
                         'Contract Freight'
                       ].map((source) => (
                         <label key={source} className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-green-50 cursor-pointer">

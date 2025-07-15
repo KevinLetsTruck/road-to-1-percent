@@ -177,13 +177,13 @@ export default function PersonalStrengthsAssessment() {
         }
       })
 
-      // Calculate average scores
+      // Calculate average scores (20% of total SPI)
       const questionsPerCategory = 3
       Object.keys(categoryScores).forEach(category => {
-        categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 25) // Convert to percentage
+        categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 4) // 4 points per category (20% total)
       })
 
-      const overallScore = Math.round((totalScore / questionsAnswered) * 25) // Convert to percentage
+      const overallScore = Math.round((totalScore / questionsAnswered) * 4) // Convert to percentage of 20%
 
       // Save to database
       const { error } = await supabase

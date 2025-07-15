@@ -177,13 +177,13 @@ export default function RiskManagementAssessment() {
         }
       })
 
-      // Calculate average scores
+      // Calculate average scores (15% of total SPI)
       const questionsPerCategory = 3
       Object.keys(categoryScores).forEach(category => {
-        categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 25) // Convert to percentage
+        categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 3) // 3 points per category (15% total)
       })
 
-      const overallScore = Math.round((totalScore / questionsAnswered) * 25) // Convert to percentage
+      const overallScore = Math.round((totalScore / questionsAnswered) * 3) // Convert to percentage of 15%
 
       // Save to database
       const { error } = await supabase

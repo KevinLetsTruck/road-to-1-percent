@@ -177,13 +177,13 @@ export default function SupportSystemsAssessment() {
         }
       })
 
-      // Calculate average scores
+      // Calculate average scores (10% of total SPI)
       const questionsPerCategory = 3
       Object.keys(categoryScores).forEach(category => {
-        categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 25) // Convert to percentage
+        categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 2) // 2 points per category (10% total)
       })
 
-      const overallScore = Math.round((totalScore / questionsAnswered) * 25) // Convert to percentage
+      const overallScore = Math.round((totalScore / questionsAnswered) * 2) // Convert to percentage of 10%
 
       // Save to database
       const { error } = await supabase

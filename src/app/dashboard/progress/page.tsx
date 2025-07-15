@@ -116,6 +116,56 @@ export default function ProgressPage() {
   const totalAssessments = assessments.length
   const progressPercentage = Math.round((completedAssessments / totalAssessments) * 100)
 
+  // Scoring ranges for each assessment type
+  const getScoreColor = (assessmentId: string, score: number) => {
+    let maxScore = 100
+    switch (assessmentId) {
+      case 'financial-foundation':
+        maxScore = 35
+        break
+      case 'market-intelligence':
+      case 'personal-strengths':
+        maxScore = 20
+        break
+      case 'risk-management':
+        maxScore = 15
+        break
+      case 'support-systems':
+        maxScore = 10
+        break
+    }
+    const percentage = (score / maxScore) * 100
+    if (percentage >= 80) return 'text-green-600'
+    if (percentage >= 60) return 'text-yellow-600'
+    if (percentage >= 40) return 'text-orange-600'
+    return 'text-red-600'
+  }
+
+  const getMaxScore = (assessmentId: string) => {
+    switch (assessmentId) {
+      case 'financial-foundation':
+        return 35
+      case 'market-intelligence':
+      case 'personal-strengths':
+        return 20
+      case 'risk-management':
+        return 15
+      case 'support-systems':
+        return 10
+      default:
+        return 100
+    }
+  }
+
+  const getScoreLabel = (assessmentId: string, score: number) => {
+    const maxScore = getMaxScore(assessmentId)
+    const percentage = (score / maxScore) * 100
+    if (percentage >= 80) return 'Excellent'
+    if (percentage >= 60) return 'Good'
+    if (percentage >= 40) return 'Fair'
+    return 'Needs Improvement'
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-lg border-b border-gray-200">
@@ -227,10 +277,12 @@ export default function ProgressPage() {
                                <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                                  <div 
                                    className="bg-[#f59e0b] h-2 rounded-full"
-                                   style={{ width: `${assessment.score}%` }}
+                                   style={{ width: `${(assessment.score / getMaxScore(assessment.id)) * 100}%` }}
                                  ></div>
                                </div>
-                               <span className="text-xs text-gray-600">{assessment.score}%</span>
+                               <span className={`text-xs ${getScoreColor(assessment.id, assessment.score)}`}>
+                                 {assessment.score}/{getMaxScore(assessment.id)} ({getScoreLabel(assessment.id, assessment.score)})
+                               </span>
                              </div>
                            </div>
                          )}
@@ -241,7 +293,9 @@ export default function ProgressPage() {
                          <div className="text-right">
                            <span className="text-green-600 font-medium">Completed</span>
                            {assessment.score > 0 && (
-                             <div className="text-sm text-gray-600">Score: {assessment.score}%</div>
+                             <div className={`text-sm ${getScoreColor(assessment.id, assessment.score)}`}>
+                               Score: {assessment.score}/{getMaxScore(assessment.id)}
+                             </div>
                            )}
                          </div>
                        ) : (

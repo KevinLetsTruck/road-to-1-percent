@@ -77,33 +77,39 @@ export default function SPIAssessmentPage() {
     const monthlySavings = data.monthly_income - data.monthly_expenses
     const emergencyFund = data.monthly_expenses * data.emergency_fund_months
     
-    // Simple SPI calculation (you can make this more sophisticated)
-    let spiScore = 0
+    // Financial Foundation scoring based on Tom Peterson's SPI system (35% of total SPI)
+    let financialScore = 0
     
-    // Net worth component (40% weight)
-    if (netWorth > 0) spiScore += 40
-    else if (netWorth > -50000) spiScore += 20
-    else spiScore += 0
+    // Net worth component (40% of Financial Foundation score)
+    if (netWorth > 50000) financialScore += 14
+    else if (netWorth > 10000) financialScore += 12
+    else if (netWorth > 0) financialScore += 10
+    else if (netWorth > -10000) financialScore += 6
+    else if (netWorth > -25000) financialScore += 3
+    else financialScore += 0
     
-    // Monthly savings component (30% weight)
-    if (monthlySavings > 1000) spiScore += 30
-    else if (monthlySavings > 500) spiScore += 20
-    else if (monthlySavings > 0) spiScore += 10
-    else spiScore += 0
+    // Monthly savings component (30% of Financial Foundation score)
+    if (monthlySavings > 2000) financialScore += 10.5
+    else if (monthlySavings > 1000) financialScore += 9
+    else if (monthlySavings > 500) financialScore += 7
+    else if (monthlySavings > 0) financialScore += 4
+    else financialScore += 0
     
-    // Emergency fund component (20% weight)
-    if (emergencyFund >= data.monthly_expenses * 6) spiScore += 20
-    else if (emergencyFund >= data.monthly_expenses * 3) spiScore += 15
-    else if (emergencyFund >= data.monthly_expenses) spiScore += 10
-    else spiScore += 0
+    // Emergency fund component (20% of Financial Foundation score)
+    if (emergencyFund >= data.monthly_expenses * 6) financialScore += 7
+    else if (emergencyFund >= data.monthly_expenses * 3) financialScore += 5
+    else if (emergencyFund >= data.monthly_expenses) financialScore += 3
+    else financialScore += 0
     
-    // Debt-to-income ratio component (10% weight)
+    // Debt-to-income ratio component (10% of Financial Foundation score)
     const debtToIncome = totalDebts / (data.monthly_income * 12)
-    if (debtToIncome < 0.3) spiScore += 10
-    else if (debtToIncome < 0.5) spiScore += 5
-    else spiScore += 0
+    if (debtToIncome < 0.2) financialScore += 3.5
+    else if (debtToIncome < 0.3) financialScore += 2.5
+    else if (debtToIncome < 0.5) financialScore += 1.5
+    else financialScore += 0
     
-    return Math.min(100, Math.max(0, spiScore))
+    // Convert to percentage (35% of total SPI)
+    return Math.min(35, Math.max(0, Math.round(financialScore)))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,8 +120,8 @@ export default function SPIAssessmentPage() {
     try {
       if (!user) throw new Error('User not authenticated')
 
-      const spiScore = calculateSPIScore(formData)
-      const category = spiScore >= 80 ? 'Excellent' : spiScore >= 60 ? 'Good' : spiScore >= 40 ? 'Fair' : 'Needs Improvement'
+      const financialScore = calculateSPIScore(formData)
+      const category = financialScore >= 28 ? 'Excellent' : financialScore >= 21 ? 'Good' : financialScore >= 14 ? 'Fair' : 'Needs Improvement'
 
       // Save assessment data
       const { error: assessmentError } = await supabase
@@ -123,7 +129,7 @@ export default function SPIAssessmentPage() {
         .insert({
           user_id: user.id,
           ...formData,
-          overall_spi_score: spiScore,
+          overall_spi_score: financialScore,
           category,
           assessment_date: new Date().toISOString()
         })
@@ -135,7 +141,7 @@ export default function SPIAssessmentPage() {
         .from('user_progress')
         .update({ 
           financial_foundation_completed: true,
-          financial_foundation_score: spiScore
+          financial_foundation_score: financialScore
         })
         .eq('user_id', user.id)
 
@@ -162,7 +168,7 @@ export default function SPIAssessmentPage() {
     )
   }
 
-  const spiScore = calculateSPIScore(formData)
+  const financialScore = calculateSPIScore(formData)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -201,8 +207,8 @@ export default function SPIAssessmentPage() {
                   <p className="text-indigo-100">Updated in real-time as you fill the form</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-4xl font-bold">{spiScore}</div>
-                  <div className="text-indigo-100">out of 100</div>
+                  <div className="text-4xl font-bold">{financialScore}</div>
+                  <div className="text-indigo-100">out of 35</div>
                 </div>
               </div>
             </div>

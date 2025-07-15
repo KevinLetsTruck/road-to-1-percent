@@ -140,6 +140,12 @@ export default function DashboardPage() {
                     <div className="text-indigo-100 text-sm">Current Tier</div>
                   </div>
                   <div className="text-center">
+                    <div className="text-2xl font-bold">
+                      {userProgress.financial_foundation_score || 0}/35
+                    </div>
+                    <div className="text-blue-100 text-sm">Financial Score</div>
+                  </div>
+                  <div className="text-center">
                     <div className="flex justify-center mb-2">
                       {userProgress.financial_foundation_completed ? (
                         <GradientShield width={32} height={32} />

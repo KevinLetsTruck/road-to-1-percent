@@ -54,69 +54,47 @@ export default function StandoutAssessment() {
       // Calculate fit score
       const fitScore = Math.round((roleFitScore[role1] + roleFitScore[role2]) / 2)
       
-      // First check if user_progress record exists
-      const { data: existingProgress } = await supabase
-        .from('user_progress')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+      // Try a simpler approach - just update the standout fields
+      console.log('Attempting to save Standout assessment for user:', user.id)
+      console.log('Data to save:', { role1, role2, fitScore })
       
-      let error
-      if (existingProgress) {
-        // Update existing record
-        const { error: updateError } = await supabase
-          .from('user_progress')
-          .update({
-            standout_completed: true,
-            standout_role_1: role1,
-            standout_role_2: role2,
-            standout_score: fitScore,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user.id)
-        error = updateError
-      } else {
-        // Create new record with all required fields
-        const { error: insertError } = await supabase
+      // Use a simple update operation
+      let { error } = await supabase
+        .from('user_progress')
+        .update({
+          standout_completed: true,
+          standout_role_1: role1,
+          standout_role_2: role2,
+          standout_score: fitScore,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+      
+      console.log('Update result:', { error })
+      
+      // If update fails (record doesn't exist), try to create it
+      if (error && error.code === 'PGRST116') {
+        console.log('Record not found, attempting to create...')
+        const { error: createError } = await supabase
           .from('user_progress')
           .insert({
             user_id: user.id,
             current_tier: '90%',
-            // Financial Foundation Assessment
             financial_foundation_completed: false,
-            financial_foundation_score: null,
-            // Market Intelligence Assessment
             market_intelligence_completed: false,
-            market_intelligence_score: null,
-            // Personal Strengths Assessment
             personal_strengths_completed: false,
-            personal_strengths_score: null,
-            // Risk Management Assessment
             risk_management_completed: false,
-            risk_management_score: null,
-            // Support Systems Assessment
             support_systems_completed: false,
-            support_systems_score: null,
-            // Legacy fields
             spi_completed: false,
-            spi_score: null,
-            // Standout Assessment
             standout_completed: true,
             standout_role_1: role1,
             standout_role_2: role2,
             standout_score: fitScore,
-            // Legacy assessment fields
             industry_knowledge_completed: false,
-            industry_knowledge_score: null,
             leadership_completed: false,
-            leadership_score: null,
             customer_service_completed: false,
-            customer_service_score: null,
             operational_completed: false,
-            operational_score: null,
             health_completed: false,
-            health_score: null,
-            // Progress tracking
             business_track_progress: 0,
             personal_track_progress: 0,
             health_track_progress: 0,
@@ -124,7 +102,13 @@ export default function StandoutAssessment() {
             program_start_date: new Date().toISOString(),
             updated_at: new Date().toISOString()
           })
-        error = insertError
+        
+        if (createError) {
+          console.log('Create error:', createError)
+          error = createError
+        } else {
+          error = null
+        }
       }
       
       if (error) {

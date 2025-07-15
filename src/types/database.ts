@@ -42,6 +42,22 @@ export interface Database {
           id: string
           user_id: string
           current_tier: UserTier
+          // Financial Foundation Assessment
+          financial_foundation_completed: boolean
+          financial_foundation_score?: number | null
+          // Market Intelligence Assessment
+          market_intelligence_completed: boolean
+          market_intelligence_score?: number | null
+          // Personal Strengths Assessment
+          personal_strengths_completed: boolean
+          personal_strengths_score?: number | null
+          // Risk Management Assessment
+          risk_management_completed: boolean
+          risk_management_score?: number | null
+          // Support Systems Assessment
+          support_systems_completed: boolean
+          support_systems_score?: number | null
+          // Legacy fields (keeping for backward compatibility)
           spi_completed: boolean
           spi_score?: number | null
           standout_completed: boolean

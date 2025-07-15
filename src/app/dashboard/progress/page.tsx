@@ -66,53 +66,49 @@ export default function ProgressPage() {
 
   const assessments = [
     {
-      id: 'spi',
-      name: 'SPI Financial Assessment',
-      description: 'Strategic Planning & Investment',
-      completed: progress?.spi_completed || false,
-      path: '/dashboard/assessments/spi'
+      id: 'financial-foundation',
+      name: 'Financial Foundation',
+      description: 'Strategic Planning, Investment & Financial Management',
+      completed: progress?.financial_foundation_completed || false,
+      score: progress?.financial_foundation_score || 0,
+      path: '/dashboard/assessments/financial-foundation',
+      icon: '💰'
     },
     {
-      id: 'leadership',
-      name: 'Leadership Assessment',
-      description: 'Leadership & Management Skills',
-      completed: false, // Will be updated when we add this to the database
-      path: '/assessments/leadership'
+      id: 'market-intelligence',
+      name: 'Market Intelligence',
+      description: 'Industry Knowledge, Market Trends & Competitive Analysis',
+      completed: progress?.market_intelligence_completed || false,
+      score: progress?.market_intelligence_score || 0,
+      path: '/dashboard/assessments/market-intelligence',
+      icon: '📊'
     },
     {
-      id: 'health',
-      name: 'Health & Wellness Assessment',
-      description: 'Physical & Mental Health',
-      completed: false,
-      path: '/assessments/health'
+      id: 'personal-strengths',
+      name: 'Personal Strengths',
+      description: 'Leadership, Communication & Personal Development',
+      completed: progress?.personal_strengths_completed || false,
+      score: progress?.personal_strengths_score || 0,
+      path: '/dashboard/assessments/personal-strengths',
+      icon: '💪'
     },
     {
-      id: 'operational',
-      name: 'Operational Excellence',
-      description: 'Business Operations & Efficiency',
-      completed: false,
-      path: '/assessments/operational'
+      id: 'risk-management',
+      name: 'Risk Tolerance',
+      description: 'Personal Risk Tolerance & Business Comfort Level',
+      completed: progress?.risk_management_completed || false,
+      score: progress?.risk_management_score || 0,
+      path: '/dashboard/assessments/risk-management',
+      icon: '🛡️'
     },
     {
-      id: 'customer-service',
-      name: 'Customer Service Assessment',
-      description: 'Customer Relations & Service',
-      completed: false,
-      path: '/assessments/customer-service'
-    },
-    {
-      id: 'industry-knowledge',
-      name: 'Industry Knowledge Assessment',
-      description: 'Trucking Industry Expertise',
-      completed: false,
-      path: '/assessments/industry-knowledge'
-    },
-    {
-      id: 'standout',
-      name: 'Standout Assessment',
-      description: 'Personal Branding & Differentiation',
-      completed: false,
-      path: '/assessments/standout'
+      id: 'support-systems',
+      name: 'Support Systems',
+      description: 'Customer Service, Networking & Support Infrastructure',
+      completed: progress?.support_systems_completed || false,
+      score: progress?.support_systems_score || 0,
+      path: '/dashboard/assessments/support-systems',
+      icon: '🤝'
     }
   ]
 
@@ -207,38 +203,57 @@ export default function ProgressPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      {assessment.completed ? (
-                        <CheckCircle className="h-6 w-6 text-green-600 mr-3" />
-                      ) : (
-                        <div className="h-6 w-6 rounded-full border-2 border-gray-300 mr-3"></div>
-                      )}
-                      <div>
-                        <h3 className={`font-semibold ${
-                          assessment.completed ? 'text-green-800' : 'text-gray-900'
-                        }`}>
-                          {assessment.name}
-                        </h3>
-                        <p className={`text-sm ${
-                          assessment.completed ? 'text-green-600' : 'text-gray-600'
-                        }`}>
-                          {assessment.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      {assessment.completed ? (
-                        <span className="text-green-600 font-medium">Completed</span>
-                      ) : (
-                        <button
-                          onClick={() => router.push(assessment.path)}
-                          className="bg-[#1e3a8a] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1e40af] transition-colors flex items-center"
-                        >
-                          Start
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </button>
-                      )}
-                    </div>
+                                         <div className="flex items-center">
+                       <div className="text-2xl mr-3">{assessment.icon}</div>
+                       {assessment.completed ? (
+                         <CheckCircle className="h-6 w-6 text-green-600 mr-3" />
+                       ) : (
+                         <div className="h-6 w-6 rounded-full border-2 border-gray-300 mr-3"></div>
+                       )}
+                       <div>
+                         <h3 className={`font-semibold ${
+                           assessment.completed ? 'text-green-800' : 'text-gray-900'
+                         }`}>
+                           {assessment.name}
+                         </h3>
+                         <p className={`text-sm ${
+                           assessment.completed ? 'text-green-600' : 'text-gray-600'
+                         }`}>
+                           {assessment.description}
+                         </p>
+                         {assessment.completed && assessment.score > 0 && (
+                           <div className="mt-1">
+                             <div className="flex items-center">
+                               <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                 <div 
+                                   className="bg-[#f59e0b] h-2 rounded-full"
+                                   style={{ width: `${assessment.score}%` }}
+                                 ></div>
+                               </div>
+                               <span className="text-xs text-gray-600">{assessment.score}%</span>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     </div>
+                     <div className="flex items-center">
+                       {assessment.completed ? (
+                         <div className="text-right">
+                           <span className="text-green-600 font-medium">Completed</span>
+                           {assessment.score > 0 && (
+                             <div className="text-sm text-gray-600">Score: {assessment.score}%</div>
+                           )}
+                         </div>
+                       ) : (
+                         <button
+                           onClick={() => router.push(assessment.path)}
+                           className="bg-[#1e3a8a] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1e40af] transition-colors flex items-center"
+                         >
+                           Start
+                           <ArrowRight className="h-4 w-4 ml-1" />
+                         </button>
+                       )}
+                     </div>
                   </div>
                 </div>
               ))}

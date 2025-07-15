@@ -133,12 +133,15 @@ export default function SPIAssessmentPage() {
       // Update user progress
       const { error: progressError } = await supabase
         .from('user_progress')
-        .update({ spi_completed: true })
+        .update({ 
+          financial_foundation_completed: true,
+          financial_foundation_score: spiScore
+        })
         .eq('user_id', user.id)
 
       if (progressError) throw progressError
 
-      router.push('/dashboard?message=SPI Assessment completed successfully!')
+      router.push('/dashboard?message=Financial Foundation Assessment completed successfully!')
     } catch (error: unknown) {
       setError((error as Error).message)
     } finally {
@@ -174,7 +177,7 @@ export default function SPIAssessmentPage() {
                 <ArrowLeft className="h-5 w-5" />
               </button>
               <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">SPI Assessment</span>
+              <span className="text-xl font-bold text-gray-900">Financial Foundation Assessment</span>
             </div>
           </div>
         </div>
@@ -184,9 +187,9 @@ export default function SPIAssessmentPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Strategic Personal Income Assessment</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Financial Foundation Assessment</h1>
               <p className="text-gray-600">
-                This assessment will help us understand your current financial position and create a personalized plan for your journey to the 1%.
+                This assessment evaluates your financial foundation including assets, liabilities, income, expenses, and emergency preparedness. It's the first step in building your path to the 1%.
               </p>
             </div>
 
@@ -194,7 +197,7 @@ export default function SPIAssessmentPage() {
             <div className="mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold">Your SPI Score</h2>
+                  <h2 className="text-xl font-semibold">Your Financial Foundation Score</h2>
                   <p className="text-indigo-100">Updated in real-time as you fill the form</p>
                 </div>
                 <div className="text-right">

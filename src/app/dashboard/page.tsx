@@ -139,16 +139,16 @@ export default function DashboardPage() {
                     <div className="text-2xl font-bold">{userProgress.current_tier}</div>
                     <div className="text-indigo-100 text-sm">Current Tier</div>
                   </div>
-                                   <div className="text-center">
-                   <div className="flex justify-center mb-2">
-                     {userProgress.spi_completed ? (
-                       <GradientShield width={32} height={32} />
-                     ) : (
-                       <div className="text-2xl">⏳</div>
-                     )}
-                   </div>
-                   <div className="text-blue-100 text-sm">SPI Assessment</div>
-                 </div>
+                  <div className="text-center">
+                    <div className="flex justify-center mb-2">
+                      {userProgress.financial_foundation_completed ? (
+                        <GradientShield width={32} height={32} />
+                      ) : (
+                        <div className="text-2xl">💰</div>
+                      )}
+                    </div>
+                    <div className="text-blue-100 text-sm">Financial Foundation</div>
+                  </div>
                                    <div className="text-center">
                    <div className="text-2xl font-bold">
                      {userProgress.business_track_progress}%
@@ -163,22 +163,22 @@ export default function DashboardPage() {
 
         {/* Show different content based on progress */}
         <div className="px-4 py-6 sm:px-0">
-          {userProgress?.spi_completed ? (
+          {userProgress?.financial_foundation_completed ? (
             <div className="space-y-4">
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <div className="flex items-center mb-4">
                   <GradientShield width={40} height={40} className="mr-3" />
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Great job! You've completed the SPI Assessment</h2>
+                    <h2 className="text-xl font-bold text-gray-900">Great job! You've completed the Financial Foundation Assessment</h2>
                     <p className="text-gray-600">Your financial foundation is set. Here's what's next:</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button
-                    onClick={() => router.push('/assessments/leadership')}
+                    onClick={() => router.push('/dashboard/assessments/market-intelligence')}
                     className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors"
                   >
-                    Take Leadership Assessment
+                    Take Market Intelligence Assessment
                   </button>
                   <button
                     onClick={() => router.push('/dashboard/progress')}
@@ -190,14 +190,14 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : (
-                         <div className="text-center">
-               <button
-                 onClick={() => router.push('/dashboard/assessments/spi')}
-                 className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors text-lg"
-               >
-                 Take SPI Financial Assessment
-               </button>
-             </div>
+            <div className="text-center">
+              <button
+                onClick={() => router.push('/dashboard/assessments/financial-foundation')}
+                className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors text-lg"
+              >
+                Take Financial Foundation Assessment
+              </button>
+            </div>
           )}
         </div>
       </main>

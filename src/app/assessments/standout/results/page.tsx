@@ -58,16 +58,24 @@ export default function StandoutResultsPage() {
   }
 
   const roleDescriptions: Record<string, string> = {
-    'Pioneer': 'You are innovative and love to explore new opportunities. You thrive on creating new solutions and pushing boundaries.',
-    'Influencer': 'You have a natural ability to inspire and motivate others. You excel at building relationships and creating positive change.',
-    'Stimulator': 'You bring energy and enthusiasm to every situation. You help others see possibilities and get excited about new ideas.',
-    'Advisor': 'You provide wise counsel and thoughtful guidance. You help others make better decisions through your insights.',
-    'Connector': 'You excel at bringing people together and building networks. You create opportunities through your relationships.',
-    'Provider': 'You are reliable and take care of others\' needs. You ensure everyone has what they need to succeed.',
-    'Equalizer': 'You create balance and fairness in situations. You help resolve conflicts and ensure everyone is heard.',
-    'Teacher': 'You love to share knowledge and help others learn. You make complex concepts easy to understand.',
-    'Creator': 'You have a unique ability to bring ideas to life. You turn vision into reality through your creative talents.',
-    'Other': 'You have unique strengths that don\'t fit neatly into other categories. Your versatility is your superpower.'
+    'Pioneer': 'Innovative risk-taker who explores new opportunities and pushes boundaries. Excellent for identifying new markets and business models.',
+    'Influencer': 'Natural persuader who inspires and motivates others. Great for sales, partnerships, and building customer relationships.',
+    'Stimulator': 'Energetic motivator who brings enthusiasm and excitement. Perfect for team building and creating positive momentum.',
+    'Advisor': 'Wise counselor who provides thoughtful guidance. Excellent for strategic planning and decision-making.',
+    'Connector': 'Network builder who brings people together. Great for partnerships, referrals, and business development.',
+    'Provider': 'Reliable caretaker who ensures needs are met. Essential for customer service and operational consistency.',
+    'Equalizer': 'Balance creator who resolves conflicts and ensures fairness. Important for team harmony and stakeholder management.',
+    'Teacher': 'Knowledge sharer who helps others learn and grow. Valuable for training, mentoring, and thought leadership.',
+    'Creator': 'Visionary builder who turns ideas into reality. Perfect for product development and innovation.',
+    'Other': 'Versatile individual with unique strengths that don\'t fit standard categories. Adaptable to various business needs.'
+  }
+
+  const getScoreDescription = (score: number): string => {
+    if (score >= 9) return 'Exceptional entrepreneurial fit'
+    if (score >= 8) return 'Strong entrepreneurial potential'
+    if (score >= 7) return 'Good entrepreneurial foundation'
+    if (score >= 6) return 'Moderate entrepreneurial fit'
+    return 'Challenging entrepreneurial fit'
   }
 
   const role1 = userProgress.standout_role_1 || 'Unknown'
@@ -108,7 +116,8 @@ export default function StandoutResultsPage() {
               <div className="text-4xl font-bold text-blue-600 mb-2">
                 {userProgress.standout_score}/10
               </div>
-              <div className="text-blue-800 font-medium">Your Standout Score</div>
+              <div className="text-blue-800 font-medium mb-2">{getScoreDescription(userProgress.standout_score || 0)}</div>
+              <div className="text-blue-700 text-sm">Entrepreneurial Fit Score</div>
             </div>
           </div>
 

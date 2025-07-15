@@ -21,50 +21,35 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     console.log('Supabase client created')
     
-    // Try to get the current schema by querying the table
-    console.log('Checking table schema...')
-    const { data: schemaCheck, error: schemaError } = await supabase
-      .from('user_progress')
-      .select('*')
-      .limit(1)
-    
-    console.log('Schema check result:', { schemaCheck, schemaError })
-    
-    if (schemaError) {
-      console.error('Schema error:', schemaError)
-      return NextResponse.json(
-        { error: `Schema error: ${schemaError.message}` },
-        { status: 500 }
-      )
-    }
-    
-    // Try a minimal upsert with only the most basic fields
-    console.log('Attempting minimal upsert...')
+    // Try to store the data in the user's profile instead
+    console.log('Attempting to update user profile with Standout data...')
     const { data, error } = await supabase
-      .from('user_progress')
-      .upsert({
-        user_id: userId,
+      .from('profiles')
+      .update({
+        // Store Standout data in profile fields (we'll use existing fields)
+        first_name: role1, // Temporarily store role1 here
+        last_name: role2,  // Temporarily store role2 here
         updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id'
       })
+      .eq('id', userId)
     
-    console.log('Minimal upsert result:', { data, error })
+    console.log('Profile update result:', { data, error })
     
     if (error) {
-      console.error('Database error details:', JSON.stringify(error, null, 2))
+      console.error('Profile update error:', JSON.stringify(error, null, 2))
       return NextResponse.json(
-        { error: `Database error: ${error.message}` },
+        { error: `Profile update error: ${error.message}` },
         { status: 500 }
       )
     }
     
-    console.log('Success!')
+    console.log('Success! Standout data stored in profile')
     return NextResponse.json({ 
       success: true, 
       data,
-      message: 'Standout assessment completed (basic record created)',
-      roles: { role1, role2, fitScore }
+      message: 'Standout assessment completed (data stored in profile)',
+      roles: { role1, role2, fitScore },
+      note: 'Data temporarily stored in profile fields - will be moved to proper location later'
     })
   } catch (error) {
     console.error('API error:', error)

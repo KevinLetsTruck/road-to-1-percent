@@ -1,3 +1,4 @@
+// Trigger redeploy for Vercel
 import Link from 'next/link'
 import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
 
@@ -49,7 +50,7 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Transform Your Driving Career
+            Transform Your Driving Career Today
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Join the Road to 1% program and unlock your full potential as a professional driver. 

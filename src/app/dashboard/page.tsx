@@ -4,16 +4,16 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 import { TrendingUp } from 'lucide-react'
 import ShieldLogo from '@/components/ui/ShieldLogo'
 import GradientShield from '@/components/ui/GradientShield'
+import { useAuth } from '@/contexts/AuthContext'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user, loading: authLoading } = useAuth()
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
   const [loading, setLoading] = useState(true)
   const [successMessage, setSuccessMessage] = useState('')
@@ -21,15 +21,14 @@ export default function DashboardPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
-      setUser(user)
-      
-      // Get user progress
+    if (authLoading) return
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const getUserProgress = async () => {
       try {
         const { data: progressData } = await supabase
           .from('user_progress')
@@ -55,15 +54,18 @@ export default function DashboardPage() {
       
       setLoading(false)
     }
-    getUser()
-  }, [router, supabase])
+
+    getUserProgress()
+  }, [user, authLoading, router, supabase])
+
+  const { signOut } = useAuth()
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
+    await signOut()
     router.push('/login')
   }
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>

@@ -629,25 +629,47 @@ export default function ComprehensiveAssessmentPage() {
                     <label className="block text-sm font-semibold text-purple-800 mb-2">
                       Your Top Strength #1
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.standout_strength_1}
                       onChange={(e) => setFormData(prev => ({ ...prev, standout_strength_1: e.target.value }))}
-                      placeholder="e.g., Pioneer, Creator, Innovator..."
                       className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">Select your top strength</option>
+                      {[
+                        'Pioneer',
+                        'Creator', 
+                        'Innovator',
+                        'Connector',
+                        'Advisor'
+                      ].filter(strength => strength !== formData.standout_strength_2).map((strength) => (
+                        <option key={strength} value={strength}>
+                          {strength}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-purple-800 mb-2">
                       Your Top Strength #2
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.standout_strength_2}
                       onChange={(e) => setFormData(prev => ({ ...prev, standout_strength_2: e.target.value }))}
-                      placeholder="e.g., Connector, Advisor, Pioneer..."
                       className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">Select your second strength</option>
+                      {[
+                        'Pioneer',
+                        'Creator', 
+                        'Innovator',
+                        'Connector',
+                        'Advisor'
+                      ].filter(strength => strength !== formData.standout_strength_1).map((strength) => (
+                        <option key={strength} value={strength}>
+                          {strength}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 

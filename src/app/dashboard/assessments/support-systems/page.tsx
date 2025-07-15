@@ -188,12 +188,14 @@ export default function SupportSystemsAssessment() {
       // Save to database
       const { error } = await supabase
         .from('user_progress')
-        .update({
+        .upsert({
+          user_id: user.id,
           support_systems_completed: true,
           support_systems_score: overallScore,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', user.id)
 
       if (error) throw error
 

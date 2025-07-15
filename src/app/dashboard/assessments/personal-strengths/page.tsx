@@ -188,12 +188,14 @@ export default function PersonalStrengthsAssessment() {
       // Save to database
       const { error } = await supabase
         .from('user_progress')
-        .update({
+        .upsert({
+          user_id: user.id,
           personal_strengths_completed: true,
           personal_strengths_score: overallScore,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', user.id)
 
       if (error) throw error
 

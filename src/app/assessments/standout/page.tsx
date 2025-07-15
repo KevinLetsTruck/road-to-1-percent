@@ -50,25 +50,33 @@ export default function StandoutAssessment() {
         router.push('/login')
         return
       }
+      
       // Calculate fit score
       const fitScore = Math.round((roleFitScore[role1] + roleFitScore[role2]) / 2)
-      // Save to user_progress
+      
+      // Use upsert to create or update the user_progress record
       const { error } = await supabase
         .from('user_progress')
-        .update({
+        .upsert({
+          user_id: user.id,
           standout_completed: true,
           standout_role_1: role1,
           standout_role_2: role2,
           standout_score: fitScore,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', user.id)
+      
       if (error) {
+        console.error('Database error:', error)
         alert('There was an error saving your Standout assessment. Please try again.')
         return
       }
+      
       router.push('/dashboard?message=Standout%202.0%20Assessment%20completed%20successfully!')
-    } catch {
+    } catch (error) {
+      console.error('Submission error:', error)
       alert('There was an error submitting your assessment. Please try again.')
     } finally {
       setIsSubmitting(false)

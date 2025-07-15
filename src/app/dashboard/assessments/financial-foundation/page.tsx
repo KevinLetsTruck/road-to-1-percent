@@ -139,11 +139,14 @@ export default function SPIAssessmentPage() {
       // Update user progress
       const { error: progressError } = await supabase
         .from('user_progress')
-        .update({ 
+        .upsert({ 
+          user_id: user.id,
           financial_foundation_completed: true,
-          financial_foundation_score: financialScore
+          financial_foundation_score: financialScore,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', user.id)
 
       if (progressError) throw progressError
 

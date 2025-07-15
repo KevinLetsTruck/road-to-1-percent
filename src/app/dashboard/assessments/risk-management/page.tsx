@@ -188,12 +188,14 @@ export default function RiskManagementAssessment() {
       // Save to database
       const { error } = await supabase
         .from('user_progress')
-        .update({
+        .upsert({
+          user_id: user.id,
           risk_management_completed: true,
           risk_management_score: overallScore,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', user.id)
 
       if (error) throw error
 

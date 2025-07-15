@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info } from 'lucide-react'
 
-type CurrentSituation = 'Employee Driver' | 'Truck Owner' | 'Leased O/O' | 'Small Carrier'
+type CurrentSituation = 'Employee Driver' | 'Carrier Authority' | 'Leased O/O' | 'Small Fleet'
 
 interface ComprehensiveAssessmentData {
   // Current Situation
@@ -561,7 +561,7 @@ export default function ComprehensiveAssessmentPage() {
                   Please select your current situation so we can provide questions that are relevant to your specific circumstances.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(['Employee Driver', 'Truck Owner', 'Leased O/O', 'Small Carrier'] as CurrentSituation[]).map((situation) => (
+                  {(['Employee Driver', 'Carrier Authority', 'Leased O/O', 'Small Fleet'] as CurrentSituation[]).map((situation) => (
                     <label key={situation} className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
                       formData.current_situation === situation 
                         ? 'border-blue-500 bg-blue-100 shadow-md' 
@@ -579,9 +579,9 @@ export default function ComprehensiveAssessmentPage() {
                         <div className="font-semibold text-gray-900">{situation}</div>
                         <div className="text-sm text-gray-600">
                           {situation === 'Employee Driver' && 'Driving for a company as an employee'}
-                          {situation === 'Truck Owner' && 'Own your truck and drive for yourself'}
+                          {situation === 'Carrier Authority' && 'Have your own authority and operate independently'}
                           {situation === 'Leased O/O' && 'Lease your truck to a carrier'}
-                          {situation === 'Small Carrier' && 'Own multiple trucks and manage drivers'}
+                          {situation === 'Small Fleet' && 'Own multiple trucks and manage drivers'}
                         </div>
                       </div>
                     </label>

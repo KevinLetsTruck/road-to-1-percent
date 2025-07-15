@@ -1,5 +1,5 @@
 'use client'
-// Minor change: Trigger redeploy for Vercel
+// Force redeploy and fix navigation issues
 export const dynamic = "force-dynamic";
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'

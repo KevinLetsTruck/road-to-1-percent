@@ -60,8 +60,13 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Road to 1%</span>
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center hover:opacity-80 transition-opacity"
+              >
+                <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
+                <span className="text-xl font-bold text-gray-900">Road to 1%</span>
+              </button>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
@@ -87,7 +92,7 @@ export default function DashboardPage() {
         {/* Always show the assessment button */}
         <div className="px-4 py-6 sm:px-0">
           <button
-            onClick={() => router.push('/assessments/spi')}
+            onClick={() => router.push('/dashboard/assessments/spi')}
             className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
           >
             Take SPI Financial Assessment

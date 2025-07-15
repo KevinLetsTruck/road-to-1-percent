@@ -174,7 +174,7 @@ export default function DashboardPage() {
             {userProgress && (
               <div className="mt-6 bg-white/10 rounded-lg p-4">
                 <h3 className="text-lg font-semibold mb-2">Your Progress</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold">{userProgress.current_tier}</div>
                     <div className="text-indigo-100 text-sm">Current Tier</div>
@@ -195,12 +195,12 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-blue-100 text-sm">Financial Foundation</div>
                   </div>
-                                   <div className="text-center">
-                   <div className="text-2xl font-bold">
-                     {userProgress.business_track_progress}%
-                   </div>
-                   <div className="text-blue-100 text-sm">Business Track</div>
-                 </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">
+                      {userProgress.business_track_progress}%
+                    </div>
+                    <div className="text-blue-100 text-sm">Business Track</div>
+                  </div>
                 </div>
               </div>
             )}

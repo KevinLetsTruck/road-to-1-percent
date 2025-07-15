@@ -96,6 +96,12 @@ export default function DashboardPage() {
               >
                 Progress
               </button>
+              <button
+                onClick={() => router.push('/dashboard/insights')}
+                className="text-[#1e3a8a] hover:text-[#1e40af] transition-colors"
+              >
+                Insights
+              </button>
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
               <button
                 onClick={handleSignOut}

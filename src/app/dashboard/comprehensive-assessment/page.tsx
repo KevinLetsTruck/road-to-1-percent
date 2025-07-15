@@ -16,6 +16,10 @@ interface ComprehensiveAssessmentData {
   fleet_size: number | string // For Small Fleet
   load_sources: string[] // For Carrier Authority and Small Fleet
   
+  // Standout Assessment Results
+  standout_strength_1: string
+  standout_strength_2: string
+  
   // Financial Foundation (35 points)
   net_worth: number
   monthly_savings: number
@@ -40,7 +44,6 @@ interface ComprehensiveAssessmentData {
   
   // Risk Management (15 points)
   contingency_planning: number
-  insurance_optimization: number
   business_continuity: number
   risk_assessment: number
   
@@ -258,21 +261,7 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     weight: 0.33,
     maxPoints: 5
   },
-  {
-    id: 'insurance_optimization',
-    dimension: 'Risk Management',
-    question: 'How would you describe your current insurance coverage?',
-    options: [
-      { value: 0, label: 'No insurance or minimal coverage', description: 'High risk' },
-      { value: 0.5, label: 'Basic coverage with high deductibles', description: 'Minimal protection' },
-      { value: 1, label: 'Standard coverage', description: 'Adequate protection' },
-      { value: 1.5, label: 'Comprehensive coverage', description: 'Good protection' },
-      { value: 2, label: 'Optimized coverage for my situation', description: 'Strategic protection' },
-      { value: 3, label: 'Professional risk management strategy', description: 'Expert protection' }
-    ],
-    weight: 0.2,
-    maxPoints: 3
-  },
+
   {
     id: 'business_continuity',
     dimension: 'Risk Management',
@@ -368,6 +357,8 @@ export default function ComprehensiveAssessmentPage() {
     current_situation: 'Employee Driver',
     fleet_size: 0,
     load_sources: [],
+    standout_strength_1: '',
+    standout_strength_2: '',
     net_worth: 0,
     monthly_savings: 0,
     emergency_fund_months: 0,
@@ -385,7 +376,6 @@ export default function ComprehensiveAssessmentPage() {
     connector_strength: 0,
     advisor_strength: 0,
     contingency_planning: 0,
-    insurance_optimization: 0,
     business_continuity: 0,
     risk_assessment: 0,
     family_alignment: 0,
@@ -609,6 +599,61 @@ export default function ComprehensiveAssessmentPage() {
                 <div className="mt-4 p-3 bg-blue-100 rounded-lg">
                   <p className="text-sm text-blue-800">
                     <strong>Selected:</strong> {formData.current_situation} - This will customize your assessment questions.
+                  </p>
+                </div>
+              </div>
+
+              {/* Standout Assessment Section */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg">
+                <h3 className="text-xl font-bold text-purple-900 mb-3">🎯 Standout Assessment</h3>
+                <p className="text-purple-700 mb-4 font-medium">
+                  Before completing this assessment, please take the Standout 2.0 assessment to discover your unique strengths.
+                </p>
+                
+                <div className="mb-6">
+                  <a
+                    href="/assessments/standout"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Take Standout 2.0 Assessment
+                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-purple-800 mb-2">
+                      Your Top Strength #1
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.standout_strength_1}
+                      onChange={(e) => setFormData(prev => ({ ...prev, standout_strength_1: e.target.value }))}
+                      placeholder="e.g., Pioneer, Creator, Innovator..."
+                      className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-purple-800 mb-2">
+                      Your Top Strength #2
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.standout_strength_2}
+                      onChange={(e) => setFormData(prev => ({ ...prev, standout_strength_2: e.target.value }))}
+                      placeholder="e.g., Connector, Advisor, Pioneer..."
+                      className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-purple-100 rounded-lg">
+                  <p className="text-sm text-purple-800">
+                    <strong>Note:</strong> These strengths will be integrated into your SPI assessment results to provide personalized insights.
                   </p>
                 </div>
               </div>

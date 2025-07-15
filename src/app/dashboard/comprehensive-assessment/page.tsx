@@ -993,9 +993,11 @@ export default function ComprehensiveAssessmentPage() {
       if (field === 'net_worth') {
         setShowNetWorthCalculator(true)
         setShowSavingsCalculator(false)
+        setFormData(prev => ({ ...prev, [field]: value }))
       } else if (field === 'monthly_savings') {
         setShowSavingsCalculator(true)
         setShowNetWorthCalculator(false)
+        setFormData(prev => ({ ...prev, [field]: value }))
       }
       return
     }
@@ -1331,11 +1333,7 @@ export default function ComprehensiveAssessmentPage() {
                               type="radio"
                               name={question.id}
                               value={option.value.toString()}
-                              checked={
-                                option.value === -1 
-                                  ? (showNetWorthCalculator && question.id === 'net_worth') || (showSavingsCalculator && question.id === 'monthly_savings')
-                                  : formData[question.id as keyof ComprehensiveAssessmentData] === option.value
-                              }
+                              checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
                             />

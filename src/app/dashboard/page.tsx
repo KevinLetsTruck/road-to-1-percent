@@ -21,30 +21,16 @@ export default function DashboardPage() {
   const router = useRouter()
   const supabase = createClient()
 
+  // Simple test to ensure console logging works
+  console.log('🎯 Dashboard component rendered, user:', user?.email, 'authLoading:', authLoading)
+
+  // Separate effect for admin check
   useEffect(() => {
-    if (authLoading) return
+    if (!user || authLoading) return
 
-    if (!user) {
-      router.push('/login')
-      return
-    }
-
-    const getUserProgress = async () => {
-      try {
-        const { data: progressData } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
-        
-        if (progressData) {
-          setUserProgress(progressData)
-        }
-      } catch (error) {
-        console.log('No progress data found, user may be new')
-      }
-
-      // Check if user is admin
+    console.log('🔍 Starting admin check for user:', user.id)
+    
+    const checkAdminStatus = async () => {
       try {
         console.log('=== ADMIN DEBUG START ===')
         console.log('Checking admin status for user:', user.id)
@@ -69,6 +55,33 @@ export default function DashboardPage() {
         console.log('=== ADMIN DEBUG END ===')
       } catch (error) {
         console.log('🚨 Error checking admin status:', error)
+      }
+    }
+
+    checkAdminStatus()
+  }, [user, authLoading, supabase])
+
+  useEffect(() => {
+    if (authLoading) return
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const getUserProgress = async () => {
+      try {
+        const { data: progressData } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .single()
+        
+        if (progressData) {
+          setUserProgress(progressData)
+        }
+      } catch (error) {
+        console.log('No progress data found, user may be new')
       }
       
       // Check for success message in URL

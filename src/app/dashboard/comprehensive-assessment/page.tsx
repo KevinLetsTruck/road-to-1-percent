@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info, X } from 'lucide-react'
 
 type CurrentSituation = 'Employee Driver' | 'Carrier Authority' | 'Leased O/O' | 'Small Fleet'
 
@@ -77,7 +77,8 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
       { value: 6, label: 'Negative $10,000 to $0', description: 'Minor debt' },
       { value: 10, label: '$0 to $10,000', description: 'Breaking even' },
       { value: 12, label: '$10,000 to $50,000', description: 'Positive foundation' },
-      { value: 14, label: '$50,000+', description: 'Strong financial base' }
+      { value: 14, label: '$50,000+', description: 'Strong financial base' },
+      { value: -1, label: '📋 Use Net Worth Calculator', description: 'Get help calculating your exact net worth' }
     ],
     weight: 0.4,
     maxPoints: 14
@@ -91,7 +92,8 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
       { value: 4, label: '$0 to $500', description: 'Breaking even' },
       { value: 7, label: '$500 to $1,000', description: 'Moderate savings' },
       { value: 9, label: '$1,000 to $2,000', description: 'Good savings rate' },
-      { value: 10.5, label: '$2,000+', description: 'Excellent savings' }
+      { value: 10.5, label: '$2,000+', description: 'Excellent savings' },
+      { value: -1, label: '📋 Use Monthly Savings Calculator', description: 'Get help calculating your exact monthly savings' }
     ],
     weight: 0.3,
     maxPoints: 10.5
@@ -409,6 +411,429 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   }
 ]
 
+// Net Worth Calculator Component
+function NetWorthCalculator({ onCalculate, onCancel }: { onCalculate: (netWorth: number) => void; onCancel: () => void }) {
+  const [assets, setAssets] = useState({
+    cash: 0,
+    savings: 0,
+    investments: 0,
+    realEstate: 0,
+    vehicles: 0,
+    businessAssets: 0,
+    otherAssets: 0
+  })
+  const [liabilities, setLiabilities] = useState({
+    creditCards: 0,
+    personalLoans: 0,
+    carLoans: 0,
+    mortgage: 0,
+    businessLoans: 0,
+    otherDebts: 0
+  })
+
+  const totalAssets = Object.values(assets).reduce((sum, value) => sum + value, 0)
+  const totalLiabilities = Object.values(liabilities).reduce((sum, value) => sum + value, 0)
+  const netWorth = totalAssets - totalLiabilities
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h4 className="text-lg font-semibold text-blue-800">Calculate Your Net Worth</h4>
+        <button onClick={onCancel} className="text-blue-600 hover:text-blue-800">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Assets */}
+        <div className="space-y-4">
+          <h5 className="font-semibold text-blue-700">Assets (What you own)</h5>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cash & Checking</label>
+              <input
+                type="number"
+                value={assets.cash}
+                onChange={(e) => setAssets(prev => ({ ...prev, cash: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Savings Accounts</label>
+              <input
+                type="number"
+                value={assets.savings}
+                onChange={(e) => setAssets(prev => ({ ...prev, savings: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Investments (401k, IRA, etc.)</label>
+              <input
+                type="number"
+                value={assets.investments}
+                onChange={(e) => setAssets(prev => ({ ...prev, investments: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Real Estate Value</label>
+              <input
+                type="number"
+                value={assets.realEstate}
+                onChange={(e) => setAssets(prev => ({ ...prev, realEstate: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vehicles Value</label>
+              <input
+                type="number"
+                value={assets.vehicles}
+                onChange={(e) => setAssets(prev => ({ ...prev, vehicles: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Business Assets</label>
+              <input
+                type="number"
+                value={assets.businessAssets}
+                onChange={(e) => setAssets(prev => ({ ...prev, businessAssets: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Other Assets</label>
+              <input
+                type="number"
+                value={assets.otherAssets}
+                onChange={(e) => setAssets(prev => ({ ...prev, otherAssets: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Liabilities */}
+        <div className="space-y-4">
+          <h5 className="font-semibold text-red-700">Liabilities (What you owe)</h5>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Credit Card Debt</label>
+              <input
+                type="number"
+                value={liabilities.creditCards}
+                onChange={(e) => setLiabilities(prev => ({ ...prev, creditCards: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Personal Loans</label>
+              <input
+                type="number"
+                value={liabilities.personalLoans}
+                onChange={(e) => setLiabilities(prev => ({ ...prev, personalLoans: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Car Loans</label>
+              <input
+                type="number"
+                value={liabilities.carLoans}
+                onChange={(e) => setLiabilities(prev => ({ ...prev, carLoans: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mortgage</label>
+              <input
+                type="number"
+                value={liabilities.mortgage}
+                onChange={(e) => setLiabilities(prev => ({ ...prev, mortgage: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Business Loans</label>
+              <input
+                type="number"
+                value={liabilities.businessLoans}
+                onChange={(e) => setLiabilities(prev => ({ ...prev, businessLoans: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Other Debts</label>
+              <input
+                type="number"
+                value={liabilities.otherDebts}
+                onChange={(e) => setLiabilities(prev => ({ ...prev, otherDebts: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div className="text-sm text-gray-600">Total Assets</div>
+            <div className="text-lg font-bold text-green-600">${totalAssets.toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-600">Total Liabilities</div>
+            <div className="text-lg font-bold text-red-600">${totalLiabilities.toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-600">Net Worth</div>
+            <div className={`text-lg font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ${netWorth.toLocaleString()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={onCancel}
+          className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => onCalculate(netWorth)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Use This Net Worth
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Monthly Savings Calculator Component
+function MonthlySavingsCalculator({ onCalculate, onCancel }: { onCalculate: (monthlySavings: number) => void; onCancel: () => void }) {
+  const [income, setIncome] = useState({
+    salary: 0,
+    bonuses: 0,
+    sideIncome: 0,
+    otherIncome: 0
+  })
+  const [expenses, setExpenses] = useState({
+    housing: 0,
+    utilities: 0,
+    food: 0,
+    transportation: 0,
+    insurance: 0,
+    entertainment: 0,
+    debtPayments: 0,
+    otherExpenses: 0
+  })
+
+  const totalIncome = Object.values(income).reduce((sum, value) => sum + value, 0)
+  const totalExpenses = Object.values(expenses).reduce((sum, value) => sum + value, 0)
+  const monthlySavings = totalIncome - totalExpenses
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h4 className="text-lg font-semibold text-green-800">Calculate Your Monthly Savings</h4>
+        <button onClick={onCancel} className="text-green-600 hover:text-green-800">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Income */}
+        <div className="space-y-4">
+          <h5 className="font-semibold text-green-700">Monthly Income</h5>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Salary/Wages</label>
+              <input
+                type="number"
+                value={income.salary}
+                onChange={(e) => setIncome(prev => ({ ...prev, salary: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bonuses/Commissions</label>
+              <input
+                type="number"
+                value={income.bonuses}
+                onChange={(e) => setIncome(prev => ({ ...prev, bonuses: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Side Income</label>
+              <input
+                type="number"
+                value={income.sideIncome}
+                onChange={(e) => setIncome(prev => ({ ...prev, sideIncome: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Other Income</label>
+              <input
+                type="number"
+                value={income.otherIncome}
+                onChange={(e) => setIncome(prev => ({ ...prev, otherIncome: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Expenses */}
+        <div className="space-y-4">
+          <h5 className="font-semibold text-red-700">Monthly Expenses</h5>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Housing (Rent/Mortgage)</label>
+              <input
+                type="number"
+                value={expenses.housing}
+                onChange={(e) => setExpenses(prev => ({ ...prev, housing: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Utilities</label>
+              <input
+                type="number"
+                value={expenses.utilities}
+                onChange={(e) => setExpenses(prev => ({ ...prev, utilities: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Food & Groceries</label>
+              <input
+                type="number"
+                value={expenses.food}
+                onChange={(e) => setExpenses(prev => ({ ...prev, food: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Transportation</label>
+              <input
+                type="number"
+                value={expenses.transportation}
+                onChange={(e) => setExpenses(prev => ({ ...prev, transportation: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Insurance</label>
+              <input
+                type="number"
+                value={expenses.insurance}
+                onChange={(e) => setExpenses(prev => ({ ...prev, insurance: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Entertainment</label>
+              <input
+                type="number"
+                value={expenses.entertainment}
+                onChange={(e) => setExpenses(prev => ({ ...prev, entertainment: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Debt Payments</label>
+              <input
+                type="number"
+                value={expenses.debtPayments}
+                onChange={(e) => setExpenses(prev => ({ ...prev, debtPayments: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Other Expenses</label>
+              <input
+                type="number"
+                value={expenses.otherExpenses}
+                onChange={(e) => setExpenses(prev => ({ ...prev, otherExpenses: Number(e.target.value) || 0 }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div className="text-sm text-gray-600">Total Income</div>
+            <div className="text-lg font-bold text-green-600">${totalIncome.toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-600">Total Expenses</div>
+            <div className="text-lg font-bold text-red-600">${totalExpenses.toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-600">Monthly Savings</div>
+            <div className={`text-lg font-bold ${monthlySavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ${monthlySavings.toLocaleString()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={onCancel}
+          className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => onCalculate(monthlySavings)}
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+        >
+          Use This Monthly Savings
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function ComprehensiveAssessmentPage() {
   const [user, setUser] = useState<User | null>(null)
   const [formData, setFormData] = useState<ComprehensiveAssessmentData>({
@@ -445,6 +870,9 @@ export default function ComprehensiveAssessmentPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [currentStep, setCurrentStep] = useState(0)
+  const [showNetWorthCalculator, setShowNetWorthCalculator] = useState(false)
+  const [showSavingsCalculator, setShowSavingsCalculator] = useState(false)
+  const [calculatorResults, setCalculatorResults] = useState<{ netWorth?: number; monthlySavings?: number }>({})
   const router = useRouter()
   const supabase = createClient()
 
@@ -560,6 +988,17 @@ export default function ComprehensiveAssessmentPage() {
   }
 
   const handleInputChange = (field: keyof ComprehensiveAssessmentData, value: number) => {
+    if (value === -1) {
+      // Handle calculator selections
+      if (field === 'net_worth') {
+        setShowNetWorthCalculator(true)
+        setShowSavingsCalculator(false)
+      } else if (field === 'monthly_savings') {
+        setShowSavingsCalculator(true)
+        setShowNetWorthCalculator(false)
+      }
+      return
+    }
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -908,6 +1347,50 @@ export default function ComprehensiveAssessmentPage() {
                     </div>
                   ))}
               </div>
+
+              {/* Calculator Components */}
+              {showNetWorthCalculator && (
+                <div className="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                  <h3 className="text-xl font-bold text-blue-900 mb-4">📊 Net Worth Calculator</h3>
+                  <NetWorthCalculator 
+                    onCalculate={(netWorth) => {
+                      setCalculatorResults(prev => ({ ...prev, netWorth }))
+                      setShowNetWorthCalculator(false)
+                      // Auto-select the appropriate range based on calculated value
+                      let selectedValue = 0
+                      if (netWorth < -25000) selectedValue = 0
+                      else if (netWorth < -10000) selectedValue = 3
+                      else if (netWorth < 0) selectedValue = 6
+                      else if (netWorth < 10000) selectedValue = 10
+                      else if (netWorth < 50000) selectedValue = 12
+                      else selectedValue = 14
+                      setFormData(prev => ({ ...prev, net_worth: selectedValue }))
+                    }}
+                    onCancel={() => setShowNetWorthCalculator(false)}
+                  />
+                </div>
+              )}
+
+              {showSavingsCalculator && (
+                <div className="mb-8 p-6 bg-green-50 border-2 border-green-200 rounded-lg">
+                  <h3 className="text-xl font-bold text-green-900 mb-4">💰 Monthly Savings Calculator</h3>
+                  <MonthlySavingsCalculator 
+                    onCalculate={(monthlySavings) => {
+                      setCalculatorResults(prev => ({ ...prev, monthlySavings }))
+                      setShowSavingsCalculator(false)
+                      // Auto-select the appropriate range based on calculated value
+                      let selectedValue = 0
+                      if (monthlySavings < 0) selectedValue = 0
+                      else if (monthlySavings < 500) selectedValue = 4
+                      else if (monthlySavings < 1000) selectedValue = 7
+                      else if (monthlySavings < 2000) selectedValue = 9
+                      else selectedValue = 10.5
+                      setFormData(prev => ({ ...prev, monthly_savings: selectedValue }))
+                    }}
+                    onCancel={() => setShowSavingsCalculator(false)}
+                  />
+                </div>
+              )}
 
               {/* Market Intelligence Section */}
               <div>

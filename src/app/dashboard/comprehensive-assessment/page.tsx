@@ -1123,7 +1123,8 @@ export default function ComprehensiveAssessmentPage() {
       <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="mb-8">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Complete SPI Assessment</h1>
               <p className="text-gray-600 mb-4">
                 This comprehensive assessment evaluates all five dimensions of your Success Probability Index. 
@@ -1269,9 +1270,11 @@ export default function ComprehensiveAssessmentPage() {
                   </div>
                 </div>
                 
+                {/* Live Standout Combo Display */}
                 <div className="mt-4 p-3 bg-purple-100 rounded-lg">
                   <p className="text-sm text-purple-800">
-                    <strong>Note:</strong> These strengths will be integrated into your SPI assessment results to provide personalized insights.
+                    <strong>Selected:</strong> {formData.standout_strength_1}{formData.standout_strength_2 ? ` + ${formData.standout_strength_2}` : ''} <br/>
+                    <strong>SPI Strength Combo:</strong> {strengthCombo}
                   </p>
                 </div>
               </div>
@@ -1652,6 +1655,11 @@ export default function ComprehensiveAssessmentPage() {
                 </div>
               )}
 
+              {/* Live SPI Score Display */}
+              <div className="mb-6 mt-8 p-4 bg-indigo-50 border border-indigo-200 rounded-lg text-center">
+                <span className="text-lg font-bold text-indigo-900">Live SPI Score: {totalScore}/100</span>
+                <span className="ml-4 text-md text-indigo-700">Current Tier: {tier}</span>
+              </div>
               <div className="flex justify-end">
                 <button
                   type="submit"

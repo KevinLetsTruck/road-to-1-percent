@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 import { TrendingUp } from 'lucide-react'
+import ShieldLogo from '@/components/ui/ShieldLogo'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
@@ -83,7 +84,7 @@ export default function DashboardPage() {
                 onClick={() => router.push('/')}
                 className="flex items-center hover:opacity-80 transition-opacity"
               >
-                <TrendingUp className="h-8 w-8 text-[#1e3a8a] mr-2" />
+                <ShieldLogo width={120} height={40} className="mr-2" />
                 <span className="text-xl font-bold text-[#1e3a8a]">Road to 1%</span>
               </button>
             </div>

@@ -1,6 +1,7 @@
 // Trigger redeploy for Vercel
 import Link from 'next/link'
 import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
+import ShieldLogo from '@/components/ui/ShieldLogo'
 
 export default function HomePage() {
   const features = [
@@ -25,8 +26,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Road to 1%</span>
+              <ShieldLogo width={120} height={40} className="mr-2" />
+              <span className="text-xl font-bold text-[#1e3a8a]">Road to 1%</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link
@@ -37,7 +38,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/register"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+                className="bg-[#1e3a8a] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#1e40af] transition-colors"
               >
                 Get Started
               </Link>
@@ -60,7 +61,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link
               href="/register"
-              className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center"
+              className="bg-[#1e3a8a] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1e40af] transition-colors flex items-center justify-center"
             >
               Start Your Journey
               <ArrowRight className="ml-2 w-5 h-5" />
@@ -107,12 +108,12 @@ export default function HomePage() {
           <p className="text-gray-600 mb-8">
             Start your assessment today and discover your path to success.
           </p>
-          <Link
-            href="/register"
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105"
-          >
-            Begin Your Assessment
-          </Link>
+                      <Link
+              href="/register"
+              className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-[#1e40af] hover:to-[#1e3a8a] transition-all transform hover:scale-105"
+            >
+              Begin Your Assessment
+            </Link>
         </div>
       </main>
 

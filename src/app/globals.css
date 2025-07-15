@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Let's Truck Color Palette */
+  --lets-truck-blue: #1e3a8a;
+  --lets-truck-blue-light: #1e40af;
+  --lets-truck-orange: #f59e0b;
+  --lets-truck-orange-dark: #d97706;
+  --lets-truck-gray: #6b7280;
+  --lets-truck-gray-light: #f3f4f6;
 }
 
 @theme inline {
@@ -10,6 +18,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Custom Let's Truck Colors */
+  --color-lets-truck-blue: var(--lets-truck-blue);
+  --color-lets-truck-blue-light: var(--lets-truck-blue-light);
+  --color-lets-truck-orange: var(--lets-truck-orange);
+  --color-lets-truck-orange-dark: var(--lets-truck-orange-dark);
+  --color-lets-truck-gray: var(--lets-truck-gray);
+  --color-lets-truck-gray-light: var(--lets-truck-gray-light);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +38,19 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Let's Truck Button Styles */
+.btn-lets-truck-primary {
+  @apply bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
+}
+
+.btn-lets-truck-secondary {
+  @apply bg-[#f59e0b] hover:bg-[#d97706] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
+}
+
+.btn-lets-truck-outline {
+  @apply border-2 border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
 }

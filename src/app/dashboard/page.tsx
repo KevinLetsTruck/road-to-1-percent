@@ -75,7 +75,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-lg">
+      <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -83,15 +83,15 @@ export default function DashboardPage() {
                 onClick={() => router.push('/')}
                 className="flex items-center hover:opacity-80 transition-opacity"
               >
-                <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-                <span className="text-xl font-bold text-gray-900">Road to 1%</span>
+                <TrendingUp className="h-8 w-8 text-[#1e3a8a] mr-2" />
+                <span className="text-xl font-bold text-[#1e3a8a]">Road to 1%</span>
               </button>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
               <button
                 onClick={handleSignOut}
-                className="bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700"
+                className="bg-[#f59e0b] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#d97706] transition-colors"
               >
                 Sign Out
               </button>
@@ -120,9 +120,9 @@ export default function DashboardPage() {
         )}
 
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-8 text-white">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] rounded-lg shadow-lg p-8 text-white">
             <h1 className="text-3xl font-bold">Welcome to Road to 1%!</h1>
-            <p className="mt-2 text-indigo-100">You're on your journey to the 1%</p>
+            <p className="mt-2 text-blue-100">You're on your journey to the 1%</p>
             
             {/* Show progress if available */}
             {userProgress && (
@@ -133,18 +133,18 @@ export default function DashboardPage() {
                     <div className="text-2xl font-bold">{userProgress.current_tier}</div>
                     <div className="text-indigo-100 text-sm">Current Tier</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">
-                      {userProgress.spi_completed ? '✅' : '⏳'}
-                    </div>
-                    <div className="text-indigo-100 text-sm">SPI Assessment</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">
-                      {userProgress.business_track_progress}%
-                    </div>
-                    <div className="text-indigo-100 text-sm">Business Track</div>
-                  </div>
+                                   <div className="text-center">
+                   <div className="text-2xl font-bold">
+                     {userProgress.spi_completed ? '✅' : '⏳'}
+                   </div>
+                   <div className="text-blue-100 text-sm">SPI Assessment</div>
+                 </div>
+                                   <div className="text-center">
+                   <div className="text-2xl font-bold">
+                     {userProgress.business_track_progress}%
+                   </div>
+                   <div className="text-blue-100 text-sm">Business Track</div>
+                 </div>
                 </div>
               </div>
             )}
@@ -159,30 +159,30 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Great job! You've completed the SPI Assessment</h2>
                 <p className="text-gray-600 mb-4">Your financial foundation is set. Here's what's next:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button
-                    onClick={() => router.push('/dashboard/assessments/leadership')}
-                    className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
-                  >
-                    Take Leadership Assessment
-                  </button>
-                  <button
-                    onClick={() => router.push('/dashboard/progress')}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-                  >
-                    View Your Progress
-                  </button>
+                                   <button
+                   onClick={() => router.push('/dashboard/assessments/leadership')}
+                   className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors"
+                 >
+                   Take Leadership Assessment
+                 </button>
+                 <button
+                   onClick={() => router.push('/dashboard/progress')}
+                   className="bg-[#f59e0b] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#d97706] transition-colors"
+                 >
+                   View Your Progress
+                 </button>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-center">
-              <button
-                onClick={() => router.push('/dashboard/assessments/spi')}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
-              >
-                Take SPI Financial Assessment
-              </button>
-            </div>
+                         <div className="text-center">
+               <button
+                 onClick={() => router.push('/dashboard/assessments/spi')}
+                 className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors text-lg"
+               >
+                 Take SPI Financial Assessment
+               </button>
+             </div>
           )}
         </div>
       </main>

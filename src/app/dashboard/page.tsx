@@ -46,23 +46,29 @@ export default function DashboardPage() {
 
       // Check if user is admin
       try {
+        console.log('=== ADMIN DEBUG START ===')
         console.log('Checking admin status for user:', user.id)
+        
         const { data: userData, error } = await supabase
           .from('profiles')
-          .select('is_admin')
+          .select('*')
           .eq('id', user.id)
           .single()
         
-        console.log('Admin check result:', userData, error)
+        console.log('Full user data:', userData)
+        console.log('Admin check result:', userData?.is_admin)
+        console.log('Error if any:', error)
         
-        if (userData?.is_admin) {
-          console.log('User is admin, setting isAdmin to true')
+        if (userData?.is_admin === true) {
+          console.log('✅ User is admin, setting isAdmin to true')
           setIsAdmin(true)
         } else {
-          console.log('User is not admin, isAdmin remains false')
+          console.log('❌ User is not admin, isAdmin remains false')
+          console.log('is_admin value:', userData?.is_admin, 'type:', typeof userData?.is_admin)
         }
+        console.log('=== ADMIN DEBUG END ===')
       } catch (error) {
-        console.log('Error checking admin status:', error)
+        console.log('🚨 Error checking admin status:', error)
       }
       
       // Check for success message in URL
@@ -136,7 +142,9 @@ export default function DashboardPage() {
               )}
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
               {/* Temporary debug info */}
-              <span className="text-xs text-gray-500">Admin: {isAdmin ? 'Yes' : 'No'}</span>
+              <span className="text-xs text-gray-500 bg-yellow-100 px-2 py-1 rounded">
+                Admin: {isAdmin ? 'Yes' : 'No'} | User ID: {user.id.slice(0, 8)}...
+              </span>
               <button
                 onClick={handleSignOut}
                 className="bg-[#f59e0b] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#d97706] transition-colors"

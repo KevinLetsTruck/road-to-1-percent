@@ -72,13 +72,13 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
       ? 'What is your current net worth (assets minus liabilities)?'
       : 'What is your current net worth (assets minus liabilities)?',
     options: [
+      { value: -1, label: '📋 Use Net Worth Calculator', description: 'Get help calculating your exact net worth' },
       { value: 0, label: 'Negative $25,000+', description: 'Significant debt burden' },
       { value: 3, label: 'Negative $10,000 to $25,000', description: 'Moderate debt' },
       { value: 6, label: 'Negative $10,000 to $0', description: 'Minor debt' },
       { value: 10, label: '$0 to $10,000', description: 'Breaking even' },
       { value: 12, label: '$10,000 to $50,000', description: 'Positive foundation' },
-      { value: 14, label: '$50,000+', description: 'Strong financial base' },
-      { value: -1, label: '📋 Use Net Worth Calculator', description: 'Get help calculating your exact net worth' }
+      { value: 14, label: '$50,000+', description: 'Strong financial base' }
     ],
     weight: 0.4,
     maxPoints: 14
@@ -88,12 +88,12 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     dimension: 'Financial Foundation',
     question: 'How much do you save monthly after all expenses?',
     options: [
+      { value: -1, label: '📋 Use Monthly Savings Calculator', description: 'Get help calculating your exact monthly savings' },
       { value: 0, label: 'Negative (spending more than earning)', description: 'Living beyond means' },
       { value: 4, label: '$0 to $500', description: 'Breaking even' },
       { value: 7, label: '$500 to $1,000', description: 'Moderate savings' },
       { value: 9, label: '$1,000 to $2,000', description: 'Good savings rate' },
-      { value: 10.5, label: '$2,000+', description: 'Excellent savings' },
-      { value: -1, label: '📋 Use Monthly Savings Calculator', description: 'Get help calculating your exact monthly savings' }
+      { value: 10.5, label: '$2,000+', description: 'Excellent savings' }
     ],
     weight: 0.3,
     maxPoints: 10.5
@@ -1330,7 +1330,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value}
+                              value={option.value.toString()}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1414,7 +1414,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value}
+                              value={option.value.toString()}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1454,7 +1454,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value}
+                              value={option.value.toString()}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1494,7 +1494,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value}
+                              value={option.value.toString()}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1534,7 +1534,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value}
+                              value={option.value.toString()}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"

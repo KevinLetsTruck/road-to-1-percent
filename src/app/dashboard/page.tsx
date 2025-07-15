@@ -46,17 +46,23 @@ export default function DashboardPage() {
 
       // Check if user is admin
       try {
-        const { data: userData } = await supabase
+        console.log('Checking admin status for user:', user.id)
+        const { data: userData, error } = await supabase
           .from('profiles')
           .select('is_admin')
           .eq('id', user.id)
           .single()
         
+        console.log('Admin check result:', userData, error)
+        
         if (userData?.is_admin) {
+          console.log('User is admin, setting isAdmin to true')
           setIsAdmin(true)
+        } else {
+          console.log('User is not admin, isAdmin remains false')
         }
       } catch (error) {
-        console.log('Error checking admin status')
+        console.log('Error checking admin status:', error)
       }
       
       // Check for success message in URL
@@ -129,6 +135,8 @@ export default function DashboardPage() {
                 </button>
               )}
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
+              {/* Temporary debug info */}
+              <span className="text-xs text-gray-500">Admin: {isAdmin ? 'Yes' : 'No'}</span>
               <button
                 onClick={handleSignOut}
                 className="bg-[#f59e0b] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#d97706] transition-colors"

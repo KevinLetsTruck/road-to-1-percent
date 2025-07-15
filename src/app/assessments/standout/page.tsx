@@ -54,68 +54,31 @@ export default function StandoutAssessment() {
       // Calculate fit score
       const fitScore = Math.round((roleFitScore[role1] + roleFitScore[role2]) / 2)
       
-      // Try a simpler approach - just update the standout fields
       console.log('Attempting to save Standout assessment for user:', user.id)
       console.log('Data to save:', { role1, role2, fitScore })
       
-      // Use a simple update operation
-      let { error } = await supabase
-        .from('user_progress')
-        .update({
-          standout_completed: true,
-          standout_role_1: role1,
-          standout_role_2: role2,
-          standout_score: fitScore,
-          updated_at: new Date().toISOString()
+      // Try using a direct API call instead of Supabase client
+      const response = await fetch('/api/user-progress/standout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          role1,
+          role2,
+          fitScore
         })
-        .eq('user_id', user.id)
+      })
       
-      console.log('Update result:', { error })
-      
-      // If update fails (record doesn't exist), try to create it
-      if (error && error.code === 'PGRST116') {
-        console.log('Record not found, attempting to create...')
-        const { error: createError } = await supabase
-          .from('user_progress')
-          .insert({
-            user_id: user.id,
-            current_tier: '90%',
-            financial_foundation_completed: false,
-            market_intelligence_completed: false,
-            personal_strengths_completed: false,
-            risk_management_completed: false,
-            support_systems_completed: false,
-            spi_completed: false,
-            standout_completed: true,
-            standout_role_1: role1,
-            standout_role_2: role2,
-            standout_score: fitScore,
-            industry_knowledge_completed: false,
-            leadership_completed: false,
-            customer_service_completed: false,
-            operational_completed: false,
-            health_completed: false,
-            business_track_progress: 0,
-            personal_track_progress: 0,
-            health_track_progress: 0,
-            milestones_achieved: [],
-            program_start_date: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-        
-        if (createError) {
-          console.log('Create error:', createError)
-          error = createError
-        } else {
-          error = null
-        }
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.log('API error:', errorData)
+        throw new Error(errorData.error || 'Failed to save assessment')
       }
       
-      if (error) {
-        console.error('Database error:', error)
-        alert('There was an error saving your Standout assessment. Please try again.')
-        return
-      }
+      const result = await response.json()
+      console.log('API success:', result)
       
       router.push('/dashboard?message=Standout%202.0%20Assessment%20completed%20successfully!')
     } catch (error) {

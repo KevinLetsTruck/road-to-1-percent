@@ -637,10 +637,14 @@ export default function ComprehensiveAssessmentPage() {
                       <option value="">Select your top strength</option>
                       {[
                         'Pioneer',
-                        'Creator', 
-                        'Innovator',
+                        'Influencer',
+                        'Stimulator',
+                        'Advisor',
                         'Connector',
-                        'Advisor'
+                        'Provider',
+                        'Equalizer',
+                        'Teacher',
+                        'Creator'
                       ].filter(strength => strength !== formData.standout_strength_2).map((strength) => (
                         <option key={strength} value={strength}>
                           {strength}
@@ -660,10 +664,14 @@ export default function ComprehensiveAssessmentPage() {
                       <option value="">Select your second strength</option>
                       {[
                         'Pioneer',
-                        'Creator', 
-                        'Innovator',
+                        'Influencer',
+                        'Stimulator',
+                        'Advisor',
                         'Connector',
-                        'Advisor'
+                        'Provider',
+                        'Equalizer',
+                        'Teacher',
+                        'Creator'
                       ].filter(strength => strength !== formData.standout_strength_1).map((strength) => (
                         <option key={strength} value={strength}>
                           {strength}

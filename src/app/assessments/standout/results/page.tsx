@@ -66,8 +66,7 @@ export default function StandoutResultsPage() {
     'Provider': 'Reliable caretaker who ensures needs are met. Essential for customer service and operational consistency.',
     'Equalizer': 'Balance creator who resolves conflicts and ensures fairness. Important for team harmony and stakeholder management.',
     'Teacher': 'Knowledge sharer who helps others learn and grow. Valuable for training, mentoring, and thought leadership.',
-    'Creator': 'Visionary builder who turns ideas into reality. Perfect for product development and innovation.',
-    'Other': 'Versatile individual with unique strengths that don\'t fit standard categories. Adaptable to various business needs.'
+    'Creator': 'Visionary builder who turns ideas into reality. Perfect for product development and innovation.'
   }
 
   const getScoreDescription = (score: number): string => {

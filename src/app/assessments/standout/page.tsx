@@ -13,8 +13,7 @@ const standoutRoles = [
   'Provider',
   'Equalizer',
   'Teacher',
-  'Creator',
-  'Other'
+  'Creator'
 ]
 
 // Comprehensive role combination scoring for entrepreneurship
@@ -28,8 +27,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 6, // Moderate: Innovation + reliability
     'Equalizer': 5, // Challenging: Innovation vs stability
     'Teacher': 7, // Good: Innovation + education
-    'Creator': 8, // Good: Innovation + creation
-    'Other': 5
+    'Creator': 8 // Good: Innovation + creation
   },
   'Influencer': {
     'Pioneer': 9, // Excellent: Persuasion + innovation
@@ -39,8 +37,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 7, // Good: Persuasion + reliability
     'Equalizer': 6, // Moderate: Persuasion vs balance
     'Teacher': 8, // Good: Persuasion + education
-    'Creator': 7, // Good: Persuasion + creation
-    'Other': 6
+    'Creator': 7 // Good: Persuasion + creation
   },
   'Stimulator': {
     'Pioneer': 8, // Good: Energy + innovation
@@ -50,8 +47,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 6, // Moderate: Energy vs reliability
     'Equalizer': 5, // Challenging: Energy vs stability
     'Teacher': 7, // Good: Energy + education
-    'Creator': 7, // Good: Energy + creation
-    'Other': 5
+    'Creator': 7 // Good: Energy + creation
   },
   'Advisor': {
     'Pioneer': 7, // Good: Wisdom + innovation
@@ -61,8 +57,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 8, // Good: Wisdom + reliability
     'Equalizer': 7, // Good: Wisdom + balance
     'Teacher': 8, // Good: Wisdom + education
-    'Creator': 7, // Good: Wisdom + creation
-    'Other': 6
+    'Creator': 7 // Good: Wisdom + creation
   },
   'Connector': {
     'Pioneer': 8, // Good: Networking + innovation
@@ -72,8 +67,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Provider': 7, // Good: Networking + reliability
     'Equalizer': 7, // Good: Networking + balance
     'Teacher': 8, // Good: Networking + education
-    'Creator': 7, // Good: Networking + creation
-    'Other': 6
+    'Creator': 7 // Good: Networking + creation
   },
   'Provider': {
     'Pioneer': 6, // Moderate: Reliability vs innovation
@@ -83,8 +77,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Connector': 7, // Good: Reliability + networking
     'Equalizer': 7, // Good: Reliability + balance
     'Teacher': 7, // Good: Reliability + education
-    'Creator': 6, // Moderate: Reliability vs creativity
-    'Other': 5
+    'Creator': 6 // Moderate: Reliability vs creativity
   },
   'Equalizer': {
     'Pioneer': 5, // Challenging: Balance vs innovation
@@ -94,8 +87,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Connector': 7, // Good: Balance + networking
     'Provider': 7, // Good: Balance + reliability
     'Teacher': 7, // Good: Balance + education
-    'Creator': 6, // Moderate: Balance vs creativity
-    'Other': 5
+    'Creator': 6 // Moderate: Balance vs creativity
   },
   'Teacher': {
     'Pioneer': 7, // Good: Education + innovation
@@ -105,8 +97,7 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Connector': 8, // Good: Education + networking
     'Provider': 7, // Good: Education + reliability
     'Equalizer': 7, // Good: Education + balance
-    'Creator': 7, // Good: Education + creation
-    'Other': 6
+    'Creator': 7 // Good: Education + creation
   },
   'Creator': {
     'Pioneer': 8, // Good: Creation + innovation
@@ -116,20 +107,9 @@ const roleCombinationScores: Record<string, Record<string, number>> = {
     'Connector': 7, // Good: Creation + networking
     'Provider': 6, // Moderate: Creation vs reliability
     'Equalizer': 6, // Moderate: Creation vs balance
-    'Teacher': 7, // Good: Creation + education
-    'Other': 5
+    'Teacher': 7 // Good: Creation + education
   },
-  'Other': {
-    'Pioneer': 5,
-    'Influencer': 6,
-    'Stimulator': 5,
-    'Advisor': 6,
-    'Connector': 6,
-    'Provider': 5,
-    'Equalizer': 5,
-    'Teacher': 6,
-    'Creator': 5
-  }
+
 }
 
 // Role descriptions for entrepreneurship context
@@ -142,8 +122,7 @@ const roleDescriptions: Record<string, string> = {
   'Provider': 'Reliable caretaker who ensures needs are met. Essential for customer service and operational consistency.',
   'Equalizer': 'Balance creator who resolves conflicts and ensures fairness. Important for team harmony and stakeholder management.',
   'Teacher': 'Knowledge sharer who helps others learn and grow. Valuable for training, mentoring, and thought leadership.',
-  'Creator': 'Visionary builder who turns ideas into reality. Perfect for product development and innovation.',
-  'Other': 'Versatile individual with unique strengths that don\'t fit standard categories. Adaptable to various business needs.'
+  'Creator': 'Visionary builder who turns ideas into reality. Perfect for product development and innovation.'
 }
 
 export default function StandoutAssessment() {

@@ -1331,7 +1331,11 @@ export default function ComprehensiveAssessmentPage() {
                               type="radio"
                               name={question.id}
                               value={option.value.toString()}
-                              checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
+                              checked={
+                                option.value === -1 
+                                  ? (showNetWorthCalculator && question.id === 'net_worth') || (showSavingsCalculator && question.id === 'monthly_savings')
+                                  : formData[question.id as keyof ComprehensiveAssessmentData] === option.value
+                              }
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
                             />

@@ -90,6 +90,12 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => router.push('/dashboard/progress')}
+                className="text-[#1e3a8a] hover:text-[#1e40af] transition-colors"
+              >
+                Progress
+              </button>
               <span className="text-sm text-gray-700">Welcome, {user.email}</span>
               <button
                 onClick={handleSignOut}
@@ -168,18 +174,18 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                   <button
-                   onClick={() => router.push('/dashboard/assessments/leadership')}
-                   className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors"
-                 >
-                   Take Leadership Assessment
-                 </button>
-                 <button
-                   onClick={() => router.push('/dashboard/progress')}
-                   className="bg-[#f59e0b] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#d97706] transition-colors"
-                 >
-                   View Your Progress
-                 </button>
+                  <button
+                    onClick={() => router.push('/assessments/leadership')}
+                    className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors"
+                  >
+                    Take Leadership Assessment
+                  </button>
+                  <button
+                    onClick={() => router.push('/dashboard/progress')}
+                    className="bg-[#f59e0b] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#d97706] transition-colors"
+                  >
+                    View Your Progress
+                  </button>
                 </div>
               </div>
             </div>

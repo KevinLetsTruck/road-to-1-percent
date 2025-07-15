@@ -6,7 +6,12 @@ import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info } from 'lucide-react'
 
+type CurrentSituation = 'Employee Driver' | 'Truck Owner' | 'Leased O/O' | 'Small Carrier'
+
 interface ComprehensiveAssessmentData {
+  // Current Situation
+  current_situation: CurrentSituation
+  
   // Financial Foundation (35 points)
   net_worth: number
   monthly_savings: number
@@ -51,12 +56,14 @@ interface AssessmentQuestion {
   maxPoints: number
 }
 
-const assessmentQuestions: AssessmentQuestion[] = [
+const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQuestion[] => [
   // Financial Foundation Questions
   {
     id: 'net_worth',
     dimension: 'Financial Foundation',
-    question: 'What is your current net worth (assets minus liabilities)?',
+    question: currentSituation === 'Employee Driver' 
+      ? 'What is your current net worth (assets minus liabilities)?'
+      : 'What is your current net worth (assets minus liabilities)?',
     options: [
       { value: 0, label: 'Negative $25,000+', description: 'Significant debt burden' },
       { value: 3, label: 'Negative $10,000 to $25,000', description: 'Moderate debt' },
@@ -115,8 +122,16 @@ const assessmentQuestions: AssessmentQuestion[] = [
   {
     id: 'rate_understanding',
     dimension: 'Market Intelligence',
-    question: 'How do you evaluate freight rates?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How do you evaluate job opportunities and compensation?'
+      : 'How do you evaluate freight rates?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'I accept whatever job is offered', description: 'No evaluation' },
+      { value: 1, label: 'I look at the hourly rate or salary', description: 'Basic awareness' },
+      { value: 2, label: 'I compare pay to my living expenses', description: 'Cost-conscious' },
+      { value: 3, label: 'I analyze benefits, hours, and work conditions', description: 'Strategic thinking' },
+      { value: 4, label: 'I evaluate career growth and long-term opportunities', description: 'Career intelligence' }
+    ] : [
       { value: 0, label: 'I accept whatever dispatch offers', description: 'Employee thinking' },
       { value: 1, label: 'I look at total pay for the run', description: 'Basic awareness' },
       { value: 2, label: 'I compare rate per mile to my costs', description: 'Cost-conscious' },
@@ -129,8 +144,16 @@ const assessmentQuestions: AssessmentQuestion[] = [
   {
     id: 'cost_analysis',
     dimension: 'Market Intelligence',
-    question: 'How well do you understand your cost per mile?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How well do you understand your personal cost of living and expenses?'
+      : 'How well do you understand your cost per mile?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'I don\'t track my expenses', description: 'No awareness' },
+      { value: 1, label: 'I know my basic bills', description: 'Basic awareness' },
+      { value: 2, label: 'I track major expenses', description: 'Partial tracking' },
+      { value: 3, label: 'I calculate my cost of living', description: 'Full cost analysis' },
+      { value: 4, label: 'I optimize my spending based on analysis', description: 'Strategic optimization' }
+    ] : [
       { value: 0, label: 'I don\'t track costs', description: 'No awareness' },
       { value: 1, label: 'I know fuel and truck payment', description: 'Basic awareness' },
       { value: 2, label: 'I track major expenses', description: 'Partial tracking' },
@@ -338,6 +361,7 @@ const assessmentQuestions: AssessmentQuestion[] = [
 export default function ComprehensiveAssessmentPage() {
   const [user, setUser] = useState<User | null>(null)
   const [formData, setFormData] = useState<ComprehensiveAssessmentData>({
+    current_situation: 'Employee Driver',
     net_worth: 0,
     monthly_savings: 0,
     emergency_fund_months: 0,
@@ -384,6 +408,7 @@ export default function ComprehensiveAssessmentPage() {
   }, [router, supabase])
 
   const calculateDimensionScore = (dimension: string) => {
+    const assessmentQuestions = getAssessmentQuestions(formData.current_situation)
     const dimensionQuestions = assessmentQuestions.filter(q => q.dimension === dimension)
     let totalScore = 0
     
@@ -484,6 +509,10 @@ export default function ComprehensiveAssessmentPage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleSituationChange = (situation: CurrentSituation) => {
+    setFormData(prev => ({ ...prev, current_situation: situation }))
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -524,13 +553,44 @@ export default function ComprehensiveAssessmentPage() {
                 This comprehensive assessment evaluates all five dimensions of your Success Probability Index. 
                 Be honest—this assessment is designed to show you exactly where you stand and where to focus your efforts.
               </p>
+              
+              {/* Current Situation Selector */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">What is your current situation?</h3>
+                <p className="text-gray-600 mb-4">
+                  This helps us provide questions that are relevant to your specific circumstances.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {(['Employee Driver', 'Truck Owner', 'Leased O/O', 'Small Carrier'] as CurrentSituation[]).map((situation) => (
+                    <label key={situation} className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="current_situation"
+                        value={situation}
+                        checked={formData.current_situation === situation}
+                        onChange={() => handleSituationChange(situation)}
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">{situation}</div>
+                        <div className="text-sm text-gray-600">
+                          {situation === 'Employee Driver' && 'Driving for a company as an employee'}
+                          {situation === 'Truck Owner' && 'Own your truck and drive for yourself'}
+                          {situation === 'Leased O/O' && 'Lease your truck to a carrier'}
+                          {situation === 'Small Carrier' && 'Own multiple trucks and manage drivers'}
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
                   <div>
                     <p className="text-sm text-blue-800 font-medium">Assessment Overview</p>
                     <p className="text-sm text-blue-700 mt-1">
-                      This assessment contains {assessmentQuestions.length} questions across five dimensions. 
+                      This assessment contains {getAssessmentQuestions(formData.current_situation).length} questions across five dimensions. 
                       Take your time and answer honestly. Your results will provide a clear roadmap for improvement.
                     </p>
                   </div>
@@ -593,7 +653,7 @@ export default function ComprehensiveAssessmentPage() {
                 <p className="text-gray-600 mb-4">
                   Your financial foundation determines your ability to invest in opportunities and weather challenges.
                 </p>
-                {assessmentQuestions
+                {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Financial Foundation')
                   .map((question, index) => (
                     <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
@@ -633,7 +693,7 @@ export default function ComprehensiveAssessmentPage() {
                 <p className="text-gray-600 mb-4">
                   Understanding the market, rates, and customer needs is crucial for making profitable decisions.
                 </p>
-                {assessmentQuestions
+                {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Market Intelligence')
                   .map((question, index) => (
                     <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
@@ -673,7 +733,7 @@ export default function ComprehensiveAssessmentPage() {
                 <p className="text-gray-600 mb-4">
                   Your natural strengths determine how you approach challenges and opportunities.
                 </p>
-                {assessmentQuestions
+                {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Personal Strengths')
                   .map((question, index) => (
                     <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
@@ -713,7 +773,7 @@ export default function ComprehensiveAssessmentPage() {
                 <p className="text-gray-600 mb-4">
                   How well you prepare for and manage risks determines your business sustainability.
                 </p>
-                {assessmentQuestions
+                {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Risk Management')
                   .map((question, index) => (
                     <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
@@ -753,7 +813,7 @@ export default function ComprehensiveAssessmentPage() {
                 <p className="text-gray-600 mb-4">
                   Your network, family support, and mentorship multiply your individual efforts.
                 </p>
-                {assessmentQuestions
+                {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Support Systems')
                   .map((question, index) => (
                     <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">

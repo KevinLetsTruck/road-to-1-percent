@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId)
       .single()
 
-    let updateData = {
+    const updateData = {
       standout_completed: true,
       standout_role_1: role1,
       standout_role_2: role2,

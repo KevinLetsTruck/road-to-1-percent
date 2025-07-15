@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     // Prepare update data based on assessment type
-    let updateData: any = {
+    const updateData: Record<string, any> = {
       updated_at: new Date().toISOString()
     }
 

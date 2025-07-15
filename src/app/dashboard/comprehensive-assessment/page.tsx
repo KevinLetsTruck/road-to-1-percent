@@ -979,6 +979,24 @@ export default function ComprehensiveAssessmentPage() {
         throw new Error(errorData.error || 'Failed to update progress')
       }
 
+      // Send assessment completion email
+      try {
+        await fetch('/api/email/assessment-completion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            assessmentName: 'Comprehensive SPI Assessment',
+            score: totalScore,
+            tier
+          })
+        })
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError)
+        // Don't fail the assessment submission if email fails
+      }
+
       router.push('/dashboard/comprehensive-assessment/results?score=' + totalScore)
     } catch (error: unknown) {
       setError((error as Error).message)

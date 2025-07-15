@@ -71,6 +71,19 @@ export default function RegisterPage() {
         await supabase.from('user_progress').insert({
           user_id: user.id,
         })
+
+        // Send welcome email
+        try {
+          await fetch('/api/email/welcome', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          })
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError)
+          // Don't fail registration if email fails
+        }
         
         // Redirect to dashboard
         router.push('/dashboard?message=Account created successfully!')

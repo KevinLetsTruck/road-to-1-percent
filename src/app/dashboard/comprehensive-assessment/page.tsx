@@ -873,6 +873,7 @@ export default function ComprehensiveAssessmentPage() {
   const [showNetWorthCalculator, setShowNetWorthCalculator] = useState(false)
   const [showSavingsCalculator, setShowSavingsCalculator] = useState(false)
   const [calculatorResults, setCalculatorResults] = useState<{ netWorth?: number; monthlySavings?: number }>({})
+  const [hasExistingData, setHasExistingData] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -884,6 +885,55 @@ export default function ComprehensiveAssessmentPage() {
         return
       }
       setUser(user)
+      
+      // Load existing assessment data if available
+      try {
+        const { data: existingAssessment } = await supabase
+          .from('comprehensive_assessments')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        
+        if (existingAssessment) {
+          // Load the existing data into the form
+          setFormData({
+            current_situation: existingAssessment.current_situation || 'Employee Driver',
+            fleet_size: existingAssessment.fleet_size || 0,
+            load_sources: existingAssessment.load_sources || [],
+            standout_strength_1: existingAssessment.standout_strength_1 || '',
+            standout_strength_2: existingAssessment.standout_strength_2 || '',
+            net_worth: existingAssessment.net_worth || 0,
+            monthly_savings: existingAssessment.monthly_savings || 0,
+            emergency_fund_months: existingAssessment.emergency_fund_months || 0,
+            debt_to_income_ratio: existingAssessment.debt_to_income_ratio || 0,
+            business_capital: existingAssessment.business_capital || 0,
+            credit_score: existingAssessment.credit_score || 0,
+            rate_understanding: existingAssessment.rate_understanding || 0,
+            cost_analysis: existingAssessment.cost_analysis || 0,
+            customer_knowledge: existingAssessment.customer_knowledge || 0,
+            industry_trends: existingAssessment.industry_trends || 0,
+            strategic_planning: existingAssessment.strategic_planning || 0,
+            pioneer_strength: existingAssessment.pioneer_strength || 0,
+            creator_strength: existingAssessment.creator_strength || 0,
+            innovator_strength: existingAssessment.innovator_strength || 0,
+            connector_strength: existingAssessment.connector_strength || 0,
+            advisor_strength: existingAssessment.advisor_strength || 0,
+            contingency_planning: existingAssessment.contingency_planning || 0,
+            business_continuity: existingAssessment.business_continuity || 0,
+            risk_assessment: existingAssessment.risk_assessment || 0,
+            family_alignment: existingAssessment.family_alignment || 0,
+            professional_network: existingAssessment.professional_network || 0,
+            mentorship: existingAssessment.mentorship || 0,
+            industry_reputation: existingAssessment.industry_reputation || 0
+          })
+          setHasExistingData(true)
+        }
+      } catch (error) {
+        console.log('No existing assessment found, starting fresh')
+      }
+      
       setLoading(false)
     }
     getUser()
@@ -997,7 +1047,7 @@ export default function ComprehensiveAssessmentPage() {
         // Don't fail the assessment submission if email fails
       }
 
-      router.push('/dashboard/comprehensive-assessment/results?score=' + totalScore)
+      router.push('/dashboard?message=Assessment completed successfully! Your SPI score is ' + totalScore + '/100. Check your detailed results below.')
     } catch (error: unknown) {
       setError((error as Error).message)
     } finally {
@@ -1079,6 +1129,27 @@ export default function ComprehensiveAssessmentPage() {
                 This comprehensive assessment evaluates all five dimensions of your Success Probability Index. 
                 Be honest—this assessment is designed to show you exactly where you stand and where to focus your efforts.
               </p>
+              
+              {/* Existing Data Banner */}
+              {hasExistingData && (
+                <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-blue-800">
+                        Previous Assessment Data Loaded
+                      </h3>
+                      <p className="text-sm text-blue-700 mt-1">
+                        Your previous assessment responses have been loaded. You can review and modify them as needed.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Current Situation Selector */}
               <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
@@ -1350,7 +1421,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value.toString()}
+                              value={option.value}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1434,7 +1505,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value.toString()}
+                              value={option.value}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1474,7 +1545,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value.toString()}
+                              value={option.value}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1514,7 +1585,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value.toString()}
+                              value={option.value}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"
@@ -1554,7 +1625,7 @@ export default function ComprehensiveAssessmentPage() {
                             <input
                               type="radio"
                               name={question.id}
-                              value={option.value.toString()}
+                              value={option.value}
                               checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
                               onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
                               className="mt-1 mr-3"

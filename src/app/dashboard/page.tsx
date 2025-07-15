@@ -153,13 +153,23 @@ export default function DashboardPage() {
         {successMessage && (
           <div className="px-4 py-6 sm:px-0 mb-6">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <GradientShield width={24} height={24} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <GradientShield width={24} height={24} />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-green-800 font-medium">{successMessage}</p>
+                  </div>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm text-green-800 font-medium">{successMessage}</p>
-                </div>
+                {userProgress?.spi_completed && (
+                  <button
+                    onClick={() => router.push('/dashboard/comprehensive-assessment/results')}
+                    className="ml-4 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
+                  >
+                    View Detailed Results
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -209,14 +219,35 @@ export default function DashboardPage() {
 
         {/* Comprehensive Assessment Section */}
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className={`rounded-lg shadow-lg p-6 ${userProgress?.spi_completed ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200' : 'bg-white'}`}>
             <div className="flex items-center mb-4">
-              <div className="text-3xl mr-3">📊</div>
+              <div className="text-3xl mr-3">{userProgress?.spi_completed ? '🎉' : '📊'}</div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Complete SPI Assessment</h2>
                 <p className="text-gray-600">Get your comprehensive evaluation across all five dimensions</p>
               </div>
             </div>
+            
+            {userProgress?.spi_completed ? (
+              <div className="mb-4 p-4 bg-green-100 rounded-lg border border-green-300">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800">
+                      Assessment Completed! 🎯
+                    </h3>
+                    <p className="text-sm text-green-700 mt-1">
+                      Your SPI Score: <strong>{userProgress.spi_score}/100</strong> | Current Tier: <strong>{userProgress.current_tier}</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center">
@@ -235,11 +266,11 @@ export default function DashboardPage() {
                 onClick={() => router.push(userProgress?.spi_completed ? '/dashboard/comprehensive-assessment/results' : '/dashboard/comprehensive-assessment')}
                 className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                   userProgress?.spi_completed 
-                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' 
+                    ? 'bg-green-600 text-white hover:bg-green-700' 
                     : 'bg-[#1e3a8a] text-white hover:bg-[#1e40af]'
                 }`}
               >
-                {userProgress?.spi_completed ? 'Review Results' : 'Take Complete Assessment'}
+                {userProgress?.spi_completed ? 'View Detailed Results' : 'Take Complete Assessment'}
               </button>
             </div>
           </div>

@@ -23,6 +23,11 @@ export class SimpleEmailService {
       </div>
     `
 
+    if (!resend) {
+      console.log('Resend not configured, skipping email send')
+      return { success: true }
+    }
+
     return await resend.emails.send({
       from: EMAIL_CONFIG.from.email,
       to: [to],
@@ -46,6 +51,11 @@ export class SimpleEmailService {
         <a href="https://roadto1percent.com/dashboard" style="background-color: #1e3a8a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Start Your First Assessment</a>
       </div>
     `
+
+    if (!resend) {
+      console.log('Resend not configured, skipping email send')
+      return { success: true }
+    }
 
     return await resend.emails.send({
       from: EMAIL_CONFIG.from.email,
@@ -72,6 +82,11 @@ export class SimpleEmailService {
         <a href="https://roadto1percent.com/dashboard" style="background-color: #1e3a8a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Continue Your Journey</a>
       </div>
     `
+
+    if (!resend) {
+      console.log('Resend not configured, skipping email send')
+      return { success: true }
+    }
 
     return await resend.emails.send({
       from: EMAIL_CONFIG.from.email,

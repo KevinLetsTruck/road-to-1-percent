@@ -272,7 +272,7 @@ export default function DashboardPage() {
                 )}
               </div>
               <button
-                onClick={() => router.push('/assessments/standout')}
+                onClick={() => router.push(userProgress?.standout_completed ? '/assessments/standout/results' : '/assessments/standout')}
                 className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                   userProgress?.standout_completed 
                     ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' 

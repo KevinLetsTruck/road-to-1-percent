@@ -555,24 +555,28 @@ export default function ComprehensiveAssessmentPage() {
               </p>
               
               {/* Current Situation Selector */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">What is your current situation?</h3>
-                <p className="text-gray-600 mb-4">
-                  This helps us provide questions that are relevant to your specific circumstances.
+              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
+                <h3 className="text-xl font-bold text-blue-900 mb-3">🚛 What is your current situation?</h3>
+                <p className="text-blue-700 mb-4 font-medium">
+                  Please select your current situation so we can provide questions that are relevant to your specific circumstances.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(['Employee Driver', 'Truck Owner', 'Leased O/O', 'Small Carrier'] as CurrentSituation[]).map((situation) => (
-                    <label key={situation} className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <label key={situation} className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      formData.current_situation === situation 
+                        ? 'border-blue-500 bg-blue-100 shadow-md' 
+                        : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                    }`}>
                       <input
                         type="radio"
                         name="current_situation"
                         value={situation}
                         checked={formData.current_situation === situation}
                         onChange={() => handleSituationChange(situation)}
-                        className="mr-3"
+                        className="mr-3 w-4 h-4 text-blue-600"
                       />
                       <div>
-                        <div className="font-medium text-gray-900">{situation}</div>
+                        <div className="font-semibold text-gray-900">{situation}</div>
                         <div className="text-sm text-gray-600">
                           {situation === 'Employee Driver' && 'Driving for a company as an employee'}
                           {situation === 'Truck Owner' && 'Own your truck and drive for yourself'}
@@ -582,6 +586,11 @@ export default function ComprehensiveAssessmentPage() {
                       </div>
                     </label>
                   ))}
+                </div>
+                <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Selected:</strong> {formData.current_situation} - This will customize your assessment questions.
+                  </p>
                 </div>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

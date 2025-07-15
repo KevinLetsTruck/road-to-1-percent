@@ -21,33 +21,17 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     console.log('Supabase client created')
     
-    // Try a simple upsert operation
+    // Try a simple upsert operation with only essential fields
     console.log('Attempting upsert operation...')
     const { data, error } = await supabase
       .from('user_progress')
       .upsert({
         user_id: userId,
         current_tier: '90%',
-        financial_foundation_completed: false,
-        market_intelligence_completed: false,
-        personal_strengths_completed: false,
-        risk_management_completed: false,
-        support_systems_completed: false,
-        spi_completed: false,
         standout_completed: true,
         standout_role_1: role1,
         standout_role_2: role2,
         standout_score: fitScore,
-        industry_knowledge_completed: false,
-        leadership_completed: false,
-        customer_service_completed: false,
-        operational_completed: false,
-        health_completed: false,
-        business_track_progress: 0,
-        personal_track_progress: 0,
-        health_track_progress: 0,
-        milestones_achieved: [],
-        program_start_date: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'user_id'

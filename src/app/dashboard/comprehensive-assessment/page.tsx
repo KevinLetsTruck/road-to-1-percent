@@ -173,8 +173,16 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'customer_knowledge',
     dimension: 'Market Intelligence',
-    question: 'How well do you understand your customers and their needs?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How well do you understand your employer\'s business and expectations?'
+      : 'How well do you understand your customers and their needs?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'I don\'t understand the business', description: 'No awareness' },
+      { value: 1, label: 'I know basic job requirements', description: 'Basic awareness' },
+      { value: 2, label: 'I understand delivery expectations', description: 'Service awareness' },
+      { value: 3, label: 'I know company policies and procedures', description: 'Business understanding' },
+      { value: 4, label: 'I understand company goals and contribute to success', description: 'Strategic partnership' }
+    ] : [
       { value: 0, label: 'I don\'t know my customers', description: 'No relationship' },
       { value: 1, label: 'I know customer names and locations', description: 'Basic awareness' },
       { value: 2, label: 'I understand delivery requirements', description: 'Service awareness' },
@@ -187,8 +195,16 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'industry_trends',
     dimension: 'Market Intelligence',
-    question: 'How well do you understand industry trends and seasonal patterns?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How well do you understand industry trends and job market conditions?'
+      : 'How well do you understand industry trends and seasonal patterns?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'I don\'t follow industry news', description: 'No awareness' },
+      { value: 1, label: 'I notice when job opportunities change', description: 'Basic awareness' },
+      { value: 2, label: 'I understand some industry patterns', description: 'Partial understanding' },
+      { value: 3, label: 'I track factors affecting job market', description: 'Comprehensive tracking' },
+      { value: 4, label: 'I can predict job market changes based on trends', description: 'Predictive analysis' }
+    ] : [
       { value: 0, label: 'I don\'t follow trends', description: 'No awareness' },
       { value: 1, label: 'I notice when rates change', description: 'Basic awareness' },
       { value: 2, label: 'I understand some seasonal patterns', description: 'Partial understanding' },
@@ -201,8 +217,16 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'strategic_planning',
     dimension: 'Market Intelligence',
-    question: 'How do you approach strategic planning for your business?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How do you approach career planning and professional development?'
+      : 'How do you approach strategic planning for your business?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'I don\'t plan my career', description: 'No planning' },
+      { value: 1, label: 'I think about next week', description: 'Short-term thinking' },
+      { value: 2, label: 'I plan for next month', description: 'Monthly planning' },
+      { value: 3, label: 'I have quarterly career goals', description: 'Quarterly planning' },
+      { value: 4, label: 'I have annual career plans and long-term strategy', description: 'Strategic planning' }
+    ] : [
       { value: 0, label: 'I don\'t plan ahead', description: 'No planning' },
       { value: 1, label: 'I think about next week', description: 'Short-term thinking' },
       { value: 2, label: 'I plan for next month', description: 'Monthly planning' },
@@ -249,8 +273,17 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'contingency_planning',
     dimension: 'Risk Management',
-    question: 'How many months of expenses could you cover if your truck was down?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How many months of expenses could you cover if you lost your job?'
+      : 'How many months of expenses could you cover if your truck was down?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: '0 months', description: 'No contingency' },
+      { value: 1, label: '1 month', description: 'Minimal protection' },
+      { value: 2, label: '2-3 months', description: 'Basic protection' },
+      { value: 3, label: '3-6 months', description: 'Good protection' },
+      { value: 4, label: '6+ months', description: 'Excellent protection' },
+      { value: 5, label: '12+ months', description: 'Outstanding protection' }
+    ] : [
       { value: 0, label: '0 months', description: 'No contingency' },
       { value: 1, label: '1 month', description: 'Minimal protection' },
       { value: 2, label: '2-3 months', description: 'Basic protection' },
@@ -265,8 +298,16 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'business_continuity',
     dimension: 'Risk Management',
-    question: 'What\'s your plan if you were injured and couldn\'t drive?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'What\'s your plan if you were injured and couldn\'t work?'
+      : 'What\'s your plan if you were injured and couldn\'t drive?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'No plan', description: 'No preparation' },
+      { value: 0.5, label: 'Hope for the best', description: 'Wishful thinking' },
+      { value: 1, label: 'Rely on family support', description: 'Dependent' },
+      { value: 2, label: 'Use savings temporarily', description: 'Basic preparation' },
+      { value: 3, label: 'Have disability insurance and backup plans', description: 'Comprehensive preparation' }
+    ] : [
       { value: 0, label: 'No plan', description: 'No preparation' },
       { value: 0.5, label: 'Hope for the best', description: 'Wishful thinking' },
       { value: 1, label: 'Rely on family support', description: 'Dependent' },
@@ -279,8 +320,17 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'risk_assessment',
     dimension: 'Risk Management',
-    question: 'How do you evaluate and mitigate business risks?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How do you evaluate and mitigate personal and career risks?'
+      : 'How do you evaluate and mitigate business risks?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'I don\'t think about risks', description: 'No awareness' },
+      { value: 0.5, label: 'I worry about risks but don\'t plan', description: 'Anxious' },
+      { value: 1, label: 'I avoid obvious risks', description: 'Cautious' },
+      { value: 2, label: 'I have basic safety measures', description: 'Basic preparation' },
+      { value: 3, label: 'I systematically assess and mitigate risks', description: 'Strategic' },
+      { value: 4, label: 'I have comprehensive risk management systems', description: 'Expert' }
+    ] : [
       { value: 0, label: 'I don\'t think about risks', description: 'No awareness' },
       { value: 0.5, label: 'I worry about risks but don\'t plan', description: 'Anxious' },
       { value: 1, label: 'I avoid obvious risks', description: 'Cautious' },
@@ -296,8 +346,16 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
   {
     id: 'family_alignment',
     dimension: 'Support Systems',
-    question: 'How well does your family understand and support your business goals?',
-    options: [
+    question: currentSituation === 'Employee Driver' 
+      ? 'How well does your family understand and support your career goals?'
+      : 'How well does your family understand and support your business goals?',
+    options: currentSituation === 'Employee Driver' ? [
+      { value: 0, label: 'Family opposes my goals', description: 'Active resistance' },
+      { value: 0.5, label: 'Family is indifferent', description: 'No support' },
+      { value: 1, label: 'Family is supportive but uninvolved', description: 'Passive support' },
+      { value: 2, label: 'Family understands and encourages', description: 'Active support' },
+      { value: 3, label: 'Family is actively involved in planning', description: 'Partnership' }
+    ] : [
       { value: 0, label: 'Family opposes my goals', description: 'Active resistance' },
       { value: 0.5, label: 'Family is indifferent', description: 'No support' },
       { value: 1, label: 'Family is supportive but uninvolved', description: 'Passive support' },

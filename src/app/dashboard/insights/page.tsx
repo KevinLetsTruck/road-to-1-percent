@@ -192,9 +192,16 @@ export default function InsightsPage() {
           {/* Action Plan Generator */}
           <div className="mt-8">
             <ActionPlanGenerator 
-              scores={currentScores}
-              onSavePlan={(plan) => {
-                console.log('Action plan generated:', plan)
+              assessmentScores={{
+                financial: currentScores.financial_foundation,
+                business: currentScores.market_intelligence,
+                personal: currentScores.personal_strengths,
+                health: currentScores.risk_management,
+                overall: Math.round((currentScores.financial_foundation + currentScores.market_intelligence + currentScores.personal_strengths + currentScores.risk_management + currentScores.support_systems) / 5)
+              }}
+              userTier={currentTier}
+              onGeneratePlan={(plans) => {
+                console.log('Action plan generated:', plans)
                 // Here you could save the plan to the database
               }}
             />

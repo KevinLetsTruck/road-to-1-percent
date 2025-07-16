@@ -80,6 +80,8 @@ export interface Database {
           health_track_progress: number
           milestones_achieved: unknown[]
           program_start_date: string
+          last_assessment_date?: string | null
+          next_quarterly_assessment_date?: string | null
           created_at: string
           updated_at: string
         }

@@ -1,183 +1,261 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, Target, Calendar, TrendingUp, BookOpen, Users, DollarSign, Shield } from 'lucide-react'
+import { Target, Calendar, CheckCircle, TrendingUp, AlertCircle } from 'lucide-react'
 
-interface AssessmentScores {
-  financial_foundation: number
-  market_intelligence: number
-  personal_strengths: number
-  risk_management: number
-  support_systems: number
+interface ActionPlan {
+  id: string
+  title: string
+  description: string
+  category: 'financial' | 'business' | 'personal' | 'health'
+  priority: 'low' | 'medium' | 'high'
+  goal: string
+  targetValue?: number
+  currentValue?: number
+  unit?: string
+  actions: string[]
+  timeline: string
+  resources: string[]
 }
 
 interface ActionPlanGeneratorProps {
-  scores: AssessmentScores
-  onSavePlan?: (plan: ActionItem[]) => void
+  assessmentScores: {
+    financial?: number
+    business?: number
+    personal?: number
+    health?: number
+    overall?: number
+  }
+  userTier: string
+  onGeneratePlan: (plans: ActionPlan[]) => void
 }
 
-interface ActionItem {
-  id: string
-  category: string
-  title: string
-  description: string
-  priority: 'high' | 'medium' | 'low'
-  timeline: '30 days' | '60 days' | '90 days'
-  completed: boolean
-  resources?: string[]
-}
+export default function ActionPlanGenerator({ 
+  assessmentScores, 
+  userTier, 
+  onGeneratePlan 
+}: ActionPlanGeneratorProps) {
+  const [generating, setGenerating] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['financial', 'business', 'personal'])
 
-export default function ActionPlanGenerator({ scores, onSavePlan }: ActionPlanGeneratorProps) {
-  const [actionPlan, setActionPlan] = useState<ActionItem[]>([])
-  const [generated, setGenerated] = useState(false)
-
-  const generateActionPlan = () => {
-    const plan: ActionItem[] = []
-
-    // Financial Foundation Actions
-    if (scores.financial_foundation < 20) {
-      plan.push({
-        id: 'fin-1',
-        category: 'Financial Foundation',
-        title: 'Build Emergency Fund',
-        description: 'Save 3-6 months of expenses to create financial security',
+  const generateActionPlans = async () => {
+    setGenerating(true)
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    const plans: ActionPlan[] = []
+    
+    // Financial Action Plans
+    if (selectedCategories.includes('financial') && assessmentScores.financial !== undefined) {
+      if (assessmentScores.financial < 70) {
+        plans.push({
+          id: 'financial-1',
+          title: 'Build Emergency Fund',
+          description: 'Establish a solid financial foundation with emergency savings',
+          category: 'financial',
+          priority: 'high',
+          goal: 'Save 6 months of expenses',
+          targetValue: 6,
+          currentValue: Math.max(0, assessmentScores.financial / 16.67), // Rough estimate
+          unit: 'months',
+          actions: [
+            'Calculate your monthly expenses',
+            'Set up automatic savings transfers',
+            'Open a high-yield savings account',
+            'Reduce non-essential expenses by 20%',
+            'Track your progress monthly'
+          ],
+          timeline: '6 months',
+          resources: [
+            'Budget tracking app',
+            'High-yield savings account',
+            'Financial advisor consultation'
+          ]
+        })
+      }
+      
+      if (assessmentScores.financial < 85) {
+        plans.push({
+          id: 'financial-2',
+          title: 'Optimize Business Finances',
+          description: 'Improve profit margins and cash flow management',
+          category: 'financial',
+          priority: 'medium',
+          goal: 'Increase profit margin by 15%',
+          targetValue: 15,
+          currentValue: assessmentScores.financial,
+          unit: 'percentage',
+          actions: [
+            'Analyze current expenses and identify savings opportunities',
+            'Negotiate better rates with suppliers',
+            'Implement fuel efficiency strategies',
+            'Review insurance policies for better rates',
+            'Set up separate business and personal accounts'
+          ],
+          timeline: '3 months',
+          resources: [
+            'Accounting software',
+            'Fuel card programs',
+            'Business banking services'
+          ]
+        })
+      }
+    }
+    
+    // Business Action Plans
+    if (selectedCategories.includes('business') && assessmentScores.business !== undefined) {
+      if (assessmentScores.business < 75) {
+        plans.push({
+          id: 'business-1',
+          title: 'Expand Customer Base',
+          description: 'Develop new customer relationships and improve retention',
+          category: 'business',
+          priority: 'high',
+          goal: 'Add 5 new regular customers',
+          targetValue: 5,
+          currentValue: Math.max(0, assessmentScores.business / 20),
+          unit: 'customers',
+          actions: [
+            'Create a professional business card and portfolio',
+            'Join industry networking groups',
+            'Ask current customers for referrals',
+            'Develop a customer service excellence program',
+            'Attend industry trade shows and events'
+          ],
+          timeline: '4 months',
+          resources: [
+            'Professional networking platforms',
+            'Customer relationship management tools',
+            'Industry association memberships'
+          ]
+        })
+      }
+    }
+    
+    // Personal Development Plans
+    if (selectedCategories.includes('personal') && assessmentScores.personal !== undefined) {
+      if (assessmentScores.personal < 80) {
+        plans.push({
+          id: 'personal-1',
+          title: 'Enhance Professional Skills',
+          description: 'Develop leadership and business management capabilities',
+          category: 'personal',
+          priority: 'medium',
+          goal: 'Complete 3 professional development courses',
+          targetValue: 3,
+          currentValue: Math.max(0, assessmentScores.personal / 33.33),
+          unit: 'courses',
+          actions: [
+            'Research relevant online courses in business management',
+            'Enroll in a leadership development program',
+            'Join a professional mentorship program',
+            'Attend industry workshops and seminars',
+            'Practice new skills in real business situations'
+          ],
+          timeline: '6 months',
+          resources: [
+            'Online learning platforms',
+            'Professional development courses',
+            'Mentorship programs'
+          ]
+        })
+      }
+    }
+    
+    // Health & Wellness Plans
+    if (selectedCategories.includes('health') && assessmentScores.health !== undefined) {
+      if (assessmentScores.health < 75) {
+        plans.push({
+          id: 'health-1',
+          title: 'Improve Health & Wellness',
+          description: 'Enhance physical and mental well-being for optimal performance',
+          category: 'health',
+          priority: 'medium',
+          goal: 'Achieve consistent 7+ hours of quality sleep',
+          targetValue: 7,
+          currentValue: Math.max(0, assessmentScores.health / 14.29),
+          unit: 'hours',
+          actions: [
+            'Establish a consistent sleep schedule',
+            'Create a relaxing bedtime routine',
+            'Optimize your sleeping environment',
+            'Limit screen time before bed',
+            'Practice stress management techniques'
+          ],
+          timeline: '3 months',
+          resources: [
+            'Sleep tracking app',
+            'Meditation and relaxation apps',
+            'Health and wellness resources'
+          ]
+        })
+      }
+    }
+    
+    // Tier-specific plans
+    if (userTier === '90%') {
+      plans.push({
+        id: 'tier-1',
+        title: 'Foundation Building',
+        description: 'Focus on establishing solid fundamentals for business success',
+        category: 'business',
         priority: 'high',
-        timeline: '90 days',
-        completed: false,
-        resources: ['Budget tracking app', 'High-yield savings account']
+        goal: 'Complete all foundational assessments',
+        targetValue: 100,
+        currentValue: assessmentScores.overall || 0,
+        unit: 'percentage',
+        actions: [
+          'Complete the comprehensive SPI assessment',
+          'Establish emergency fund',
+          'Build basic business systems',
+          'Develop customer service processes',
+          'Create a business plan'
+        ],
+        timeline: '6 months',
+        resources: [
+          'Business planning templates',
+          'Financial planning tools',
+          'Customer service training'
+        ]
       })
-    }
-
-    if (scores.financial_foundation < 25) {
-      plan.push({
-        id: 'fin-2',
-        category: 'Financial Foundation',
-        title: 'Reduce High-Interest Debt',
-        description: 'Focus on paying off credit cards and high-interest loans first',
+    } else if (userTier === '9%') {
+      plans.push({
+        id: 'tier-2',
+        title: 'Scale and Optimize',
+        description: 'Focus on scaling operations and optimizing for growth',
+        category: 'business',
         priority: 'high',
-        timeline: '60 days',
-        completed: false,
-        resources: ['Debt snowball calculator', 'Credit counseling service']
+        goal: 'Increase revenue by 25%',
+        targetValue: 25,
+        currentValue: 0,
+        unit: 'percentage',
+        actions: [
+          'Analyze current operations for efficiency gains',
+          'Develop new revenue streams',
+          'Optimize pricing strategies',
+          'Expand customer base strategically',
+          'Invest in technology and automation'
+        ],
+        timeline: '12 months',
+        resources: [
+          'Business analytics tools',
+          'Automation software',
+          'Strategic planning resources'
+        ]
       })
     }
-
-    // Market Intelligence Actions
-    if (scores.market_intelligence < 12) {
-      plan.push({
-        id: 'market-1',
-        category: 'Market Intelligence',
-        title: 'Research Local Markets',
-        description: 'Study freight patterns and rates in your target areas',
-        priority: 'medium',
-        timeline: '30 days',
-        completed: false,
-        resources: ['DAT RateView', 'FreightWaves', 'Local trucking associations']
-      })
-    }
-
-    if (scores.market_intelligence < 15) {
-      plan.push({
-        id: 'market-2',
-        category: 'Market Intelligence',
-        title: 'Network with Other Drivers',
-        description: 'Join online forums and attend industry events',
-        priority: 'medium',
-        timeline: '60 days',
-        completed: false,
-        resources: ['Trucking forums', 'Industry conferences', 'Local meetups']
-      })
-    }
-
-    // Personal Strengths Actions
-    if (scores.personal_strengths < 12) {
-      plan.push({
-        id: 'personal-1',
-        category: 'Personal Strengths',
-        title: 'Develop Communication Skills',
-        description: 'Practice clear communication with dispatchers and customers',
-        priority: 'medium',
-        timeline: '30 days',
-        completed: false,
-        resources: ['Communication course', 'Practice scenarios', 'Feedback from peers']
-      })
-    }
-
-    if (scores.personal_strengths < 15) {
-      plan.push({
-        id: 'personal-2',
-        category: 'Personal Strengths',
-        title: 'Build Leadership Confidence',
-        description: 'Take on small leadership roles in your current position',
-        priority: 'low',
-        timeline: '90 days',
-        completed: false,
-        resources: ['Leadership books', 'Mentorship program', 'Volunteer opportunities']
-      })
-    }
-
-    // Risk Management Actions
-    if (scores.risk_management < 10) {
-      plan.push({
-        id: 'risk-1',
-        category: 'Risk Management',
-        title: 'Assess Personal Risk Tolerance',
-        description: 'Understand your comfort level with business decisions',
-        priority: 'medium',
-        timeline: '30 days',
-        completed: false,
-        resources: ['Risk assessment tools', 'Financial advisor consultation']
-      })
-    }
-
-    if (scores.risk_management < 12) {
-      plan.push({
-        id: 'risk-2',
-        category: 'Risk Management',
-        title: 'Create Business Contingency Plan',
-        description: 'Develop backup plans for common business challenges',
-        priority: 'low',
-        timeline: '90 days',
-        completed: false,
-        resources: ['Business planning templates', 'Insurance consultation']
-      })
-    }
-
-    // Support Systems Actions
-    if (scores.support_systems < 6) {
-      plan.push({
-        id: 'support-1',
-        category: 'Support Systems',
-        title: 'Involve Family in Planning',
-        description: 'Discuss your business goals with family members',
-        priority: 'high',
-        timeline: '30 days',
-        completed: false,
-        resources: ['Family meeting agenda', 'Goal-setting worksheets']
-      })
-    }
-
-    if (scores.support_systems < 8) {
-      plan.push({
-        id: 'support-2',
-        category: 'Support Systems',
-        title: 'Build Customer Service Skills',
-        description: 'Develop relationships with shippers and receivers',
-        priority: 'medium',
-        timeline: '60 days',
-        completed: false,
-        resources: ['Customer service training', 'Relationship building tips']
-      })
-    }
-
-    setActionPlan(plan)
-    setGenerated(true)
-    onSavePlan?.(plan)
+    
+    setGenerating(false)
+    onGeneratePlan(plans)
   }
 
-  const toggleActionComplete = (id: string) => {
-    setActionPlan(prev => prev.map(item => 
-      item.id === id ? { ...item, completed: !item.completed } : item
-    ))
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    )
   }
 
   const getPriorityColor = (priority: string) => {
@@ -189,124 +267,87 @@ export default function ActionPlanGenerator({ scores, onSavePlan }: ActionPlanGe
     }
   }
 
-  const getTimelineColor = (timeline: string) => {
-    switch (timeline) {
-      case '30 days': return 'text-blue-600 bg-blue-50'
-      case '60 days': return 'text-purple-600 bg-purple-50'
-      case '90 days': return 'text-orange-600 bg-orange-50'
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'financial': return 'text-green-600 bg-green-50'
+      case 'business': return 'text-blue-600 bg-blue-50'
+      case 'personal': return 'text-purple-600 bg-purple-50'
+      case 'health': return 'text-orange-600 bg-orange-50'
       default: return 'text-gray-600 bg-gray-50'
     }
   }
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'Financial Foundation': return <DollarSign className="h-4 w-4" />
-      case 'Market Intelligence': return <TrendingUp className="h-4 w-4" />
-      case 'Personal Strengths': return <Target className="h-4 w-4" />
-      case 'Risk Management': return <Shield className="h-4 w-4" />
-      case 'Support Systems': return <Users className="h-4 w-4" />
-      default: return <BookOpen className="h-4 w-4" />
-    }
-  }
-
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="flex items-center mb-6">
-        <Target className="h-6 w-6 text-[#1e3a8a] mr-3" />
-        <h2 className="text-xl font-bold text-gray-900">Your Action Plan</h2>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Generate Action Plan</h3>
+        <p className="text-gray-600">
+          Based on your assessment results, we'll create personalized action plans to help you reach the next tier.
+        </p>
       </div>
 
-      {!generated ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600 mb-4">
-            Generate a personalized action plan based on your assessment results
-          </p>
-          <button
-            onClick={generateActionPlan}
-            className="bg-[#1e3a8a] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1e40af] transition-colors"
-          >
-            Generate Action Plan
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {actionPlan.map((action) => (
-            <div
-              key={action.id}
-              className={`border rounded-lg p-4 transition-all duration-200 ${
-                action.completed 
-                  ? 'border-green-200 bg-green-50' 
-                  : 'border-gray-200 hover:border-[#1e3a8a] hover:shadow-md'
+      {/* Category Selection */}
+      <div className="mb-6">
+        <h4 className="text-lg font-semibold text-gray-900 mb-3">Select Focus Areas</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { key: 'financial', label: 'Financial', icon: '💰' },
+            { key: 'business', label: 'Business', icon: '🏢' },
+            { key: 'personal', label: 'Personal', icon: '🎯' },
+            { key: 'health', label: 'Health', icon: '❤️' }
+          ].map(category => (
+            <button
+              key={category.key}
+              onClick={() => toggleCategory(category.key)}
+              className={`p-3 rounded-lg border-2 transition-colors ${
+                selectedCategories.includes(category.key)
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    {getCategoryIcon(action.category)}
-                    <span className="ml-2 text-sm font-medium text-gray-600">
-                      {action.category}
-                    </span>
-                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(action.priority)}`}>
-                      {action.priority} priority
-                    </span>
-                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getTimelineColor(action.timeline)}`}>
-                      {action.timeline}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <button
-                      onClick={() => toggleActionComplete(action.id)}
-                      className={`mt-1 mr-3 flex-shrink-0 ${
-                        action.completed ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'
-                      }`}
-                    >
-                      <CheckCircle className="h-5 w-5" />
-                    </button>
-                    
-                    <div className="flex-1">
-                      <h3 className={`font-semibold ${
-                        action.completed ? 'text-green-800 line-through' : 'text-gray-900'
-                      }`}>
-                        {action.title}
-                      </h3>
-                      <p className={`text-sm mt-1 ${
-                        action.completed ? 'text-green-600' : 'text-gray-600'
-                      }`}>
-                        {action.description}
-                      </p>
-                      
-                      {action.resources && action.resources.length > 0 && (
-                        <div className="mt-3">
-                          <p className="text-xs font-medium text-gray-500 mb-1">Resources:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {action.resources.map((resource, index) => (
-                              <span
-                                key={index}
-                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                              >
-                                {resource}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div className="text-2xl mb-1">{category.icon}</div>
+              <div className="text-sm font-medium text-gray-900">{category.label}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Current Status */}
+      <div className="mb-6">
+        <h4 className="text-lg font-semibold text-gray-900 mb-3">Current Status</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Object.entries(assessmentScores).map(([category, score]) => (
+            <div key={category} className="text-center">
+              <div className="text-2xl font-bold text-gray-900">{score || 0}</div>
+              <div className="text-sm text-gray-600 capitalize">{category}</div>
             </div>
           ))}
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setGenerated(false)}
-              className="text-[#1e3a8a] hover:text-[#1e40af] text-sm font-medium"
-            >
-              Regenerate Plan
-            </button>
-          </div>
         </div>
+      </div>
+
+      {/* Generate Button */}
+      <button
+        onClick={generateActionPlans}
+        disabled={generating || selectedCategories.length === 0}
+        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+      >
+        {generating ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            Generating Plans...
+          </>
+        ) : (
+          <>
+            <Target className="w-4 h-4 mr-2" />
+            Generate Action Plans
+          </>
+        )}
+      </button>
+
+      {selectedCategories.length === 0 && (
+        <p className="text-sm text-gray-500 text-center mt-2">
+          Please select at least one focus area to generate action plans.
+        </p>
       )}
     </div>
   )

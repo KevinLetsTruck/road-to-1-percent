@@ -1,279 +1,165 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { TrendingUp, Target, Calendar, BarChart3 } from 'lucide-react'
-
-interface ProgressEntry {
-  date: string
-  totalScore: number
-  financialScore: number
-  marketScore: number
-  strengthsScore: number
-  riskScore: number
-  supportScore: number
-}
+import { useAuth } from '@/contexts/AuthContext'
 
 interface SPIProgressChartProps {
-  userId: string
+  timeframe: '3m' | '6m' | '1y'
 }
 
-export default function SPIProgressChart({ userId }: SPIProgressChartProps) {
-  const [progressData, setProgressData] = useState<ProgressEntry[]>([])
+interface ChartData {
+  date: string
+  score: number
+  label: string
+}
+
+export default function SPIProgressChart({ timeframe }: SPIProgressChartProps) {
+  const { user } = useAuth()
+  const [chartData, setChartData] = useState<ChartData[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentScore, setCurrentScore] = useState(0)
-  const [targetScore, setTargetScore] = useState(72)
-  const [weeksToTarget, setWeeksToTarget] = useState(0)
   const supabase = createClient()
 
   useEffect(() => {
-    const fetchProgress = async () => {
+    if (!user) return
+
+    const loadChartData = async () => {
       try {
-        // Get current user progress
-        const { data: userProgress } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', userId)
-          .single()
+        // Get comprehensive assessments for the user
+        const { data: assessments } = await supabase
+          .from('comprehensive_assessments')
+          .select('assessment_date, total_spi_score')
+          .eq('user_id', user.id)
+          .order('assessment_date', { ascending: true })
 
-        if (userProgress) {
-          const current = userProgress.spi_score || 0
-          setCurrentScore(current)
-          
-          // Calculate weeks to target (assuming 1 point per week)
-          const pointsNeeded = targetScore - current
-          setWeeksToTarget(Math.max(0, pointsNeeded))
+        // Get quarterly assessments for the user
+        const { data: quarterlyAssessments } = await supabase
+          .from('quarterly_assessments')
+          .select('assessment_date, total_score')
+          .eq('user_id', user.id)
+          .order('assessment_date', { ascending: true })
 
-          // Create sample progress data (in real app, this would come from progress tracking)
-          const sampleData: ProgressEntry[] = [
-            {
-              date: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              totalScore: Math.max(0, current - 4),
-              financialScore: userProgress.financial_foundation_score || 0,
-              marketScore: userProgress.market_intelligence_score || 0,
-              strengthsScore: userProgress.personal_strengths_score || 0,
-              riskScore: userProgress.risk_management_score || 0,
-              supportScore: userProgress.support_systems_score || 0
-            },
-            {
-              date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              totalScore: Math.max(0, current - 3),
-              financialScore: userProgress.financial_foundation_score || 0,
-              marketScore: userProgress.market_intelligence_score || 0,
-              strengthsScore: userProgress.personal_strengths_score || 0,
-              riskScore: userProgress.risk_management_score || 0,
-              supportScore: userProgress.support_systems_score || 0
-            },
-            {
-              date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              totalScore: Math.max(0, current - 2),
-              financialScore: userProgress.financial_foundation_score || 0,
-              marketScore: userProgress.market_intelligence_score || 0,
-              strengthsScore: userProgress.personal_strengths_score || 0,
-              riskScore: userProgress.risk_management_score || 0,
-              supportScore: userProgress.support_systems_score || 0
-            },
-            {
-              date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-              totalScore: Math.max(0, current - 1),
-              financialScore: userProgress.financial_foundation_score || 0,
-              marketScore: userProgress.market_intelligence_score || 0,
-              strengthsScore: userProgress.personal_strengths_score || 0,
-              riskScore: userProgress.risk_management_score || 0,
-              supportScore: userProgress.support_systems_score || 0
-            },
-            {
-              date: new Date().toISOString().split('T')[0],
-              totalScore: current,
-              financialScore: userProgress.financial_foundation_score || 0,
-              marketScore: userProgress.market_intelligence_score || 0,
-              strengthsScore: userProgress.personal_strengths_score || 0,
-              riskScore: userProgress.risk_management_score || 0,
-              supportScore: userProgress.support_systems_score || 0
-            }
-          ]
-          
-          setProgressData(sampleData)
+        // Combine and process data
+        const allData: ChartData[] = []
+
+        // Add comprehensive assessments
+        assessments?.forEach(assessment => {
+          allData.push({
+            date: assessment.assessment_date,
+            score: assessment.total_spi_score,
+            label: 'Comprehensive'
+          })
+        })
+
+        // Add quarterly assessments
+        quarterlyAssessments?.forEach(assessment => {
+          allData.push({
+            date: assessment.assessment_date,
+            score: assessment.total_score,
+            label: 'Quarterly'
+          })
+        })
+
+        // Sort by date
+        allData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+        // Filter by timeframe
+        const now = new Date()
+        const timeframeMap = {
+          '3m': new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000),
+          '6m': new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000),
+          '1y': new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
         }
+
+        const filteredData = allData.filter(item => 
+          new Date(item.date) >= timeframeMap[timeframe]
+        )
+
+        // If no data, create sample data
+        if (filteredData.length === 0) {
+          const sampleData: ChartData[] = []
+          const months = timeframe === '3m' ? 3 : timeframe === '6m' ? 6 : 12
+          
+          for (let i = months; i >= 0; i--) {
+            const date = new Date()
+            date.setMonth(date.getMonth() - i)
+            sampleData.push({
+              date: date.toISOString(),
+              score: Math.floor(Math.random() * 40) + 60, // Random score between 60-100
+              label: 'Sample'
+            })
+          }
+          setChartData(sampleData)
+        } else {
+          setChartData(filteredData)
+        }
+
+        setLoading(false)
       } catch (error) {
-        console.error('Error fetching progress:', error)
-      } finally {
+        console.error('Error loading chart data:', error)
         setLoading(false)
       }
     }
 
-    fetchProgress()
-  }, [userId, targetScore, supabase])
-
-  const getTierColor = (score: number) => {
-    if (score >= 70) return 'text-green-600'
-    if (score >= 50) return 'text-blue-600'
-    return 'text-red-600'
-  }
-
-  const getTierLabel = (score: number) => {
-    if (score >= 70) return '1%'
-    if (score >= 50) return '9%'
-    return '90%'
-  }
-
-  const getWeeklyGoal = () => {
-    if (currentScore >= targetScore) return 0
-    return Math.ceil((targetScore - currentScore) / Math.max(1, weeksToTarget))
-  }
+    loadChartData()
+  }, [user, timeframe, supabase])
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
-        </div>
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
+  if (chartData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-gray-500">
+        No data available for this timeframe
+      </div>
+    )
+  }
+
+  const maxScore = Math.max(...chartData.map(d => d.score))
+  const minScore = Math.min(...chartData.map(d => d.score))
+
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900 flex items-center">
-          <TrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
-          SPI Progress Tracker
-        </h2>
-        <div className="text-right">
-          <div className="text-sm text-gray-600">Target Score</div>
-          <div className="text-lg font-bold text-indigo-600">{targetScore}/100</div>
-        </div>
-      </div>
-
-      {/* Current Status */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-4 text-white">
-          <div className="text-2xl font-bold">{currentScore}</div>
-          <div className="text-indigo-100 text-sm">Current Score</div>
-          <div className="text-xs text-indigo-200 mt-1">{getTierLabel(currentScore)} Tier</div>
-        </div>
-        
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="text-2xl font-bold text-green-600">{targetScore - currentScore}</div>
-          <div className="text-green-800 text-sm">Points to Target</div>
-          <div className="text-xs text-green-600 mt-1">Goal: {targetScore}</div>
-        </div>
-        
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="text-2xl font-bold text-blue-600">{weeksToTarget}</div>
-          <div className="text-blue-800 text-sm">Weeks to Target</div>
-          <div className="text-xs text-blue-600 mt-1">At 1 pt/week</div>
-        </div>
-        
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <div className="text-2xl font-bold text-purple-600">{getWeeklyGoal()}</div>
-          <div className="text-purple-800 text-sm">Weekly Goal</div>
-          <div className="text-xs text-purple-600 mt-1">Points needed</div>
-        </div>
-      </div>
-
-      {/* Progress Chart */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <BarChart3 className="w-5 h-5 mr-2 text-gray-600" />
-          4-Week Progress Trend
-        </h3>
-        
-        <div className="space-y-3">
-          {progressData.map((entry, index) => (
-            <div key={entry.date} className="flex items-center space-x-4">
-              <div className="w-20 text-sm text-gray-600">
-                {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </div>
-              
-              <div className="flex-1 bg-gray-200 rounded-full h-3">
+    <div className="w-full h-full">
+      <div className="flex items-end justify-between h-full space-x-2">
+        {chartData.map((data, index) => {
+          const height = maxScore > minScore 
+            ? ((data.score - minScore) / (maxScore - minScore)) * 100
+            : 50
+          
+          return (
+            <div key={index} className="flex-1 flex flex-col items-center">
+              <div className="relative group">
                 <div 
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-300"
-                  style={{ width: `${(entry.totalScore / 100) * 100}%` }}
+                  className="bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg transition-all duration-300 hover:from-blue-700 hover:to-blue-500"
+                  style={{ height: `${Math.max(height, 10)}%` }}
                 ></div>
-              </div>
-              
-              <div className="w-16 text-right">
-                <div className={`text-sm font-semibold ${getTierColor(entry.totalScore)}`}>
-                  {entry.totalScore}
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {data.score}/100
+                  <br />
+                  {new Date(data.date).toLocaleDateString()}
                 </div>
-                <div className="text-xs text-gray-500">{getTierLabel(entry.totalScore)}</div>
+              </div>
+              <div className="text-xs text-gray-500 mt-2 text-center">
+                {new Date(data.date).toLocaleDateString('en-US', { 
+                  month: 'short',
+                  day: 'numeric'
+                })}
               </div>
             </div>
-          ))}
-        </div>
+          )
+        })}
       </div>
-
-      {/* Dimension Breakdown */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Target className="w-5 h-5 mr-2 text-gray-600" />
-          Dimension Scores
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          <div className="text-center">
-            <div className="text-lg font-bold text-green-600">
-              {progressData[progressData.length - 1]?.financialScore || 0}/35
-            </div>
-            <div className="text-xs text-gray-600">Financial</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-blue-600">
-              {progressData[progressData.length - 1]?.marketScore || 0}/20
-            </div>
-            <div className="text-xs text-gray-600">Market</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-purple-600">
-              {progressData[progressData.length - 1]?.strengthsScore || 0}/20
-            </div>
-            <div className="text-xs text-gray-600">Strengths</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-red-600">
-              {progressData[progressData.length - 1]?.riskScore || 0}/15
-            </div>
-            <div className="text-xs text-gray-600">Risk</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-orange-600">
-              {progressData[progressData.length - 1]?.supportScore || 0}/10
-            </div>
-            <div className="text-xs text-gray-600">Support</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Weekly Goals */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-          <Calendar className="w-5 h-5 mr-2 text-gray-600" />
-          This Week's Goals
-        </h3>
-        
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Target Score Increase:</span>
-            <span className="font-semibold text-indigo-600">+{getWeeklyGoal()} points</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Focus Area:</span>
-            <span className="font-semibold text-green-600">Financial Foundation</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Quick Wins:</span>
-            <span className="font-semibold text-blue-600">Track expenses, review insurance</span>
-          </div>
-        </div>
-        
-        <div className="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-          <p className="text-sm text-indigo-800">
-            <strong>Tip:</strong> Focus on your weakest dimension for maximum impact. 
-            Each point gained in Financial Foundation (35% weight) has the biggest effect on your total score.
-          </p>
-        </div>
+      
+      {/* Y-axis labels */}
+      <div className="flex justify-between text-xs text-gray-500 mt-2">
+        <span>{Math.round(minScore)}</span>
+        <span>{Math.round((maxScore + minScore) / 2)}</span>
+        <span>{Math.round(maxScore)}</span>
       </div>
     </div>
   )

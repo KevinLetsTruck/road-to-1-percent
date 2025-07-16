@@ -7,6 +7,8 @@ A comprehensive personal development platform designed to help professional driv
 - **User Authentication**: Secure login and registration with Supabase
 - **Assessment System**: Multiple assessment types (SPI Financial, Leadership, etc.)
 - **Progress Tracking**: Visual progress indicators and milestone tracking
+- **Quarterly Assessment System**: Regular progress reviews and goal setting
+- **Personalized Action Plans**: AI-generated recommendations based on assessment results
 - **Community Features**: Peer groups and member connections
 - **Responsive Design**: Modern UI built with Tailwind CSS
 - **Real-time Updates**: Live progress tracking and score calculation

@@ -897,38 +897,9 @@ export default function ComprehensiveAssessmentPage() {
           .single()
         
         if (existingAssessment) {
-          // Load the existing data into the form
-          setFormData({
-            current_situation: existingAssessment.current_situation || 'Employee Driver',
-            fleet_size: existingAssessment.fleet_size || 0,
-            load_sources: existingAssessment.load_sources || [],
-            standout_strength_1: existingAssessment.standout_strength_1 || '',
-            standout_strength_2: existingAssessment.standout_strength_2 || '',
-            net_worth: existingAssessment.net_worth || 0,
-            monthly_savings: existingAssessment.monthly_savings || 0,
-            emergency_fund_months: existingAssessment.emergency_fund_months || 0,
-            debt_to_income_ratio: existingAssessment.debt_to_income_ratio || 0,
-            business_capital: existingAssessment.business_capital || 0,
-            credit_score: existingAssessment.credit_score || 0,
-            rate_understanding: existingAssessment.rate_understanding || 0,
-            cost_analysis: existingAssessment.cost_analysis || 0,
-            customer_knowledge: existingAssessment.customer_knowledge || 0,
-            industry_trends: existingAssessment.industry_trends || 0,
-            strategic_planning: existingAssessment.strategic_planning || 0,
-            pioneer_strength: existingAssessment.pioneer_strength || 0,
-            creator_strength: existingAssessment.creator_strength || 0,
-            innovator_strength: existingAssessment.innovator_strength || 0,
-            connector_strength: existingAssessment.connector_strength || 0,
-            advisor_strength: existingAssessment.advisor_strength || 0,
-            contingency_planning: existingAssessment.contingency_planning || 0,
-            business_continuity: existingAssessment.business_continuity || 0,
-            risk_assessment: existingAssessment.risk_assessment || 0,
-            family_alignment: existingAssessment.family_alignment || 0,
-            professional_network: existingAssessment.professional_network || 0,
-            mentorship: existingAssessment.mentorship || 0,
-            industry_reputation: existingAssessment.industry_reputation || 0
-          })
-          setHasExistingData(true)
+          // User has already completed the assessment, redirect to results
+          router.push('/dashboard/comprehensive-assessment/results')
+          return
         }
       } catch (error) {
         console.log('No existing assessment found, starting fresh')
@@ -1053,7 +1024,7 @@ export default function ComprehensiveAssessmentPage() {
         // Don't fail the assessment submission if email fails
       }
 
-      router.push('/dashboard?message=Assessment completed successfully! Your SPI score is ' + totalScore + '/100. Check your detailed results below.')
+      router.push('/dashboard/comprehensive-assessment/results')
     } catch (error: unknown) {
       setError((error as Error).message)
     } finally {

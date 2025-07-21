@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface DimensionBreakdown {
   name: string
@@ -23,8 +24,26 @@ function ComprehensiveAssessmentResultsContent() {
   const [userProgress, setUserProgress] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [showRetakeModal, setShowRetakeModal] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const { signOut } = useAuth()
+  
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/login')
+  }
+  
+  const handleRetakeAssessment = async () => {
+    // Delete the existing assessment
+    await supabase
+      .from('comprehensive_assessments')
+      .delete()
+      .eq('user_id', user?.id)
+    
+    // Redirect to assessment
+    router.push('/dashboard/comprehensive-assessment')
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -246,14 +265,24 @@ function ComprehensiveAssessmentResultsContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="mr-4 p-2 rounded-md hover:bg-gray-100"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
               <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Assessment Results</span>
+              <span className="text-xl font-bold text-gray-900">Your SPI Assessment Results</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">{user?.email}</span>
+              <button
+                onClick={() => setShowRetakeModal(true)}
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+              >
+                Retake Assessment
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <LogOut className="h-5 w-5 mr-1" />
+                <span className="text-sm font-medium">Sign Out</span>
+              </button>
             </div>
           </div>
         </div>
@@ -461,12 +490,6 @@ function ComprehensiveAssessmentResultsContent() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <button
-              onClick={() => router.push('/dashboard')}
-              className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
-            >
-              Return to Dashboard
-            </button>
-            <button
               onClick={() => router.push('/dashboard/progress')}
               className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
             >
@@ -481,6 +504,33 @@ function ComprehensiveAssessmentResultsContent() {
           </div>
         </div>
       </main>
+      
+      {/* Retake Assessment Modal */}
+      {showRetakeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Retake Assessment?</h3>
+            <p className="text-gray-600 mb-6">
+              This will delete your current assessment results and allow you to start over. 
+              Your previous results will be permanently removed.
+            </p>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setShowRetakeModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRetakeAssessment}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Yes, Retake Assessment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

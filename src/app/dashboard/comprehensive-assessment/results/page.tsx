@@ -90,11 +90,11 @@ function ComprehensiveAssessmentResultsContent() {
 
   const getStrengthDescription = (combo: string) => {
     switch (combo) {
-      case 'Pioneer + Creator':
+      case 'Pioneer + Influencer':
         return 'Rare combination found in only 8% of the population. Excellent for entrepreneurial ventures but needs discipline to channel effectively.'
       case 'Pioneer':
         return 'Natural innovator who sees opportunities others miss. Focus on building systematic foundations.'
-      case 'Creator':
+      case 'Influencer':
         return 'Problem-solver who improves existing systems. Leverage this strength in business optimization.'
       default:
         return 'Balanced strengths across multiple areas. Good foundation for steady improvement.'
@@ -306,10 +306,10 @@ function ComprehensiveAssessmentResultsContent() {
               Your Strength Profile
             </h2>
             <p className="text-gray-600 mb-4">{getStrengthDescription(strengthCombo)}</p>
-            {strengthCombo === 'Pioneer + Creator' && (
+            {strengthCombo === 'Pioneer + Influencer' && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-yellow-800">
-                  <strong>Special Note:</strong> Your Pioneer + Creator combination is rare and powerful. 
+                  <strong>Special Note:</strong> Your Pioneer + Influencer combination is rare and powerful. 
                   Focus on building discipline and systems to channel your natural innovation effectively.
                 </p>
               </div>
@@ -431,21 +431,21 @@ function ComprehensiveAssessmentResultsContent() {
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 border border-gray-200 rounded-lg">
+              <a href="#" className="text-center p-4 border border-gray-200 rounded-lg hover:border-indigo-500 transition-colors cursor-pointer">
                 <div className="text-2xl mb-2">📚</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Weekly Classes</h3>
-                <p className="text-sm text-gray-600">Join our weekly SPI improvement classes</p>
-              </div>
-              <div className="text-center p-4 border border-gray-200 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">Road Scholar</h3>
+                <p className="text-sm text-gray-600">Join our 52 week Program</p>
+              </a>
+              <a href="https://letstrucktribe.com" target="_blank" rel="noopener noreferrer" className="text-center p-4 border border-gray-200 rounded-lg hover:border-indigo-500 transition-colors cursor-pointer">
                 <div className="text-2xl mb-2">💬</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Forum Community</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Community</h3>
                 <p className="text-sm text-gray-600">Connect with other drivers on similar journeys</p>
-              </div>
-              <div className="text-center p-4 border border-gray-200 rounded-lg">
+              </a>
+              <a href="#" className="text-center p-4 border border-gray-200 rounded-lg hover:border-indigo-500 transition-colors cursor-pointer">
                 <div className="text-2xl mb-2">👥</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Mentor Network</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Apply to be a Mentor / Find a Mentor</h3>
                 <p className="text-sm text-gray-600">Get guidance from successful operators</p>
-              </div>
+              </a>
             </div>
           </div>
 

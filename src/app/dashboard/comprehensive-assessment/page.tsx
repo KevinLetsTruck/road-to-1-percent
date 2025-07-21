@@ -387,10 +387,10 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     question: 'Do you have mentors or advisors in the industry?',
     options: [
       { value: 0, label: 'No mentors', description: 'No guidance' },
-      { value: 1, label: 'Informal advice from experienced drivers', description: 'Casual guidance' },
-      { value: 2, label: 'One formal mentor', description: 'Structured guidance' },
-      { value: 3, label: 'Multiple mentors and advisors', description: 'Comprehensive guidance' },
-      { value: 4, label: 'Professional coaching and advisory team', description: 'Expert guidance' }
+      { value: 0.5, label: 'Informal advice from experienced drivers', description: 'Casual guidance' },
+      { value: 1, label: 'One formal mentor', description: 'Structured guidance' },
+      { value: 1.5, label: 'Multiple mentors and advisors', description: 'Comprehensive guidance' },
+      { value: 2, label: 'Professional coaching and advisory team', description: 'Expert guidance' }
     ],
     weight: 0.2,
     maxPoints: 2
@@ -972,9 +972,9 @@ export default function ComprehensiveAssessmentPage() {
     const pioneer = formData.pioneer_strength
     const creator = formData.creator_strength
     
-    if (pioneer >= 8 && creator >= 8) return 'Pioneer + Creator'
+    if (pioneer >= 8 && creator >= 8) return 'Pioneer + Influencer'
     if (pioneer >= 8) return 'Pioneer'
-    if (creator >= 8) return 'Creator'
+    if (creator >= 8) return 'Influencer'
     return 'Balanced'
   }
 

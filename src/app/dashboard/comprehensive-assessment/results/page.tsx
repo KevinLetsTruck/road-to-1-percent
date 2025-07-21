@@ -89,16 +89,25 @@ function ComprehensiveAssessmentResultsContent() {
   }
 
   const getStrengthDescription = (combo: string) => {
-    switch (combo) {
-      case 'Pioneer + Influencer':
-        return 'Rare combination found in only 8% of the population. Excellent for entrepreneurial ventures but needs discipline to channel effectively.'
-      case 'Pioneer':
-        return 'Natural innovator who sees opportunities others miss. Focus on building systematic foundations.'
-      case 'Influencer':
-        return 'Problem-solver who improves existing systems. Leverage this strength in business optimization.'
-      default:
-        return 'Balanced strengths across multiple areas. Good foundation for steady improvement.'
+    // Handle combination strengths
+    if (combo.includes(' + ')) {
+      return 'This unique combination of strengths provides you with exceptional capabilities. Focus on leveraging both strengths to maximize your potential.'
     }
+    
+    // Handle individual strengths
+    const strengthDescriptions: Record<string, string> = {
+      'Pioneer': 'Natural innovator who sees opportunities others miss. Focus on building systematic foundations.',
+      'Influencer': 'Natural leader who inspires and motivates others. Use this to build strong networks and partnerships.',
+      'Stimulator': 'Energizes and excites others about possibilities. Channel this enthusiasm into concrete action plans.',
+      'Advisor': 'Trusted counselor who provides valuable guidance. Your insights help others make better decisions.',
+      'Connector': 'Builds bridges between people and ideas. Your networking abilities create valuable opportunities.',
+      'Provider': 'Reliable supporter who ensures others have what they need. Your consistency builds trust and loyalty.',
+      'Equalizer': 'Creates fairness and balance in all situations. Your sense of justice helps build sustainable systems.',
+      'Teacher': 'Natural educator who helps others grow. Your ability to explain complex ideas simply is invaluable.',
+      'Creator': 'Innovative problem-solver who builds new solutions. Your creativity drives progress and improvement.'
+    }
+    
+    return strengthDescriptions[combo] || 'Balanced strengths across multiple areas. Good foundation for steady improvement.'
   }
 
   const dimensionBreakdowns: DimensionBreakdown[] = [
@@ -306,11 +315,11 @@ function ComprehensiveAssessmentResultsContent() {
               Your Strength Profile
             </h2>
             <p className="text-gray-600 mb-4">{getStrengthDescription(strengthCombo)}</p>
-            {strengthCombo === 'Pioneer + Influencer' && (
+            {strengthCombo.includes(' + ') && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-yellow-800">
-                  <strong>Special Note:</strong> Your Pioneer + Influencer combination is rare and powerful. 
-                  Focus on building discipline and systems to channel your natural innovation effectively.
+                  <strong>Special Note:</strong> Your {strengthCombo} combination is unique and powerful. 
+                  This dual strength gives you exceptional versatility in approaching challenges and opportunities.
                 </p>
               </div>
             )}

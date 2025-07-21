@@ -969,12 +969,18 @@ export default function ComprehensiveAssessmentPage() {
   }
 
   const getStrengthCombination = () => {
-    const pioneer = formData.pioneer_strength
-    const creator = formData.creator_strength
+    const strength1 = formData.standout_strength_1
+    const strength2 = formData.standout_strength_2
     
-    if (pioneer >= 8 && creator >= 8) return 'Pioneer + Influencer'
-    if (pioneer >= 8) return 'Pioneer'
-    if (creator >= 8) return 'Influencer'
+    if (strength1 && strength2) {
+      // Sort alphabetically for consistent combination naming
+      const strengths = [strength1, strength2].sort()
+      return `${strengths[0]} + ${strengths[1]}`
+    } else if (strength1) {
+      return strength1
+    } else if (strength2) {
+      return strength2
+    }
     return 'Balanced'
   }
 

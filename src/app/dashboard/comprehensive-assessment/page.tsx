@@ -642,6 +642,21 @@ export default function ComprehensiveAssessmentPage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  // Handle click on calculator options even when already selected
+  const handleOptionClick = (field: keyof ComprehensiveAssessmentData, value: number) => {
+    if (value === -1) {
+      // Always open calculator when clicked, even if already selected
+      if (field === 'net_worth') {
+        setShowNetWorthCalculator(true)
+        setShowSavingsCalculator(false)
+      } else if (field === 'monthly_savings') {
+        setShowSavingsCalculator(true)
+        setShowNetWorthCalculator(false)
+      }
+    }
+    handleInputChange(field, value)
+  }
+
   // Helper function to render option with special styling for calculators
   const renderOption = (option: any, question: any) => {
     const isCalculatorOption = option.value === -1
@@ -655,13 +670,19 @@ export default function ComprehensiveAssessmentPage() {
             ? 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 dark:border-indigo-600' 
             : 'border-gray-200 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700'
         } ${isSelected ? 'ring-2 ring-indigo-500' : ''}`}
+        onClick={() => {
+          if (isCalculatorOption && isSelected) {
+            // If calculator option is already selected, still open the calculator
+            handleOptionClick(question.id as keyof ComprehensiveAssessmentData, option.value)
+          }
+        }}
       >
         <input
           type="radio"
           name={question.id}
           value={option.value}
           checked={isSelected}
-          onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
+          onChange={() => handleOptionClick(question.id as keyof ComprehensiveAssessmentData, option.value)}
           className="mt-1 mr-3"
         />
         <div>
@@ -1217,7 +1238,13 @@ export default function ComprehensiveAssessmentPage() {
       {/* Calculator Modals */}
       <CalculatorModal
         isOpen={showNetWorthCalculator}
-        onClose={() => setShowNetWorthCalculator(false)}
+        onClose={() => {
+          setShowNetWorthCalculator(false)
+          // Clear the calculator selection if no value was chosen
+          if (formData.net_worth === -1) {
+            setFormData(prev => ({ ...prev, net_worth: 0 }))
+          }
+        }}
         title="Net Worth Calculator"
         icon={<Calculator className="w-6 h-6 text-blue-600" />}
       >
@@ -1235,13 +1262,25 @@ export default function ComprehensiveAssessmentPage() {
             else selectedValue = 14
             setFormData(prev => ({ ...prev, net_worth: selectedValue }))
           }}
-          onCancel={() => setShowNetWorthCalculator(false)}
+          onCancel={() => {
+            setShowNetWorthCalculator(false)
+            // Clear the calculator selection if no value was chosen
+            if (formData.net_worth === -1) {
+              setFormData(prev => ({ ...prev, net_worth: 0 }))
+            }
+          }}
         />
       </CalculatorModal>
 
       <CalculatorModal
         isOpen={showSavingsCalculator}
-        onClose={() => setShowSavingsCalculator(false)}
+        onClose={() => {
+          setShowSavingsCalculator(false)
+          // Clear the calculator selection if no value was chosen
+          if (formData.monthly_savings === -1) {
+            setFormData(prev => ({ ...prev, monthly_savings: 0 }))
+          }
+        }}
         title="Monthly Savings Calculator"
         icon={<DollarSign className="w-6 h-6 text-green-600" />}
       >
@@ -1258,7 +1297,13 @@ export default function ComprehensiveAssessmentPage() {
             else selectedValue = 10.5
             setFormData(prev => ({ ...prev, monthly_savings: selectedValue }))
           }}
-          onCancel={() => setShowSavingsCalculator(false)}
+          onCancel={() => {
+            setShowSavingsCalculator(false)
+            // Clear the calculator selection if no value was chosen
+            if (formData.monthly_savings === -1) {
+              setFormData(prev => ({ ...prev, monthly_savings: 0 }))
+            }
+          }}
         />
       </CalculatorModal>
     </div>

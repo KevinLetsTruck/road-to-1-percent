@@ -331,7 +331,7 @@ function ComprehensiveAssessmentResultsContent() {
               <span className="text-xl font-bold text-gray-900 dark:text-gray-100">Your SPI Assessment Results</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{user?.email}</span>
               {isAdmin && (
                 <button
                   onClick={() => router.push('/admin/dashboard')}
@@ -343,7 +343,7 @@ function ComprehensiveAssessmentResultsContent() {
               )}
               <button
                 onClick={handleSignOut}
-                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
               >
                 <LogOut className="h-5 w-5 mr-1" />
                 <span className="text-sm font-medium">Sign Out</span>
@@ -357,20 +357,20 @@ function ComprehensiveAssessmentResultsContent() {
         <div className="px-4 py-6 sm:px-0">
           {/* Success Message */}
           {showSuccessMessage && (
-            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
+                  <h3 className="text-sm font-medium text-green-800 dark:text-green-200">
                     Assessment Completed Successfully!
                   </h3>
-                  <p className="text-sm text-green-700 mt-1">
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
                     Your comprehensive SPI assessment has been saved. Here are your detailed results and personalized action plan.
                   </p>
                 </div>
@@ -384,12 +384,12 @@ function ComprehensiveAssessmentResultsContent() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 dark:from-indigo-600/20 dark:to-purple-600/20 rounded-full blur-3xl"></div>
               <div className="relative z-10">
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">SPI Total Score</h2>
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">SPI Total Score</h2>
                 <div className="flex items-baseline mb-2">
                   <span className="text-6xl font-bold text-gray-900 dark:text-gray-100">{totalScore}</span>
-                  <span className="text-2xl text-gray-500 dark:text-gray-400 ml-2">/100</span>
+                  <span className="text-2xl text-gray-500 dark:text-gray-300 ml-2">/100</span>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                   <div>Assessment Score: {Math.round(baseScore * 0.8)}/80</div>
                   <div>Standout Bonus: +{Math.round(standoutScore * 2)}/20</div>
                 </div>
@@ -401,7 +401,7 @@ function ComprehensiveAssessmentResultsContent() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-medium text-gray-700 dark:text-gray-300">Tier: {tier}</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{getSPITierDescription(tier)}</span>
+                                      <span className="text-sm text-gray-500 dark:text-gray-300">{getSPITierDescription(tier)}</span>
                 </div>
               </div>
             </div>
@@ -423,7 +423,7 @@ function ComprehensiveAssessmentResultsContent() {
               }`}></div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Success Probability</h2>
+                  <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Success Probability</h2>
                   <span className="text-3xl">{probabilityData.icon}</span>
                 </div>
                 <div className="flex items-baseline mb-4">
@@ -444,13 +444,13 @@ function ComprehensiveAssessmentResultsContent() {
                 }`}>
                   {probabilityData.tier} Probability Range
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   {probabilityData.message}
                 </p>
                 
                 {/* Probability Meter */}
                 <div className="mt-4">
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-300 mb-1">
                     <span>0%</span>
                     <span>25%</span>
                     <span>50%</span>
@@ -529,15 +529,15 @@ function ComprehensiveAssessmentResultsContent() {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-600 dark:text-gray-400">{standoutDescription}</p>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Bonus Points</div>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">{standoutDescription}</p>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">Bonus Points</div>
                 </div>
               </div>
             </div>
             
-            <p className="text-gray-600 dark:text-gray-400 mb-4">{getStrengthDescription(strengthCombo)}</p>
+                          <p className="text-gray-600 dark:text-gray-300 mb-4">{getStrengthDescription(strengthCombo)}</p>
             {strengthCombo.includes(' + ') && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
@@ -557,29 +557,29 @@ function ComprehensiveAssessmentResultsContent() {
             
             <div className="space-y-6">
               {dimensionBreakdowns.map((dimension) => (
-                <div key={dimension.name} className="border border-gray-200 rounded-lg p-6">
+                <div key={dimension.name} className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className={`p-2 rounded-lg mr-3 bg-${dimension.color}-100`}>
-                        <div className={`text-${dimension.color}-600`}>
+                      <div className={`p-2 rounded-lg mr-3 bg-${dimension.color}-100 dark:bg-${dimension.color}-900`}>
+                        <div className={`text-${dimension.color}-600 dark:text-${dimension.color}-400`}>
                           {dimension.icon}
                         </div>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{dimension.name}</h3>
-                        <p className="text-sm text-gray-600">{dimension.description}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{dimension.name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{dimension.description}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-gray-900">{dimension.score}/{dimension.maxScore}</div>
-                      <div className="text-sm text-gray-600">{dimension.percentage}%</div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{dimension.score}/{dimension.maxScore}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">{dimension.percentage}%</div>
                     </div>
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
                     <div 
-                      className={`bg-${dimension.color}-600 h-2 rounded-full transition-all duration-300`}
+                      className={`bg-${dimension.color}-600 dark:bg-${dimension.color}-400 h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${dimension.percentage}%` }}
                     ></div>
                   </div>
@@ -587,28 +587,28 @@ function ComprehensiveAssessmentResultsContent() {
                   {/* Quick Wins and Long Term Goals */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-                        <Target className="w-4 h-4 mr-1 text-green-600" />
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center">
+                        <Target className="w-4 h-4 mr-1 text-green-600 dark:text-green-400" />
                         Quick Wins (This Week)
                       </h4>
                       <ul className="space-y-1">
                         {dimension.quickWins.map((win, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start">
-                            <span className="text-green-500 mr-2">•</span>
+                          <li key={index} className="text-sm text-gray-600 dark:text-gray-300 flex items-start">
+                            <span className="text-green-500 dark:text-green-400 mr-2">•</span>
                             {win}
                           </li>
                         ))}
                       </ul>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-                        <Calendar className="w-4 h-4 mr-1 text-blue-600" />
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center">
+                        <Calendar className="w-4 h-4 mr-1 text-blue-600 dark:text-blue-400" />
                         Long Term Goals (3-12 Months)
                       </h4>
                       <ul className="space-y-1">
                         {dimension.longTermGoals.map((goal, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start">
-                            <span className="text-blue-500 mr-2">•</span>
+                          <li key={index} className="text-sm text-gray-600 dark:text-gray-300 flex items-start">
+                            <span className="text-blue-500 dark:text-blue-400 mr-2">•</span>
                             {goal}
                           </li>
                         ))}
@@ -629,13 +629,13 @@ function ComprehensiveAssessmentResultsContent() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Immediate Focus</h3>
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-green-800 font-medium mb-2">{nextSteps.focus}</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Immediate Focus</h3>
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <p className="text-green-800 dark:text-green-200 font-medium mb-2">{nextSteps.focus}</p>
                   <ul className="space-y-1">
                     {nextSteps.quickWins.map((win, index) => (
-                      <li key={index} className="text-sm text-green-700 flex items-start">
-                        <span className="text-green-500 mr-2">•</span>
+                      <li key={index} className="text-sm text-green-700 dark:text-green-300 flex items-start">
+                        <span className="text-green-500 dark:text-green-400 mr-2">•</span>
                         {win}
                       </li>
                     ))}
@@ -644,10 +644,10 @@ function ComprehensiveAssessmentResultsContent() {
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Timeline</h3>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-800 font-medium mb-2">{nextSteps.timeline}</p>
-                  <p className="text-sm text-blue-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Timeline</h3>
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <p className="text-blue-800 dark:text-blue-200 font-medium mb-2">{nextSteps.timeline}</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
                     Focus on gaining 1 point per week through systematic improvement in your weakest dimensions.
                   </p>
                 </div>

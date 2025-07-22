@@ -115,11 +115,13 @@ function ComprehensiveAssessmentResultsContent() {
   const tier = userProgress.current_tier || '90%'
   const strengthCombo = userProgress.strength_combination || 'Balanced'
   
+  // Get the actual standout strengths
+  const strength1 = userProgress.standout_strength_1 || ''
+  const strength2 = userProgress.standout_strength_2 || ''
+  const actualStrengthCombo = strength1 && strength2 ? `${strength1} + ${strength2}` : strengthCombo
+  
   // Calculate standout score
-  const standoutResult = calculateStandoutScore(
-    userProgress.standout_strength_1 || '', 
-    userProgress.standout_strength_2 || ''
-  )
+  const standoutResult = calculateStandoutScore(strength1, strength2)
   const standoutScore = standoutResult.score
   const standoutDescription = standoutResult.description
   const standoutTier = getStandoutTier(standoutScore)
@@ -731,19 +733,24 @@ function ComprehensiveAssessmentResultsContent() {
 
           {/* Enhanced Strength Profile Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
+                <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
+                Your Standout Strength Profile - {actualStrengthCombo}
+              </h2>
+              <div className="text-right">
+                <div className="text-sm text-gray-600 dark:text-gray-300">Bonus Points</div>
+                <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
+              </div>
+            </div>
+            
             {(() => {
               const insights = getStrengthInsights(strengthCombo)
               return (
                 <>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
-                      <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
-                      Your Standout Strength Profile - {insights.title}
-                    </h2>
-                    <div className="text-right">
-                      <div className="text-sm text-gray-600 dark:text-gray-300">Bonus Points</div>
-                      <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
-                    </div>
+                  {/* Subtitle with descriptive titles */}
+                  <div className="mb-4">
+                    <p className="text-lg text-gray-600 dark:text-gray-400 font-medium">{insights.title}</p>
                   </div>
                   
                   {/* Description and Type Badge */}

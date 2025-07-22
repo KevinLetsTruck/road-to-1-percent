@@ -1,3 +1,11 @@
+/**
+ * Dashboard Page
+ * Updated: December 2024
+ * - Added rounded corners (16px) to all buttons
+ * - Redesigned Success Probability card with orange gradient
+ * - Improved text contrast and styling
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";

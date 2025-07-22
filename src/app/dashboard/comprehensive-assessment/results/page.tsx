@@ -962,7 +962,7 @@ function ComprehensiveAssessmentResultsContent() {
             </button>
             
             {/* PDF Download Button */}
-            {isClient && (
+            {isClient && userProgress && (
               <PDFDownloadButton 
                 userProgress={userProgress}
                 spiScore={totalScore}

@@ -170,9 +170,14 @@ const getProbabilityData = (spiScore: number, tier: string) => {
 }
 
 const AssessmentResultsPDF: React.FC<AssessmentResultsPDFProps> = ({ userProgress, spiScore, dimensions }) => {
-  const tier = userProgress.current_tier || '90%'
-  const strength1 = userProgress.standout_strength_1 || ''
-  const strength2 = userProgress.standout_strength_2 || ''
+  // Ensure userProgress exists with defaults
+  const safeUserProgress = userProgress || {}
+  const tier = safeUserProgress.current_tier || '90%'
+  const strength1 = safeUserProgress.standout_strength_1 || ''
+  const strength2 = safeUserProgress.standout_strength_2 || ''
+  const firstName = safeUserProgress.first_name || 'User'
+  const lastName = safeUserProgress.last_name || ''
+  
   const actualStrengthCombo = strength1 && strength2 ? `${strength1} + ${strength2}` : 'Balanced'
   const standoutResult = calculateStandoutScore(strength1, strength2)
   const standoutSynergy = getStandoutTier(standoutResult.score)
@@ -185,7 +190,7 @@ const AssessmentResultsPDF: React.FC<AssessmentResultsPDFProps> = ({ userProgres
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>SPI Assessment Results</Text>
-          <Text style={styles.subtitle}>{userProgress.first_name} {userProgress.last_name}</Text>
+          <Text style={styles.subtitle}>{firstName} {lastName}</Text>
           <Text style={styles.subtitle}>{currentDate}</Text>
         </View>
 

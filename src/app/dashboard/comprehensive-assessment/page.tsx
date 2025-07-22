@@ -965,9 +965,7 @@ export default function ComprehensiveAssessmentPage() {
   const getSPITier = (score: number) => {
     if (score >= 85) return '1%'  // Top 1% - Exceptional performers
     if (score >= 70) return '9%'  // Top 9% - High performers
-    if (score >= 50) return '25%' // Top 25% - Above average
-    if (score >= 30) return '50%' // Top 50% - Average performers
-    return '75%' // Bottom 25% - Needs significant improvement
+    return '90%' // Bottom 90% - Building foundation
   }
 
   const getStrengthCombination = () => {

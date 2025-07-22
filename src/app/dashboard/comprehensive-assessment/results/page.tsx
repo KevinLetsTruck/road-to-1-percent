@@ -92,12 +92,8 @@ function ComprehensiveAssessmentResultsContent() {
         return 'Elite Performer - Top 1%'
       case '9%':
         return 'High Achiever - Top 9%'
-      case '25%':
-        return 'Above Average - Top 25%'
-      case '50%':
-        return 'Average Performer - Top 50%'
-      case '75%':
-        return 'Foundation Level - Bottom 25%'
+      case '90%':
+        return 'Building Foundation - Bottom 90%'
       default:
         return 'Building Foundation'
     }

@@ -89,7 +89,7 @@ function ComprehensiveAssessmentResultsContent() {
       // Check if user is admin from database
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_admin")
+        .select("is_admin, first_name, last_name")
         .eq("id", user.id)
         .single();
 
@@ -102,7 +102,16 @@ function ComprehensiveAssessmentResultsContent() {
         .eq("user_id", user.id)
         .single();
 
-      setUserProgress(progress);
+      // Merge profile data with progress data
+      if (progress && profile) {
+        setUserProgress({
+          ...progress,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+        });
+      } else {
+        setUserProgress(progress);
+      }
 
       // Get comprehensive assessment for standout strengths
       const { data: assessment } = await supabase

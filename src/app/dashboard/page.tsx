@@ -74,6 +74,13 @@ export default function DashboardPage() {
       try {
         setLoading(true);
 
+        // Fetch user profile for name
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("id", user.id)
+          .single();
+
         // Fetch user progress
         const { data: progressData } = await supabase
           .from("user_progress")
@@ -81,7 +88,16 @@ export default function DashboardPage() {
           .eq("user_id", user.id)
           .single();
 
-        setUserProgress(progressData);
+        // Merge profile data with progress data
+        if (progressData && profileData) {
+          setUserProgress({
+            ...progressData,
+            first_name: profileData.first_name,
+            last_name: profileData.last_name,
+          });
+        } else {
+          setUserProgress(progressData);
+        }
 
         // Fetch latest assessment for standout strengths
         const { data: assessmentData } = await supabase

@@ -239,6 +239,106 @@ CREATE INDEX IF NOT EXISTS idx_assessment_reminders_due_date ON assessment_remin
 CREATE INDEX IF NOT EXISTS idx_action_plans_user_id ON action_plans(user_id);
 CREATE INDEX IF NOT EXISTS idx_progress_milestones_user_id ON progress_milestones(user_id);
 
+-- Enable Row Level Security (RLS) on all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comprehensive_assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quarterly_assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assessment_reminders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE action_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE progress_milestones ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policies for profiles table
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Create RLS policies for user_progress table
+DROP POLICY IF EXISTS "Users can view own progress" ON user_progress;
+CREATE POLICY "Users can view own progress" ON user_progress
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own progress" ON user_progress;
+CREATE POLICY "Users can insert own progress" ON user_progress
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own progress" ON user_progress;
+CREATE POLICY "Users can update own progress" ON user_progress
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create RLS policies for comprehensive_assessments table
+DROP POLICY IF EXISTS "Users can view own comprehensive assessments" ON comprehensive_assessments;
+CREATE POLICY "Users can view own comprehensive assessments" ON comprehensive_assessments
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own comprehensive assessments" ON comprehensive_assessments;
+CREATE POLICY "Users can insert own comprehensive assessments" ON comprehensive_assessments
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own comprehensive assessments" ON comprehensive_assessments;
+CREATE POLICY "Users can update own comprehensive assessments" ON comprehensive_assessments
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create RLS policies for quarterly_assessments table
+DROP POLICY IF EXISTS "Users can view own quarterly assessments" ON quarterly_assessments;
+CREATE POLICY "Users can view own quarterly assessments" ON quarterly_assessments
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own quarterly assessments" ON quarterly_assessments;
+CREATE POLICY "Users can insert own quarterly assessments" ON quarterly_assessments
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own quarterly assessments" ON quarterly_assessments;
+CREATE POLICY "Users can update own quarterly assessments" ON quarterly_assessments
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create RLS policies for assessment_reminders table
+DROP POLICY IF EXISTS "Users can view own assessment reminders" ON assessment_reminders;
+CREATE POLICY "Users can view own assessment reminders" ON assessment_reminders
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own assessment reminders" ON assessment_reminders;
+CREATE POLICY "Users can insert own assessment reminders" ON assessment_reminders
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own assessment reminders" ON assessment_reminders;
+CREATE POLICY "Users can update own assessment reminders" ON assessment_reminders
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create RLS policies for action_plans table
+DROP POLICY IF EXISTS "Users can view own action plans" ON action_plans;
+CREATE POLICY "Users can view own action plans" ON action_plans
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own action plans" ON action_plans;
+CREATE POLICY "Users can insert own action plans" ON action_plans
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own action plans" ON action_plans;
+CREATE POLICY "Users can update own action plans" ON action_plans
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create RLS policies for progress_milestones table
+DROP POLICY IF EXISTS "Users can view own progress milestones" ON progress_milestones;
+CREATE POLICY "Users can view own progress milestones" ON progress_milestones
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own progress milestones" ON progress_milestones;
+CREATE POLICY "Users can insert own progress milestones" ON progress_milestones
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own progress milestones" ON progress_milestones;
+CREATE POLICY "Users can update own progress milestones" ON progress_milestones
+  FOR UPDATE USING (auth.uid() = user_id);
+
 -- Create trigger function to update user_progress when comprehensive assessment is submitted
 CREATE OR REPLACE FUNCTION update_user_progress_from_comprehensive()
 RETURNS TRIGGER AS $$

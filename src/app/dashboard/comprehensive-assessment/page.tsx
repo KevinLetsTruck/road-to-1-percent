@@ -755,7 +755,7 @@ export default function ComprehensiveAssessmentPage() {
                 ? hasCalculatedValue
                   ? 'text-green-700 dark:text-green-300'
                   : 'text-indigo-700 dark:text-indigo-300' 
-                : 'text-gray-600 dark:text-gray-400'
+                : 'text-gray-700 dark:text-gray-400'
             }`}>
               {option.description}
             </div>
@@ -809,10 +809,10 @@ export default function ComprehensiveAssessmentPage() {
 
       <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Complete SPI Assessment</h1>
-              <p className="text-gray-600 mb-4">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Complete SPI Assessment</h1>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 This comprehensive assessment evaluates all five dimensions of your Success Probability Index. 
                 Be honest—this assessment is designed to show you exactly where you stand and where to focus your efforts.
               </p>
@@ -839,17 +839,17 @@ export default function ComprehensiveAssessmentPage() {
               )}
               
               {/* Current Situation Selector */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
-                <h3 className="text-xl font-bold text-blue-900 mb-3">🚛 What is your current situation?</h3>
-                <p className="text-blue-700 mb-4 font-medium">
+              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg">
+                <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 mb-3">🚛 What is your current situation?</h3>
+                <p className="text-blue-700 dark:text-blue-300 mb-4 font-medium">
                   Please select your current situation so we can provide questions that are relevant to your specific circumstances.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(['Employee Driver', 'Carrier Authority', 'Leased O/O', 'Small Fleet'] as CurrentSituation[]).map((situation) => (
                     <label key={situation} className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
                       formData.current_situation === situation 
-                        ? 'border-blue-500 bg-blue-100 shadow-md' 
-                        : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                        ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30 shadow-md' 
+                        : 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                     }`}>
                       <input
                         type="radio"
@@ -860,7 +860,7 @@ export default function ComprehensiveAssessmentPage() {
                         className="mr-3 w-4 h-4 text-blue-600"
                       />
                       <div>
-                        <div className="font-semibold text-gray-900">{situation}</div>
+                        <div className="font-semibold text-gray-900 dark:text-gray-100">{situation}</div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           {situation === 'Employee Driver' && 'Driving for a company as an employee'}
                           {situation === 'Carrier Authority' && 'Have your own authority and operate independently'}
@@ -871,17 +871,17 @@ export default function ComprehensiveAssessmentPage() {
                     </label>
                   ))}
                 </div>
-                <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Selected:</strong> {formData.current_situation} - This will customize your assessment questions.
                   </p>
                 </div>
               </div>
 
               {/* Standout Assessment Section */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg">
-                <h3 className="text-xl font-bold text-purple-900 mb-3">🎯 Standout Assessment</h3>
-                <p className="text-purple-700 mb-4 font-medium">
+              <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-lg">
+                <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-3">🎯 Standout Assessment</h3>
+                <p className="text-purple-700 dark:text-purple-300 mb-4 font-medium">
                   Before completing this assessment, please take the Standout 2.0 assessment to discover your unique strengths. OR if you know your top two strengths you can enter them below now.
                 </p>
                 
@@ -901,13 +901,13 @@ export default function ComprehensiveAssessmentPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-purple-800 mb-2">
+                    <label className="block text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
                       Your Top Strength #1
                     </label>
                     <select
                       value={formData.standout_strength_1}
                       onChange={(e) => setFormData(prev => ({ ...prev, standout_strength_1: e.target.value }))}
-                      className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full p-3 border border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       <option value="">Select your top strength</option>
                       {[
@@ -928,13 +928,13 @@ export default function ComprehensiveAssessmentPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-purple-800 mb-2">
+                    <label className="block text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
                       Your Top Strength #2
                     </label>
                     <select
                       value={formData.standout_strength_2}
                       onChange={(e) => setFormData(prev => ({ ...prev, standout_strength_2: e.target.value }))}
-                      className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full p-3 border border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       <option value="">Select your second strength</option>
                       {[
@@ -956,8 +956,8 @@ export default function ComprehensiveAssessmentPage() {
                   </div>
                 </div>
                 
-                <div className="mt-4 p-3 bg-purple-100 rounded-lg">
-                  <p className="text-sm text-purple-800">
+                <div className="mt-4 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <p className="text-sm text-purple-800 dark:text-purple-200">
                     <strong>Note:</strong> These strengths will be integrated into your SPI assessment results to provide personalized insights.
                   </p>
                 </div>
@@ -965,19 +965,19 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Contextual Questions Based on Situation */}
               {(formData.current_situation === 'Small Fleet' || formData.current_situation === 'Carrier Authority') && (
-                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg">
-                  <h3 className="text-xl font-bold text-green-900 mb-3">📋 Additional Information</h3>
+                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-700 rounded-lg">
+                  <h3 className="text-xl font-bold text-green-900 dark:text-green-100 mb-3">📋 Additional Information</h3>
                   
                   {/* Fleet Size Question (Small Fleet only) */}
                   {formData.current_situation === 'Small Fleet' && (
                     <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-green-800 mb-3">How many trucks do you own?</h4>
+                      <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-3">How many trucks do you own?</h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[2, 3, 4, 5, 6, 7, 8, 9, 10, '10+'].map((size) => (
                           <label key={size} className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
                             formData.fleet_size === size 
-                              ? 'border-green-500 bg-green-100 shadow-md' 
-                              : 'border-gray-300 hover:border-green-300 hover:bg-green-50'
+                              ? 'border-green-500 bg-green-100 dark:bg-green-900/30 shadow-md' 
+                              : 'border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
                           }`}>
                             <input
                               type="radio"
@@ -996,7 +996,7 @@ export default function ComprehensiveAssessmentPage() {
 
                   {/* Load Sources Question */}
                   <div className="mb-4">
-                    <h4 className="text-lg font-semibold text-green-800 mb-3">Where do you get your loads? (Select all that apply)</h4>
+                    <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-3">Where do you get your loads? (Select all that apply)</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {[
                         'Load Boards (DAT, Truckstop, etc.)',
@@ -1005,20 +1005,20 @@ export default function ComprehensiveAssessmentPage() {
                         'Freight Forwarders',
                         'Contract Freight'
                       ].map((source) => (
-                        <label key={source} className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-green-50 cursor-pointer">
+                        <label key={source} className="flex items-center p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={formData.load_sources.includes(source)}
                             onChange={(e) => handleLoadSourceChange(source, e.target.checked)}
                             className="mr-3 w-4 h-4 text-green-600"
                           />
-                          <span className="text-gray-900">{source}</span>
+                          <span className="text-gray-900 dark:text-gray-100">{source}</span>
                         </label>
                       ))}
                     </div>
                     {formData.load_sources.length > 0 && (
-                      <div className="mt-3 p-2 bg-green-100 rounded-lg">
-                        <p className="text-sm text-green-800">
+                      <div className="mt-3 p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                        <p className="text-sm text-green-800 dark:text-green-200">
                           <strong>Selected sources:</strong> {formData.load_sources.join(', ')}
                         </p>
                       </div>
@@ -1026,12 +1026,12 @@ export default function ComprehensiveAssessmentPage() {
                   </div>
                 </div>
               )}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
                 <div className="flex items-start">
-                  <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-blue-800 font-medium">Assessment Overview</p>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">Assessment Overview</p>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                       This assessment contains {getAssessmentQuestions(formData.current_situation).length} questions across five dimensions. 
                       Take your time and answer honestly. Your results will provide a clear roadmap for improvement.
                     </p>
@@ -1045,11 +1045,11 @@ export default function ComprehensiveAssessmentPage() {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Financial Foundation Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
                   <DollarSign className="w-5 h-5 mr-2 text-green-600" />
                   Financial Foundation
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
                   Your financial foundation determines your ability to invest in opportunities and weather challenges.
                 </p>
                 {getAssessmentQuestions(formData.current_situation)
@@ -1078,11 +1078,11 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Market Intelligence Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
                   <Brain className="w-5 h-5 mr-2 text-blue-600" />
                   Market Intelligence
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
                   Understanding the market, rates, and customer needs is crucial for making profitable decisions.
                 </p>
                 {getAssessmentQuestions(formData.current_situation)
@@ -1120,11 +1120,11 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Risk Management Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
                   <Shield className="w-5 h-5 mr-2 text-red-600" />
                   Risk Management
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
                   How well you prepare for and manage risks determines your business sustainability.
                 </p>
                 {getAssessmentQuestions(formData.current_situation)
@@ -1160,11 +1160,11 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Support Systems Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
                   <Users className="w-5 h-5 mr-2 text-orange-600" />
                   Support Systems
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
                   Your network, family support, and mentorship multiply your individual efforts.
                 </p>
                 {getAssessmentQuestions(formData.current_situation)

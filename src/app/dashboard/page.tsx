@@ -213,6 +213,35 @@ export default function DashboardPage() {
     return "#ef4444"; // red
   };
 
+  const getProbabilityRange = (probability: number) => {
+    if (probability >= 90) return "90-100%";
+    if (probability >= 80) return "80-89%";
+    if (probability >= 70) return "70-79%";
+    if (probability >= 60) return "60-69%";
+    if (probability >= 50) return "50-59%";
+    if (probability >= 40) return "40-49%";
+    if (probability >= 30) return "30-39%";
+    return "15-24%";
+  };
+
+  const getProbabilityDescription = (probability: number) => {
+    if (probability >= 90)
+      return "Exceptional - Top tier performance with clear path to success";
+    if (probability >= 80)
+      return "Excellent - Strong foundation with high growth potential";
+    if (probability >= 70)
+      return "Very Good - Solid progress with room for optimization";
+    if (probability >= 60)
+      return "Good - On track with specific areas needing attention";
+    if (probability >= 50)
+      return "Fair - Making progress but requires strategic improvements";
+    if (probability >= 40)
+      return "Developing - Building foundation with focused improvement needed";
+    if (probability >= 30)
+      return "Developing - Building foundation with focused improvement needed";
+    return "Early Stage - Significant development needed across multiple areas";
+  };
+
   // Define dimension data with quick wins and long-term goals
   const dimensionsData: DimensionData[] = [
     {
@@ -341,77 +370,48 @@ export default function DashboardPage() {
               <div className="absolute top-0 right-0 p-2">
                 <Target className="w-20 h-20 text-white/10" />
               </div>
-              <div className="relative z-10 p-8">
-                <h2 className="text-2xl font-bold text-white mb-6">
+              <div className="relative z-10 p-6">
+                <h2 className="text-xl font-semibold text-white/90 mb-4 tracking-wider">
                   SUCCESS PROBABILITY
                 </h2>
 
                 {/* Large Percentage Display */}
-                <div className="mb-8">
+                <div className="mb-3">
                   <span
-                    className="text-7xl font-bold"
+                    className="text-6xl font-bold"
                     style={{ color: "#ff7b00" }}
                   >
                     {stats?.successProbability || 30}%
                   </span>
                 </div>
 
-                {/* Score Breakdown */}
-                <div className="mb-6 text-white/80">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <p className="text-white/60">Financial (35%)</p>
-                      <p className="font-semibold">
-                        {userProgress?.financial_foundation_score || 0}/35
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-white/60">Market (20%)</p>
-                      <p className="font-semibold">
-                        {userProgress?.market_intelligence_score || 0}/20
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-white/60">Risk (15%)</p>
-                      <p className="font-semibold">
-                        {userProgress?.risk_management_score || 0}/15
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-white/60">Support (10%)</p>
-                      <p className="font-semibold">
-                        {userProgress?.support_systems_score || 0}/10
-                      </p>
-                    </div>
-                  </div>
-                  {stats?.standoutStrength1 && stats?.standoutStrength2 && (
-                    <div className="mt-3 pt-3 border-t border-white/20">
-                      <p className="text-white/60">Standout Bonus (20%)</p>
-                      <p className="font-semibold">
-                        {Math.round(
-                          calculateStandoutScore(
-                            stats.standoutStrength1,
-                            stats.standoutStrength2
-                          ).score * 2
-                        )}
-                        /20
-                      </p>
-                    </div>
-                  )}
+                {/* Probability Range */}
+                <div className="mb-3">
+                  <span
+                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-white/90"
+                    style={{ backgroundColor: "rgba(255, 123, 0, 0.3)" }}
+                  >
+                    {getProbabilityRange(stats?.successProbability || 30)}
+                  </span>
                 </div>
 
+                {/* Description */}
+                <p className="text-white/70 text-sm mb-6">
+                  {getProbabilityDescription(stats?.successProbability || 30)}
+                </p>
+
                 {/* Progress Bar */}
-                <div className="mt-8">
-                  <div className="flex justify-between text-sm mb-2 text-white/60">
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs mb-1 text-white/50">
                     <span>0%</span>
                     <span>25%</span>
                     <span>50%</span>
                     <span>75%</span>
                     <span>100%</span>
                   </div>
-                  <div className="relative h-4 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="relative h-3 bg-gray-700/50 rounded-full overflow-hidden">
                     {/* Gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 via-blue-500 to-green-500 opacity-30" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 via-blue-500 to-green-500 opacity-20" />
                     {/* Progress indicator */}
                     <div
                       className="relative h-full rounded-full transition-all duration-1000"
@@ -422,7 +422,7 @@ export default function DashboardPage() {
                     />
                     {/* White marker */}
                     <div
-                      className="absolute top-1/2 -translate-y-1/2 w-1 h-6 bg-white"
+                      className="absolute top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white"
                       style={{ left: `${stats?.successProbability || 30}%` }}
                     />
                   </div>
@@ -437,12 +437,12 @@ export default function DashboardPage() {
               userProgress={userProgress}
               standoutStrength1={stats?.standoutStrength1 || ""}
               standoutStrength2={stats?.standoutStrength2 || ""}
-              className="btn-primary w-full"
+              className="btn-primary w-full rounded-lg"
             />
 
             <button
               onClick={() => router.push("/dashboard/progress")}
-              className="btn-secondary w-full flex items-center justify-center gap-2"
+              className="btn-secondary w-full flex items-center justify-center gap-2 rounded-lg"
             >
               <FileText className="w-4 h-4" />
               Progress Update
@@ -450,7 +450,7 @@ export default function DashboardPage() {
 
             <button
               onClick={() => router.push("/dashboard/comprehensive-assessment")}
-              className="btn-secondary w-full flex items-center justify-center gap-2"
+              className="btn-secondary w-full flex items-center justify-center gap-2 rounded-lg"
             >
               <RefreshCw className="w-4 h-4" />
               Retake Assessment

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
 
 interface DimensionBreakdown {
   name: string
@@ -52,6 +53,24 @@ function ComprehensiveAssessmentResultsContent() {
         .single()
       
       setUserProgress(progress)
+      
+      // Get comprehensive assessment for standout strengths
+      const { data: assessment } = await supabase
+        .from('comprehensive_assessments')
+        .select('standout_strength_1, standout_strength_2')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (assessment) {
+        setUserProgress(prev => ({ 
+          ...prev, 
+          standout_strength_1: assessment.standout_strength_1,
+          standout_strength_2: assessment.standout_strength_2
+        }))
+      }
+      
       setLoading(false)
       
       // Check if user just completed assessment (has score in URL)
@@ -85,6 +104,18 @@ function ComprehensiveAssessmentResultsContent() {
   const totalScore = userProgress.spi_score || 0
   const tier = userProgress.current_tier || '90%'
   const strengthCombo = userProgress.strength_combination || 'Balanced'
+  
+  // Calculate standout score
+  const standoutResult = calculateStandoutScore(
+    userProgress.standout_strength_1 || '', 
+    userProgress.standout_strength_2 || ''
+  )
+  const standoutScore = standoutResult.score
+  const standoutDescription = standoutResult.description
+  const standoutTier = getStandoutTier(standoutScore)
+  
+  // Base score is total minus standout bonus
+  const baseScore = Math.max(0, totalScore - standoutScore)
 
   const getSPITierDescription = (tier: string) => {
     switch (tier) {
@@ -251,7 +282,7 @@ function ComprehensiveAssessmentResultsContent() {
 
   const nextSteps = getNextSteps()
 
-  // Calculate probability of success based on SPI score
+  // Calculate probability of success based on SPI score (now out of 110)
   const getProbabilityData = (score: number) => {
     let probability = 0
     let tier = ''
@@ -259,37 +290,37 @@ function ComprehensiveAssessmentResultsContent() {
     let message = ''
     let icon = ''
     
-    if (score >= 85) {
-      // Score 85-100 → Probability 85-100%
-      probability = 85 + Math.floor((score - 85) / 15 * 15)
+    if (score >= 94) {
+      // Score 94-110 → Probability 85-100%
+      probability = 85 + Math.floor((score - 94) / 16 * 15)
       tier = '85-100%'
       color = 'green'
       icon = '🚀'
       message = 'Elite Performance - You\'re in the top 1% with exceptional foundation'
-    } else if (score >= 70) {
-      // Score 70-84 → Probability 70-84%
-      probability = 70 + Math.floor((score - 70) / 15 * 15)
+    } else if (score >= 77) {
+      // Score 77-93 → Probability 70-84%
+      probability = 70 + Math.floor((score - 77) / 17 * 15)
       tier = '70-84%'
       color = 'blue'
       icon = '📈'
       message = 'High Performance - Top 9% with strong success indicators'
-    } else if (score >= 50) {
-      // Score 50-69 → Probability 50-69%
-      probability = 50 + Math.floor((score - 50) / 20 * 20)
+    } else if (score >= 55) {
+      // Score 55-76 → Probability 50-69%
+      probability = 50 + Math.floor((score - 55) / 22 * 20)
       tier = '50-69%'
       color = 'yellow'
       icon = '⚡'
-      message = 'Above Average - Top 25% with solid potential for growth'
-    } else if (score >= 30) {
-      // Score 30-49 → Probability 30-49%
-      probability = 30 + Math.floor((score - 30) / 20 * 20)
+      message = 'Above Average - Building strong foundation with growth potential'
+    } else if (score >= 33) {
+      // Score 33-54 → Probability 30-49%
+      probability = 30 + Math.floor((score - 33) / 22 * 20)
       tier = '30-49%'
       color = 'orange'
       icon = '🎯'
       message = 'Developing - Building foundation with focused improvement needed'
     } else {
-      // Score 0-29 → Probability 10-29%
-      probability = 10 + Math.floor(score / 30 * 20)
+      // Score 0-32 → Probability 10-29%
+      probability = 10 + Math.floor(score / 33 * 20)
       tier = '10-29%'
       color = 'red'
       icon = '🔧'
@@ -355,15 +386,19 @@ function ComprehensiveAssessmentResultsContent() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 dark:from-indigo-600/20 dark:to-purple-600/20 rounded-full blur-3xl"></div>
               <div className="relative z-10">
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">SPI Raw Score</h2>
-                <div className="flex items-baseline mb-4">
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">SPI Total Score</h2>
+                <div className="flex items-baseline mb-2">
                   <span className="text-6xl font-bold text-gray-900 dark:text-gray-100">{totalScore}</span>
-                  <span className="text-2xl text-gray-500 dark:text-gray-400 ml-2">/100</span>
+                  <span className="text-2xl text-gray-500 dark:text-gray-400 ml-2">/110</span>
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <div>Base Score: {baseScore}/100</div>
+                  <div>Standout Bonus: +{standoutScore}/10</div>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-4">
                   <div 
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${totalScore}%` }}
+                    style={{ width: `${Math.min((totalScore / 110) * 100, 100)}%` }}
                   ></div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -481,6 +516,29 @@ function ComprehensiveAssessmentResultsContent() {
               <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
               Your Strength Profile
             </h2>
+            
+            {/* Standout Combination Score */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Standout Combination: {strengthCombo}</h3>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  standoutTier === 'Power Combination' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                  standoutTier === 'Strong Combination' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                  standoutTier === 'Supportive Combination' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                  'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                }`}>
+                  {standoutTier}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{standoutDescription}</p>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{standoutScore}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Bonus Points</div>
+                </div>
+              </div>
+            </div>
+            
             <p className="text-gray-600 dark:text-gray-400 mb-4">{getStrengthDescription(strengthCombo)}</p>
             {strengthCombo.includes(' + ') && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">

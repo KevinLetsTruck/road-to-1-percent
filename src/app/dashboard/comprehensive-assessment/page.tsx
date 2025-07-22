@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info, X } from 'lucide-react'
+import { calculateStandoutScore } from '@/lib/standoutScoring'
 
 type CurrentSituation = 'Employee Driver' | 'Carrier Authority' | 'Leased O/O' | 'Small Fleet'
 
@@ -959,12 +960,20 @@ export default function ComprehensiveAssessmentPage() {
     const riskScore = calculateDimensionScore('Risk Management')
     const supportScore = calculateDimensionScore('Support Systems')
     
-    return financialScore + marketScore + strengthsScore + riskScore + supportScore
+    // Calculate base score (out of 100)
+    const baseScore = financialScore + marketScore + strengthsScore + riskScore + supportScore
+    
+    // Add standout strength bonus (up to 10 points)
+    const standoutBonus = calculateStandoutScore(formData.standout_strength_1, formData.standout_strength_2).score
+    
+    // Total score is now out of 110
+    return baseScore + standoutBonus
   }
 
   const getSPITier = (score: number) => {
-    if (score >= 85) return '1%'  // Top 1% - Exceptional performers
-    if (score >= 70) return '9%'  // Top 9% - High performers
+    // Adjusted for new 110 max score (same percentages)
+    if (score >= 94) return '1%'  // Top 1% - Exceptional performers (85% of 110)
+    if (score >= 77) return '9%'  // Top 9% - High performers (70% of 110)
     return '90%' // Bottom 90% - Building foundation
   }
 

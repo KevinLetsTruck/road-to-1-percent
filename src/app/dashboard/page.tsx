@@ -25,13 +25,15 @@ import {
 } from "lucide-react";
 
 interface DashboardStats {
-  spiScore: number;
+  assessmentScore: number;
+  standoutBonus: number;
+  successProbability: number;
   completedAssessments: number;
   strongestDimension: string;
   improvementArea: string;
   lastAssessmentDate: string | null;
-  successProbability: number;
-  tier: string;
+  standoutStrength1: string | null;
+  standoutStrength2: string | null;
 }
 
 interface DimensionData {
@@ -75,7 +77,7 @@ export default function DashboardPage() {
 
         setUserProgress(progressData);
 
-        // Fetch latest assessment
+        // Fetch latest assessment for standout strengths
         const { data: assessmentData } = await supabase
           .from("comprehensive_assessments")
           .select("*")
@@ -96,10 +98,6 @@ export default function DashboardPage() {
               score: progressData.market_intelligence_score || 0,
             },
             {
-              name: "Personal Strengths",
-              score: progressData.personal_strengths_score || 0,
-            },
-            {
               name: "Risk Management",
               score: progressData.risk_management_score || 0,
             },
@@ -116,29 +114,48 @@ export default function DashboardPage() {
             a.score < b.score ? a : b
           );
 
-          const spiScore = progressData.spi_score || 0;
-          let tier = "Building Foundation";
-          let successProb = 30;
+          // Calculate assessment score (sum of all dimensions)
+          const assessmentScore = dimensions.reduce(
+            (sum, dim) => sum + dim.score,
+            0
+          );
 
-          if (spiScore >= 80) {
-            tier = "Top 10%";
-            successProb = 75;
-          } else if (spiScore >= 60) {
-            tier = "Scaling Up";
-            successProb = 60;
-          } else if (spiScore >= 40) {
-            tier = "Developing";
-            successProb = 45;
+          // Calculate standout bonus based on standout strengths
+          let standoutBonus = 0;
+          if (
+            assessmentData?.standout_strength_1 &&
+            assessmentData?.standout_strength_2
+          ) {
+            standoutBonus = progressData.standout_score || 0; // Get from user_progress
           }
 
+          // Calculate success probability
+          const totalScore = assessmentScore + standoutBonus;
+          let successProbability = 30; // Base probability
+
+          if (totalScore >= 80) {
+            successProbability = 75 + Math.round((totalScore - 80) / 2);
+          } else if (totalScore >= 60) {
+            successProbability = 60 + Math.round((totalScore - 60) * 0.75);
+          } else if (totalScore >= 40) {
+            successProbability = 45 + Math.round((totalScore - 40) * 0.75);
+          } else {
+            successProbability = 30 + Math.round(totalScore * 0.375);
+          }
+
+          // Cap at 95%
+          successProbability = Math.min(successProbability, 95);
+
           setStats({
-            spiScore,
+            assessmentScore,
+            standoutBonus,
+            successProbability,
             completedAssessments: progressData.assessments_completed || 0,
             strongestDimension: strongestDim.name,
             improvementArea: weakestDim.name,
             lastAssessmentDate: assessmentData?.assessment_date || null,
-            successProbability: successProb,
-            tier,
+            standoutStrength1: assessmentData?.standout_strength_1 || null,
+            standoutStrength2: assessmentData?.standout_strength_2 || null,
           });
         }
       } catch (error) {
@@ -278,7 +295,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-100">
-                Your SPI Assessment Results
+                Your Assessment Results
               </h1>
               <p className="text-gray-400 mt-1">
                 {user?.email || "Entrepreneur"}
@@ -297,75 +314,67 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Top Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* SPI Score Card */}
-          <div className="card-dark-gradient">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-gray-400 text-sm uppercase tracking-wide">
-                  SPI Total Score
-                </p>
-                <div className="flex items-baseline gap-3 mt-2">
-                  <span className="text-6xl font-bold text-gray-100">
-                    {stats?.spiScore || 0}
-                  </span>
-                  <span className="text-2xl text-gray-400">/100</span>
-                </div>
-                <p className="text-gray-400 mt-2">
-                  Assessment Score:{" "}
-                  {Math.round(((stats?.spiScore || 0) * 34) / 100)}/80
-                </p>
-                <p className="text-gray-400">Standout Bonus: +6/20</p>
-              </div>
-              <div className="icon-container bg-purple-500/20">
-                <Trophy className="w-6 h-6 text-purple-400" />
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">
-                  Tier: {stats?.tier || "Building Foundation"}
-                </span>
-                <span className="text-gray-400">Bottom 90%</span>
-              </div>
-              <div className="progress-bar">
-                <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
-                  style={{ width: getProgressWidth(stats?.spiScore || 0) }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Success Probability Card */}
+        {/* Success Probability Card */}
+        <div className="mb-8">
           <div className="card-orange-gradient relative overflow-hidden">
             <div className="absolute top-0 right-0 p-2">
               <Target className="w-20 h-20 text-white/10" />
             </div>
             <div className="relative z-10">
-              <p className="text-white/80 text-sm uppercase tracking-wide">
+              <h2 className="text-2xl font-bold text-white mb-6">
                 Success Probability
-              </p>
-              <div className="flex items-baseline gap-3 mt-2">
-                <span className="text-6xl font-bold">
-                  {stats?.successProbability || 30}%
-                </span>
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {/* Success Probability Percentage */}
+                <div>
+                  <p className="text-white/80 text-sm mb-2">
+                    Probability Score
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold">
+                      {stats?.successProbability || 30}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Assessment Score */}
+                <div>
+                  <p className="text-white/80 text-sm mb-2">Assessment Score</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold">
+                      {stats?.assessmentScore || 0}
+                    </span>
+                    <span className="text-white/60">/80</span>
+                  </div>
+                </div>
+
+                {/* Standout Bonus */}
+                <div>
+                  <p className="text-white/80 text-sm mb-2">Standout Bonus</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold">
+                      +{stats?.standoutBonus || 0}
+                    </span>
+                    <span className="text-white/60">/20</span>
+                  </div>
+                  {stats?.standoutStrength1 && stats?.standoutStrength2 && (
+                    <p className="text-xs text-white/60 mt-1">
+                      {stats.standoutStrength1} + {stats.standoutStrength2}
+                    </p>
+                  )}
+                </div>
               </div>
-              <p className="text-white/80 mt-4 text-sm">
-                30-49% Probability Range
-              </p>
-              <p className="text-white/90 mt-2">
-                Developing - Building foundation with focused improvement needed
-              </p>
-              <div className="mt-4">
-                <div className="bg-white/20 rounded-full h-2 overflow-hidden">
+
+              {/* Progress Bar */}
+              <div className="mt-6">
+                <div className="bg-white/20 rounded-full h-3 overflow-hidden">
                   <div
-                    className="h-full bg-white/80 rounded-full"
+                    className="h-full bg-white rounded-full transition-all duration-500"
                     style={{ width: `${stats?.successProbability || 30}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-xs mt-1 text-white/60">
+                <div className="flex justify-between text-xs mt-2 text-white/60">
                   <span>0%</span>
                   <span>25%</span>
                   <span>50%</span>

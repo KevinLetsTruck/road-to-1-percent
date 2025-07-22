@@ -72,7 +72,7 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
       ? 'What is your current net worth (assets minus liabilities)?'
       : 'What is your current net worth (assets minus liabilities)?',
     options: [
-      { value: -1, label: '🧮 Open Net Worth Calculator', description: 'Click to calculate your exact net worth' },
+      { value: -1, label: '🧮 Open Net Worth Calculator', description: 'Calculate assets minus liabilities for precise value' },
       { value: 0, label: 'Negative $25,000+', description: 'Significant debt burden' },
       { value: 3, label: 'Negative $10,000 to $25,000', description: 'Moderate debt' },
       { value: 6, label: 'Negative $10,000 to $0', description: 'Minor debt' },
@@ -88,7 +88,7 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     dimension: 'Financial Foundation',
     question: 'How much do you save monthly after all expenses?',
     options: [
-      { value: -1, label: '💰 Open Monthly Savings Calculator', description: 'Click to calculate your exact monthly savings' },
+      { value: -1, label: '💰 Open Monthly Savings Calculator', description: 'Calculate income minus expenses for precise value' },
       { value: 0, label: 'Negative (spending more than earning)', description: 'Living beyond means' },
       { value: 4, label: '$0 to $500', description: 'Breaking even' },
       { value: 7, label: '$500 to $1,000', description: 'Moderate savings' },
@@ -1071,6 +1071,14 @@ export default function ComprehensiveAssessmentPage() {
                       <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
+                      {/* Add helpful instructions for calculator questions */}
+                      {(question.id === 'net_worth' || question.id === 'monthly_savings') && (
+                        <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                          <p className="text-sm text-blue-800 dark:text-blue-200">
+                            <strong>💡 Tip:</strong> You can either use the calculator for a precise calculation or select a range if you already know your {question.id === 'net_worth' ? 'net worth' : 'monthly savings'}.
+                          </p>
+                        </div>
+                      )}
                       <div className="space-y-2">
                         {question.options.map((option) => renderOption(option, question))}
                       </div>

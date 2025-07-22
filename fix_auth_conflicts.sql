@@ -1,11 +1,17 @@
 -- Comprehensive fix for authentication conflicts (409 errors)
 -- This script fixes issues with both profiles and user_progress tables
 
--- First, let's check the current state
+-- First, let's check the table structure
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'profiles' 
+AND table_schema = 'public';
+
+-- Check for the correct column name in profiles table
 SELECT 'Checking for duplicate profiles...' as status;
-SELECT user_id, COUNT(*) 
+SELECT id, COUNT(*) 
 FROM profiles 
-GROUP BY user_id 
+GROUP BY id 
 HAVING COUNT(*) > 1;
 
 SELECT 'Checking for duplicate user_progress...' as status;

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
 
@@ -25,6 +25,7 @@ function ComprehensiveAssessmentResultsContent() {
   const [userProgress, setUserProgress] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const router = useRouter()
   const supabase = createClient()
@@ -44,6 +45,10 @@ function ComprehensiveAssessmentResultsContent() {
         return
       }
       setUser(user)
+      
+      // Check if user is admin
+      const adminEmails = ['admin@spiassessment.com', 'kevin@spiassessment.com'] // Add your admin emails
+      setIsAdmin(adminEmails.includes(user.email || ''))
       
       // Get user progress
       const { data: progress } = await supabase
@@ -322,6 +327,15 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</span>
+              {isAdmin && (
+                <button
+                  onClick={() => router.push('/admin/dashboard')}
+                  className="flex items-center px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                >
+                  <Settings className="h-4 w-4 mr-1" />
+                  <span className="text-sm font-medium">Admin</span>
+                </button>
+              )}
               <button
                 onClick={handleSignOut}
                 className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"

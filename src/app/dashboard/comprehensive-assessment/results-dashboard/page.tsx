@@ -4,13 +4,14 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { LogOut, Gauge, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
+import { LogOut, Gauge, TrendingUp, AlertTriangle, CheckCircle, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 function TruckDashboardResultsContent() {
   const [user, setUser] = useState<User | null>(null)
   const [userProgress, setUserProgress] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
   const supabase = createClient()
   const { signOut } = useAuth()
@@ -26,9 +27,13 @@ function TruckDashboardResultsContent() {
       if (!user) {
         router.push('/login')
         return
-      }
+            }
       setUser(user)
       
+      // Check if user is admin
+      const adminEmails = ['admin@spiassessment.com', 'kevin@spiassessment.com'] // Add your admin emails
+      setIsAdmin(adminEmails.includes(user.email || ''))
+
       // Get user progress
       const { data: progress } = await supabase
         .from('user_progress')
@@ -103,6 +108,15 @@ function TruckDashboardResultsContent() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-400">{user?.email}</span>
+              {isAdmin && (
+                <button
+                  onClick={() => router.push('/admin/dashboard')}
+                  className="flex items-center px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                >
+                  <Settings className="h-4 w-4 mr-1" />
+                  <span className="text-sm font-medium">Admin</span>
+                </button>
+              )}
               <button
                 onClick={handleSignOut}
                 className="flex items-center text-gray-400 hover:text-white transition-colors"

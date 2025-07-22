@@ -51,6 +51,19 @@
   - Direct redirect to assessment after account creation
   - No email verification needed to start using the app
 
+### Added - Admin Dashboard
+- **Admin Dashboard**: Beautiful, modern admin dashboard for monitoring all users
+  - Key metrics: Total users, completed assessments, average SPI score, weekly activity
+  - Tier distribution visualization with circular progress charts
+  - User table with search, filtering by tier, and sorting options
+  - Export to CSV functionality for data analysis
+  - Shows all user details: scores, strengths, dimension breakdowns
+  - Dark mode support
+- **Admin Access**: 
+  - Admin button appears in results pages for authorized users
+  - Currently uses email-based authentication (admin@spiassessment.com, kevin@spiassessment.com)
+  - Seamless navigation from user results to admin dashboard
+
 ### Technical Details
 - Modified `src/app/dashboard/comprehensive-assessment/page.tsx`:
   - Updated `getStrengthCombination()` function to use dropdown selections

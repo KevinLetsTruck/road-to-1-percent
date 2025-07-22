@@ -42,6 +42,11 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Custom test color to force regeneration
+        test: {
+          DEFAULT: "#ff0000",
+          light: "#ff6666",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -1,11 +1,20 @@
 {
-	"folders": [
-		{
-			"name": "🎯 Road to 1%",
-			"path": "./road-to-1-percent"
-		}
-	],
-	"settings": {
-		"typescript.preferences.includePackageJsonAutoImports": "on"
-	}
-}
+  "folders": [
+    {
+      "name": "Road to 1%",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "extensions": {
+    "recommendations": [
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-typescript-next"
+    ]
+  }
+} 

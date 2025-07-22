@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd road-to-1-percent && npm run build",
+  "buildCommand": "cd road-to-1-percent && npm install && npm run build",
   "outputDirectory": "road-to-1-percent/.next",
   "installCommand": "cd road-to-1-percent && npm install",
   "framework": "nextjs"
-}
+} 

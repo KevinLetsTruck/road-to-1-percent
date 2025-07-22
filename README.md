@@ -1,82 +1,98 @@
-# Development Workspace
+# Road to 1% - Personal Development Platform
 
-This workspace contains two separate projects:
-
-## 📁 Projects
-
-### 🎯 [Road to 1%](./road-to-1-percent/)
 A comprehensive personal development platform designed to help professional drivers progress through different tiers (90%, 9%, 1%) by completing assessments and tracking their progress.
 
-**Tech Stack**: Next.js 15, TypeScript, Supabase, Tailwind CSS
+## Features
 
-**Quick Start**:
-```bash
-cd road-to-1-percent
-npm install
-npm run dev
-# Open http://localhost:3000
-```
+- **User Authentication**: Secure login and registration with Supabase
+- **Assessment System**: Multiple assessment types (SPI Financial, Leadership, etc.)
+- **Progress Tracking**: Visual progress indicators and milestone tracking
+- **Quarterly Assessment System**: Regular progress reviews and goal setting
+- **Personalized Action Plans**: AI-generated recommendations based on assessment results
+- **Community Features**: Peer groups and member connections
+- **Responsive Design**: Modern UI built with Tailwind CSS
+- **Real-time Updates**: Live progress tracking and score calculation
 
-### 🎙️ [AudioRoad Radio System](./AudioRoad-Radio-System/)
-A professional WebRTC call-in show and podcast system with AI-powered analysis for hosting live radio broadcasts.
+## Tech Stack
 
-**Tech Stack**: Node.js, Express, Socket.IO, WebRTC, OpenAI
+- **Frontend**: Next.js 15 with TypeScript
+- **Styling**: Tailwind CSS
+- **Authentication**: Supabase Auth
+- **Database**: Supabase PostgreSQL
+- **Icons**: Lucide React
+- **Forms**: React Hook Form with Zod validation
 
-**Quick Start**:
-```bash
-cd AudioRoad-Radio-System/webrtc-server
-npm install
-npm start
-# Open http://localhost:3002
-```
+## Getting Started
 
-## 🚀 Development Workflow
+### Prerequisites
 
-### Running Both Projects
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
 
-1. **Start Road to 1% (Port 3000)**
+### Installation
+
+1. **Navigate to the project directory**
    ```bash
    cd road-to-1-percent
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   
+   Create a `.env.local` file in the project directory:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
+
+4. **Set up Supabase Database**
+   
+   Run the SQL from `database_migration.sql` in your Supabase SQL editor.
+
+5. **Run the development server**
+   ```bash
    npm run dev
    ```
 
-2. **Start AudioRoad WebRTC Server (Port 3002)**
-   ```bash
-   cd AudioRoad-Radio-System/webrtc-server
-   npm start
-   ```
+6. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-### Environment Setup
+## Project Structure
 
-Each project has its own environment configuration:
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Authentication pages
+│   │   ├── login/         # Login page
+│   │   └── register/      # Registration page
+│   ├── (dashboard)/       # Protected dashboard pages
+│   │   ├── assessments/   # Assessment pages
+│   │   ├── community/     # Community features
+│   │   ├── progress/      # Progress tracking
+│   │   └── page.tsx       # Main dashboard
+│   ├── api/               # API routes
+│   └── page.tsx           # Landing page
+├── components/            # Reusable components
+├── lib/                   # Utility libraries
+│   └── supabase/         # Supabase client configuration
+├── types/                # TypeScript type definitions
+└── contexts/             # React contexts
+```
 
-- **Road to 1%**: Create `.env.local` in `road-to-1-percent/` directory
-- **AudioRoad**: Create `.env` in `AudioRoad-Radio-System/webrtc-server/` directory
+## Development
 
-## 📋 Project Status
+- **Development**: `npm run dev`
+- **Build**: `npm run build`
+- **Start**: `npm start`
+- **Lint**: `npm run lint`
 
-### Road to 1% ✅
-- ✅ Next.js app running
-- ✅ Quarterly assessment interface
-- ✅ Dashboard and progress tracking
-- 🔧 Needs Supabase setup for data persistence
+## Deployment
 
-### AudioRoad Radio System ✅
-- ✅ WebRTC server running
-- ✅ Caller interface
-- ✅ Screener dashboard
-- ✅ Host dashboard
-- 🔧 Needs environment configuration for full features
-
-## 🛠️ Next Steps
-
-1. **Set up Supabase** for Road to 1% data persistence
-2. **Configure environment variables** for both projects
-3. **Test full functionality** of both applications
-4. **Deploy to production** when ready
-
-## 📚 Documentation
-
-- [Road to 1% Documentation](./road-to-1-percent/README.md)
-- [AudioRoad Radio System Documentation](./AudioRoad-Radio-System/README.md)
-- [AudioRoad Deployment Guide](./AudioRoad-Radio-System/DEPLOYMENT.md) 
+This project is configured for deployment on Vercel, Netlify, or Railway. See the respective configuration files for details.

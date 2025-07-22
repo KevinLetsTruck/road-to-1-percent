@@ -47,6 +47,18 @@ const nextConfig: NextConfig = {
 
   // Disable powered by header for security
   poweredByHeader: false,
+
+  // Handle ESM packages
+  transpilePackages: ['@react-pdf/renderer'],
+
+  // Webpack configuration for react-pdf
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      canvas: false,
+    }
+    return config
+  },
 };
 
 export default nextConfig;

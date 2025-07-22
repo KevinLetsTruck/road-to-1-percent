@@ -1,51 +1,72 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
-import { Mail, Lock, TrendingUp } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { Mail, Lock, TrendingUp } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
-  const { user, loading: authLoading } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
-  const supabase = createClient()
+  const { user, loading: authLoading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const supabase = createClient();
 
   // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      })
+      });
 
       if (error) {
-        throw error
+        throw error;
       }
-      
-      router.push('/dashboard')
-      router.refresh()
+
+      // Sync the session with the server
+      if (data.session) {
+        const syncResponse = await fetch("/api/auth/session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+          }),
+        });
+
+        if (!syncResponse.ok) {
+          throw new Error("Failed to sync session");
+        }
+      }
+
+      // Wait a moment for cookies to be set properly
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Force a full page reload to ensure cookies are synchronized
+      window.location.replace("/dashboard");
     } catch (error: unknown) {
-      setError((error as Error).message)
+      setError((error as Error).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Show loading while checking auth state
   if (authLoading) {
@@ -53,7 +74,7 @@ export default function LoginPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -64,7 +85,9 @@ export default function LoginPage() {
             <TrendingUp className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in to your Road to 1% account</p>
+          <p className="text-gray-600 mt-2">
+            Sign in to your Road to 1% account
+          </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
@@ -114,14 +137,17 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
                 Sign up
               </Link>
             </p>
@@ -129,5 +155,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

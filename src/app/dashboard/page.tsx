@@ -116,10 +116,16 @@ export default function DashboardPage() {
             a.score < b.score ? a : b
           );
 
-          // Calculate base score (sum of all dimensions out of 80)
+          // Calculate weighted scores based on original percentages
+          // Financial Foundation: 35% (max 35 points)
+          // Market Intelligence: 20% (max 20 points)
+          // Risk Management: 15% (max 15 points)
+          // Support Systems: 10% (max 10 points)
+          // Total base: 80%
+
           const baseScore = dimensions.reduce((sum, dim) => sum + dim.score, 0);
 
-          // Calculate standout bonus (0-20 points)
+          // Calculate standout bonus: 20% (max 20 points)
           let standoutBonus = 0;
           if (
             assessmentData?.standout_strength_1 &&
@@ -133,7 +139,7 @@ export default function DashboardPage() {
             standoutBonus = standoutResult.score * 2;
           }
 
-          // Calculate total score out of 100
+          // Total possible score: 100 points (80 base + 20 standout)
           const totalScore = baseScore + standoutBonus;
 
           // Calculate success probability with progressive scaling
@@ -348,6 +354,50 @@ export default function DashboardPage() {
                   >
                     {stats?.successProbability || 30}%
                   </span>
+                </div>
+
+                {/* Score Breakdown */}
+                <div className="mb-6 text-white/80">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p className="text-white/60">Financial (35%)</p>
+                      <p className="font-semibold">
+                        {userProgress?.financial_foundation_score || 0}/35
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Market (20%)</p>
+                      <p className="font-semibold">
+                        {userProgress?.market_intelligence_score || 0}/20
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Risk (15%)</p>
+                      <p className="font-semibold">
+                        {userProgress?.risk_management_score || 0}/15
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/60">Support (10%)</p>
+                      <p className="font-semibold">
+                        {userProgress?.support_systems_score || 0}/10
+                      </p>
+                    </div>
+                  </div>
+                  {stats?.standoutStrength1 && stats?.standoutStrength2 && (
+                    <div className="mt-3 pt-3 border-t border-white/20">
+                      <p className="text-white/60">Standout Bonus (20%)</p>
+                      <p className="font-semibold">
+                        {Math.round(
+                          calculateStandoutScore(
+                            stats.standoutStrength1,
+                            stats.standoutStrength2
+                          ).score * 2
+                        )}
+                        /20
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Progress Bar */}

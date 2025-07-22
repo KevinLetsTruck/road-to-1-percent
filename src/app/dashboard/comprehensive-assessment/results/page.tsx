@@ -727,28 +727,7 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
           </div>
 
-          {/* Overall Score Card - Updated Design */}
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-8 text-white mb-8">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-semibold mb-2">Performance Summary</h2>
-              <p className="text-indigo-100">Your comprehensive assessment results and next steps</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{strengthCombo}</div>
-                <div className="text-indigo-100 text-sm">Strength Combination</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{nextSteps.timeline}</div>
-                <div className="text-indigo-100 text-sm">Improvement Timeline</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{nextSteps.priority}</div>
-                <div className="text-indigo-100 text-sm">Priority Focus</div>
-              </div>
-            </div>
-          </div>
+
 
           {/* Enhanced Strength Profile Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">

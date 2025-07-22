@@ -249,6 +249,45 @@ function ComprehensiveAssessmentResultsContent() {
 
   const nextSteps = getNextSteps()
 
+  // Calculate probability of success based on SPI score
+  const getProbabilityData = (score: number) => {
+    let probability = 0
+    let tier = ''
+    let color = ''
+    let message = ''
+    let icon = ''
+    
+    if (score >= 70) {
+      probability = 76 + Math.floor((score - 70) / 30 * 24) // 76-100%
+      tier = '76-100%'
+      color = 'green'
+      icon = '🚀'
+      message = 'Exceptional - You have the foundation for extraordinary success'
+    } else if (score >= 50) {
+      probability = 51 + Math.floor((score - 50) / 20 * 25) // 51-75%
+      tier = '51-75%'
+      color = 'blue'
+      icon = '📈'
+      message = 'Strong - You\'re on the right path with room to optimize'
+    } else if (score >= 30) {
+      probability = 26 + Math.floor((score - 30) / 20 * 25) // 26-50%
+      tier = '26-50%'
+      color = 'yellow'
+      icon = '⚡'
+      message = 'Developing - Focus on fundamentals to accelerate growth'
+    } else {
+      probability = Math.floor(score / 30 * 26) // 0-25%
+      tier = '0-25%'
+      color = 'red'
+      icon = '🎯'
+      message = 'Foundation Phase - Build core systems for sustainable success'
+    }
+    
+    return { probability, tier, color, message, icon }
+  }
+
+  const probabilityData = getProbabilityData(totalScore)
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <nav className="bg-white dark:bg-gray-800 shadow-lg">
@@ -297,12 +336,108 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
           )}
 
-          {/* Overall Score Card */}
+          {/* New Stunning Score and Probability Display */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* SPI Score Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 dark:from-indigo-600/20 dark:to-purple-600/20 rounded-full blur-3xl"></div>
+              <div className="relative z-10">
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">SPI Raw Score</h2>
+                <div className="flex items-baseline mb-4">
+                  <span className="text-6xl font-bold text-gray-900 dark:text-gray-100">{totalScore}</span>
+                  <span className="text-2xl text-gray-500 dark:text-gray-400 ml-2">/100</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-4">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${totalScore}%` }}
+                  ></div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-medium text-gray-700 dark:text-gray-300">Tier: {tier}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{getSPITierDescription(tier)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Probability of Success Card */}
+            <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 relative overflow-hidden border-2 ${
+              probabilityData.color === 'green' ? 'border-green-500' :
+              probabilityData.color === 'blue' ? 'border-blue-500' :
+              probabilityData.color === 'yellow' ? 'border-yellow-500' :
+              'border-red-500'
+            }`}>
+              <div className={`absolute top-0 left-0 w-40 h-40 rounded-full blur-3xl ${
+                probabilityData.color === 'green' ? 'bg-green-400/20 dark:bg-green-600/20' :
+                probabilityData.color === 'blue' ? 'bg-blue-400/20 dark:bg-blue-600/20' :
+                probabilityData.color === 'yellow' ? 'bg-yellow-400/20 dark:bg-yellow-600/20' :
+                'bg-red-400/20 dark:bg-red-600/20'
+              }`}></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Success Probability</h2>
+                  <span className="text-3xl">{probabilityData.icon}</span>
+                </div>
+                <div className="flex items-baseline mb-4">
+                  <span className={`text-6xl font-bold ${
+                    probabilityData.color === 'green' ? 'text-green-600 dark:text-green-400' :
+                    probabilityData.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                    probabilityData.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+                    'text-red-600 dark:text-red-400'
+                  }`}>{probabilityData.probability}%</span>
+                </div>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-4 ${
+                  probabilityData.color === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                  probabilityData.color === 'blue' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                  probabilityData.color === 'yellow' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                  'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                }`}>
+                  {probabilityData.tier} Probability Range
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {probabilityData.message}
+                </p>
+                
+                {/* Probability Meter */}
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <span>0%</span>
+                    <span>25%</span>
+                    <span>50%</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                  </div>
+                  <div className="relative w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className="absolute inset-0 flex">
+                      <div className="w-1/4 bg-red-200 dark:bg-red-900/50"></div>
+                      <div className="w-1/4 bg-yellow-200 dark:bg-yellow-900/50"></div>
+                      <div className="w-1/4 bg-blue-200 dark:bg-blue-900/50"></div>
+                      <div className="w-1/4 bg-green-200 dark:bg-green-900/50"></div>
+                    </div>
+                    <div 
+                      className={`absolute top-0 left-0 h-full transition-all duration-1000 ease-out ${
+                        probabilityData.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                        probabilityData.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                        probabilityData.color === 'yellow' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
+                        'bg-gradient-to-r from-red-500 to-red-600'
+                      }`}
+                      style={{ width: `${probabilityData.probability}%` }}
+                    ></div>
+                    <div 
+                      className="absolute top-1/2 -translate-y-1/2 w-1 h-5 bg-gray-900 dark:bg-gray-100 transition-all duration-1000 ease-out"
+                      style={{ left: `${probabilityData.probability}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Overall Score Card - Updated Design */}
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-8 text-white mb-8">
             <div className="text-center mb-6">
-              <h1 className="text-4xl font-bold mb-2">Your SPI Score: {totalScore}/100</h1>
-              <p className="text-xl text-indigo-100 mb-4">Current Tier: {tier}</p>
-              <p className="text-indigo-100">{getSPITierDescription(tier)}</p>
+              <h2 className="text-2xl font-semibold mb-2">Performance Summary</h2>
+              <p className="text-indigo-100">Your comprehensive assessment results and next steps</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -322,15 +457,15 @@ function ComprehensiveAssessmentResultsContent() {
           </div>
 
           {/* Strength Combination Details */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <Lightbulb className="w-6 h-6 mr-2 text-yellow-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+              <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
               Your Strength Profile
             </h2>
-            <p className="text-gray-600 mb-4">{getStrengthDescription(strengthCombo)}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{getStrengthDescription(strengthCombo)}</p>
             {strengthCombo.includes(' + ') && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-800">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   <strong>Special Note:</strong> Your {strengthCombo} combination is unique and powerful. 
                   This dual strength gives you exceptional versatility in approaching challenges and opportunities.
                 </p>
@@ -339,9 +474,9 @@ function ComprehensiveAssessmentResultsContent() {
           </div>
 
           {/* Dimension Breakdown */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <BarChart3 className="w-6 h-6 mr-2 text-indigo-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center">
+              <BarChart3 className="w-6 h-6 mr-2 text-indigo-600 dark:text-indigo-400" />
               Dimension Breakdown
             </h2>
             
@@ -411,9 +546,9 @@ function ComprehensiveAssessmentResultsContent() {
           </div>
 
           {/* Next Steps */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <Target className="w-6 h-6 mr-2 text-green-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+              <Target className="w-6 h-6 mr-2 text-green-600 dark:text-green-400" />
               Your Action Plan
             </h2>
             

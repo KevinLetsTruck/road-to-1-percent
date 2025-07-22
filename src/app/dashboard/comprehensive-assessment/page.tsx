@@ -652,8 +652,8 @@ export default function ComprehensiveAssessmentPage() {
         key={option.value} 
         className={`flex items-start p-3 border rounded-lg cursor-pointer transition-all ${
           isCalculatorOption 
-            ? 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30' 
-            : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
+            ? 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 dark:border-indigo-600' 
+            : 'border-gray-200 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700'
         } ${isSelected ? 'ring-2 ring-indigo-500' : ''}`}
       >
         <input
@@ -774,7 +774,7 @@ export default function ComprehensiveAssessmentPage() {
                       />
                       <div>
                         <div className="font-semibold text-gray-900">{situation}</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           {situation === 'Employee Driver' && 'Driving for a company as an employee'}
                           {situation === 'Carrier Authority' && 'Have your own authority and operate independently'}
                           {situation === 'Leased O/O' && 'Lease your truck to a carrier'}
@@ -900,7 +900,7 @@ export default function ComprehensiveAssessmentPage() {
                               onChange={() => handleFleetSizeChange(size as number)}
                               className="mr-2 w-4 h-4 text-green-600"
                             />
-                            <span className="font-medium text-gray-900">{size} {size === 1 ? 'Truck' : 'Trucks'}</span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">{size} {size === 1 ? 'Truck' : 'Trucks'}</span>
                           </label>
                         ))}
                       </div>
@@ -1018,8 +1018,8 @@ export default function ComprehensiveAssessmentPage() {
                 {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Financial Foundation')
                   .map((question, index) => (
-                    <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                    <div key={question.id} className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
@@ -1043,13 +1043,13 @@ export default function ComprehensiveAssessmentPage() {
                 {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Market Intelligence')
                   .map((question, index) => (
-                    <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                    <div key={question.id} className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
-                          <label key={option.value} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                          <label key={option.value} className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer">
                             <input
                               type="radio"
                               name={question.id}
@@ -1059,9 +1059,9 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900">{option.label}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{option.label}</div>
                               {option.description && (
-                                <div className="text-sm text-gray-600">{option.description}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
                               )}
                             </div>
                           </label>
@@ -1083,13 +1083,13 @@ export default function ComprehensiveAssessmentPage() {
                 {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Personal Strengths')
                   .map((question, index) => (
-                    <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                    <div key={question.id} className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
-                          <label key={option.value} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                          <label key={option.value} className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer">
                             <input
                               type="radio"
                               name={question.id}
@@ -1099,9 +1099,9 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900">{option.label}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{option.label}</div>
                               {option.description && (
-                                <div className="text-sm text-gray-600">{option.description}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
                               )}
                             </div>
                           </label>
@@ -1123,13 +1123,13 @@ export default function ComprehensiveAssessmentPage() {
                 {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Risk Management')
                   .map((question, index) => (
-                    <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                    <div key={question.id} className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
-                          <label key={option.value} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                          <label key={option.value} className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer">
                             <input
                               type="radio"
                               name={question.id}
@@ -1139,9 +1139,9 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900">{option.label}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{option.label}</div>
                               {option.description && (
-                                <div className="text-sm text-gray-600">{option.description}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
                               )}
                             </div>
                           </label>
@@ -1163,13 +1163,13 @@ export default function ComprehensiveAssessmentPage() {
                 {getAssessmentQuestions(formData.current_situation)
                   .filter(q => q.dimension === 'Support Systems')
                   .map((question, index) => (
-                    <div key={question.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                    <div key={question.id} className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
-                          <label key={option.value} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                          <label key={option.value} className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer">
                             <input
                               type="radio"
                               name={question.id}
@@ -1179,9 +1179,9 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900">{option.label}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{option.label}</div>
                               {option.description && (
-                                <div className="text-sm text-gray-600">{option.description}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
                               )}
                             </div>
                           </label>

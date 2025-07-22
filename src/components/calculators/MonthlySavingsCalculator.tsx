@@ -10,25 +10,27 @@ interface MonthlySavingsCalculatorProps {
 
 const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onCalculate, onCancel }) => {
   const [income, setIncome] = useState({
-    salary: 0,
-    bonuses: 0,
-    sideIncome: 0,
-    otherIncome: 0
+    salary: '',
+    bonuses: '',
+    sideIncome: '',
+    otherIncome: ''
   })
   
   const [expenses, setExpenses] = useState({
-    housing: 0,
-    utilities: 0,
-    food: 0,
-    transportation: 0,
-    insurance: 0,
-    debts: 0,
-    otherExpenses: 0
+    housing: '',
+    utilities: '',
+    food: '',
+    transportation: '',
+    insurance: '',
+    debts: '',
+    otherExpenses: ''
   })
 
-  const totalIncome = Object.values(income).reduce((sum, value) => sum + value, 0)
-  const totalExpenses = Object.values(expenses).reduce((sum, value) => sum + value, 0)
+  const totalIncome = Object.values(income).reduce((sum, value) => sum + (Number(value) || 0), 0)
+  const totalExpenses = Object.values(expenses).reduce((sum, value) => sum + (Number(value) || 0), 0)
   const monthlySavings = totalIncome - totalExpenses
+
+  const inputClassName = "w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 
   return (
     <div className="space-y-6">
@@ -42,9 +44,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={income.salary}
-                onChange={(e) => setIncome(prev => ({ ...prev, salary: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setIncome(prev => ({ ...prev, salary: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -52,9 +54,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={income.bonuses}
-                onChange={(e) => setIncome(prev => ({ ...prev, bonuses: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setIncome(prev => ({ ...prev, bonuses: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -62,9 +64,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={income.sideIncome}
-                onChange={(e) => setIncome(prev => ({ ...prev, sideIncome: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setIncome(prev => ({ ...prev, sideIncome: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -72,9 +74,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={income.otherIncome}
-                onChange={(e) => setIncome(prev => ({ ...prev, otherIncome: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setIncome(prev => ({ ...prev, otherIncome: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
           </div>
@@ -89,9 +91,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.housing}
-                onChange={(e) => setExpenses(prev => ({ ...prev, housing: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, housing: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -99,9 +101,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.utilities}
-                onChange={(e) => setExpenses(prev => ({ ...prev, utilities: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, utilities: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -109,9 +111,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.food}
-                onChange={(e) => setExpenses(prev => ({ ...prev, food: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, food: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -119,9 +121,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.transportation}
-                onChange={(e) => setExpenses(prev => ({ ...prev, transportation: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, transportation: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -129,9 +131,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.insurance}
-                onChange={(e) => setExpenses(prev => ({ ...prev, insurance: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, insurance: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -139,9 +141,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.debts}
-                onChange={(e) => setExpenses(prev => ({ ...prev, debts: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, debts: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -149,9 +151,9 @@ const MonthlySavingsCalculator: React.FC<MonthlySavingsCalculatorProps> = ({ onC
               <input
                 type="number"
                 value={expenses.otherExpenses}
-                onChange={(e) => setExpenses(prev => ({ ...prev, otherExpenses: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setExpenses(prev => ({ ...prev, otherExpenses: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
           </div>

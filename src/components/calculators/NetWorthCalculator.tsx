@@ -10,27 +10,29 @@ interface NetWorthCalculatorProps {
 
 const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, onCancel }) => {
   const [assets, setAssets] = useState({
-    cash: 0,
-    savings: 0,
-    investments: 0,
-    realEstate: 0,
-    vehicles: 0,
-    businessAssets: 0,
-    otherAssets: 0
+    cash: '',
+    savings: '',
+    investments: '',
+    realEstate: '',
+    vehicles: '',
+    businessAssets: '',
+    otherAssets: ''
   })
   
   const [liabilities, setLiabilities] = useState({
-    creditCards: 0,
-    personalLoans: 0,
-    carLoans: 0,
-    mortgage: 0,
-    businessLoans: 0,
-    otherDebts: 0
+    creditCards: '',
+    personalLoans: '',
+    carLoans: '',
+    mortgage: '',
+    businessLoans: '',
+    otherDebts: ''
   })
 
-  const totalAssets = Object.values(assets).reduce((sum, value) => sum + value, 0)
-  const totalLiabilities = Object.values(liabilities).reduce((sum, value) => sum + value, 0)
+  const totalAssets = Object.values(assets).reduce((sum, value) => sum + (Number(value) || 0), 0)
+  const totalLiabilities = Object.values(liabilities).reduce((sum, value) => sum + (Number(value) || 0), 0)
   const netWorth = totalAssets - totalLiabilities
+
+  const inputClassName = "w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 
   return (
     <div className="space-y-6">
@@ -44,9 +46,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.cash}
-                onChange={(e) => setAssets(prev => ({ ...prev, cash: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, cash: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -54,9 +56,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.savings}
-                onChange={(e) => setAssets(prev => ({ ...prev, savings: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, savings: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -64,9 +66,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.investments}
-                onChange={(e) => setAssets(prev => ({ ...prev, investments: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, investments: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -74,9 +76,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.realEstate}
-                onChange={(e) => setAssets(prev => ({ ...prev, realEstate: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, realEstate: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -84,9 +86,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.vehicles}
-                onChange={(e) => setAssets(prev => ({ ...prev, vehicles: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, vehicles: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -94,9 +96,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.businessAssets}
-                onChange={(e) => setAssets(prev => ({ ...prev, businessAssets: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, businessAssets: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -104,9 +106,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={assets.otherAssets}
-                onChange={(e) => setAssets(prev => ({ ...prev, otherAssets: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setAssets(prev => ({ ...prev, otherAssets: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
           </div>
@@ -121,9 +123,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={liabilities.creditCards}
-                onChange={(e) => setLiabilities(prev => ({ ...prev, creditCards: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setLiabilities(prev => ({ ...prev, creditCards: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -131,9 +133,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={liabilities.personalLoans}
-                onChange={(e) => setLiabilities(prev => ({ ...prev, personalLoans: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setLiabilities(prev => ({ ...prev, personalLoans: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -141,9 +143,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={liabilities.carLoans}
-                onChange={(e) => setLiabilities(prev => ({ ...prev, carLoans: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setLiabilities(prev => ({ ...prev, carLoans: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -151,9 +153,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={liabilities.mortgage}
-                onChange={(e) => setLiabilities(prev => ({ ...prev, mortgage: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setLiabilities(prev => ({ ...prev, mortgage: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -161,9 +163,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={liabilities.businessLoans}
-                onChange={(e) => setLiabilities(prev => ({ ...prev, businessLoans: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setLiabilities(prev => ({ ...prev, businessLoans: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
             <div>
@@ -171,9 +173,9 @@ const NetWorthCalculator: React.FC<NetWorthCalculatorProps> = ({ onCalculate, on
               <input
                 type="number"
                 value={liabilities.otherDebts}
-                onChange={(e) => setLiabilities(prev => ({ ...prev, otherDebts: Number(e.target.value) || 0 }))}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="0"
+                onChange={(e) => setLiabilities(prev => ({ ...prev, otherDebts: e.target.value }))}
+                className={inputClassName}
+                placeholder="Enter amount"
               />
             </div>
           </div>

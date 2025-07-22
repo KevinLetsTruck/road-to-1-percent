@@ -15,12 +15,26 @@ ORDER BY ordinal_position;
 
 -- Check existing constraints
 SELECT 'Existing constraints on profiles:' as info;
-SELECT conname, contype, consrc
+SELECT conname, 
+       CASE contype 
+           WHEN 'p' THEN 'PRIMARY KEY'
+           WHEN 'u' THEN 'UNIQUE'
+           WHEN 'f' THEN 'FOREIGN KEY'
+           WHEN 'c' THEN 'CHECK'
+           ELSE contype
+       END as constraint_type
 FROM pg_constraint
 WHERE conrelid = 'profiles'::regclass;
 
 SELECT 'Existing constraints on user_progress:' as info;
-SELECT conname, contype, consrc
+SELECT conname, 
+       CASE contype 
+           WHEN 'p' THEN 'PRIMARY KEY'
+           WHEN 'u' THEN 'UNIQUE'
+           WHEN 'f' THEN 'FOREIGN KEY'
+           WHEN 'c' THEN 'CHECK'
+           ELSE contype
+       END as constraint_type
 FROM pg_constraint
 WHERE conrelid = 'user_progress'::regclass;
 

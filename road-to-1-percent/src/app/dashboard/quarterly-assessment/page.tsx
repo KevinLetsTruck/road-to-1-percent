@@ -82,6 +82,7 @@ export default function QuarterlyAssessmentPage() {
   const [error, setError] = useState('')
   const [currentSection, setCurrentSection] = useState(0)
   const [userProgress, setUserProgress] = useState<any>(null)
+  const [supabaseAvailable, setSupabaseAvailable] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -119,6 +120,10 @@ export default function QuarterlyAssessmentPage() {
   ]
 
   useEffect(() => {
+    // Check if Supabase is configured
+    const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    setSupabaseAvailable(!!isSupabaseConfigured)
+
     if (authLoading) return
 
     if (!user) {
@@ -128,26 +133,37 @@ export default function QuarterlyAssessmentPage() {
 
     const loadUserData = async () => {
       try {
-        // Get user progress
-        const { data: progressData } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
-        
-        if (progressData) {
-          setUserProgress(progressData)
-        }
-
-        // Check if quarterly assessment is due
-        if (progressData?.next_quarterly_assessment_date) {
-          const nextDue = new Date(progressData.next_quarterly_assessment_date)
-          const today = new Date()
+        if (isSupabaseConfigured) {
+          // Get user progress
+          const { data: progressData } = await supabase
+            .from('user_progress')
+            .select('*')
+            .eq('user_id', user.id)
+            .single()
           
-          if (today < nextDue) {
-            const daysUntilDue = Math.ceil((nextDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-            setError(`Your next quarterly assessment is due in ${daysUntilDue} days. You can complete it early if you'd like.`)
+          if (progressData) {
+            setUserProgress(progressData)
           }
+
+          // Check if quarterly assessment is due
+          if (progressData?.next_quarterly_assessment_date) {
+            const nextDue = new Date(progressData.next_quarterly_assessment_date)
+            const today = new Date()
+            
+            if (today < nextDue) {
+              const daysUntilDue = Math.ceil((nextDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+              setError(`Your next quarterly assessment is due in ${daysUntilDue} days. You can complete it early if you'd like.`)
+            }
+          }
+        } else {
+          // Mock data for testing without Supabase
+          setUserProgress({
+            user_id: user.id,
+            current_tier: '90%',
+            spi_completed: false,
+            next_quarterly_assessment_date: null
+          })
+          setError('⚠️ Supabase not configured - running in demo mode. Your data will not be saved.')
         }
 
         setLoading(false)
@@ -234,34 +250,40 @@ export default function QuarterlyAssessmentPage() {
       const quarter = Math.ceil((currentDate.getMonth() + 1) / 3)
       const year = currentDate.getFullYear()
 
-      // Save quarterly assessment
-      const { error: assessmentError } = await supabase
-        .from('quarterly_assessments')
-        .insert({
-          user_id: user.id,
-          assessment_period: `Q${quarter}` as any,
-          year,
-          ...formData,
-          total_score: totalScore,
-          tier_progress: totalScore,
-          assessment_date: currentDate.toISOString()
-        })
+      if (supabaseAvailable) {
+        // Save quarterly assessment
+        const { error: assessmentError } = await supabase
+          .from('quarterly_assessments')
+          .insert({
+            user_id: user.id,
+            assessment_period: `Q${quarter}` as any,
+            year,
+            ...formData,
+            total_score: totalScore,
+            tier_progress: totalScore,
+            assessment_date: currentDate.toISOString()
+          })
 
-      if (assessmentError) throw assessmentError
+        if (assessmentError) throw assessmentError
 
-      // Update user progress
-      const { error: progressError } = await supabase
-        .from('user_progress')
-        .update({
-          last_assessment_date: currentDate.toISOString(),
-          next_quarterly_assessment_date: new Date(currentDate.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', user.id)
+        // Update user progress
+        const { error: progressError } = await supabase
+          .from('user_progress')
+          .update({
+            last_assessment_date: currentDate.toISOString(),
+            next_quarterly_assessment_date: new Date(currentDate.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
 
-      if (progressError) throw progressError
+        if (progressError) throw progressError
 
-      router.push('/dashboard?message=Quarterly assessment completed successfully! Your score is ' + totalScore + '/100.')
+        router.push('/dashboard?message=Quarterly assessment completed successfully! Your score is ' + totalScore + '/100.')
+      } else {
+        // Demo mode - just show success message
+        alert(`Demo Mode: Assessment completed! Your score is ${totalScore}/100.\n\nTo save your data permanently, please set up Supabase by creating a .env.local file with your Supabase credentials.`)
+        router.push('/dashboard?message=Demo: Quarterly assessment completed! Your score is ' + totalScore + '/100. (Data not saved - Supabase not configured)')
+      }
     } catch (error: unknown) {
       setError((error as Error).message)
     } finally {

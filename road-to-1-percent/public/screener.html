@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screener Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .answer-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        .answer-btn:hover {
+            background: #45a049;
+        }
+        .hangup-btn {
+            background: #f44336;
+            color: white;
+        }
+        .hangup-btn:hover {
+            background: #da190b;
+        }
+        .disabled {
+            background: #ccc !important;
+            cursor: not-allowed;
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            background: #000;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .caller-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎧 Screener Interface</h1>
+        
+        <div class="status" id="status">
+            Connecting to server...
+        </div>
+        
+        <div class="caller-info" id="callerInfo" style="display: none;">
+            <h3>📞 Incoming Call</h3>
+            <p id="callerDetails">Waiting for caller...</p>
+        </div>
+        
+        <div class="controls">
+            <button class="answer-btn" id="answerBtn" disabled>📞 Answer Call</button>
+            <button class="hangup-btn" id="hangupBtn" disabled>📴 Hang Up</button>
+        </div>
+        
+        <video id="localVideo" autoplay muted playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const statusEl = document.getElementById('status');
+        const callerInfo = document.getElementById('callerInfo');
+        const callerDetails = document.getElementById('callerDetails');
+        const answerBtn = document.getElementById('answerBtn');
+        const hangupBtn = document.getElementById('hangupBtn');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const logEl = document.getElementById('log');
+
+        let localStream;
+        let peerConnection;
+        let callerId = null;
+
+        // Logging function
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${time}] ${message}<br>`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        // Update status
+        function updateStatus(message) {
+            statusEl.textContent = message;
+        }
+
+        // Socket connection events
+        socket.on('connect', () => {
+            log('Connected to server');
+            updateStatus('Connected to server');
+            socket.emit('screener-join');
+        });
+
+        socket.on('disconnect', () => {
+            log('Disconnected from server');
+            updateStatus('Disconnected from server');
+            answerBtn.disabled = true;
+            hangupBtn.disabled = true;
+        });
+
+        socket.on('caller-joined', (id) => {
+            log(`Caller ${id} joined`);
+            updateStatus('Caller available');
+        });
+
+        socket.on('caller-disconnected', () => {
+            log('Caller disconnected');
+            updateStatus('No caller available');
+            answerBtn.disabled = true;
+            hangupBtn.disabled = true;
+            callerInfo.style.display = 'none';
+        });
+
+        // WebRTC configuration
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' }
+            ]
+        };
+
+        // Initialize local stream
+        async function initializeStream() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: true
+                });
+                localVideo.srcObject = localStream;
+                log('Local stream initialized');
+            } catch (error) {
+                log(`Error getting user media: ${error.message}`);
+            }
+        }
+
+        // Handle incoming call offer
+        socket.on('offer', async (data) => {
+            callerId = data.from;
+            log(`Incoming call from ${callerId}`);
+            updateStatus('Incoming call...');
+            callerDetails.textContent = `Caller ID: ${callerId}`;
+            callerInfo.style.display = 'block';
+            answerBtn.disabled = false;
+        });
+
+        // Answer call
+        answerBtn.addEventListener('click', async () => {
+            if (!callerId) {
+                log('No caller to answer');
+                return;
+            }
+
+            try {
+                await initializeStream();
+                
+                peerConnection = new RTCPeerConnection(configuration);
+                
+                // Add local stream
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+
+                // Handle ICE candidates
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        socket.emit('ice-candidate', {
+                            candidate: event.candidate,
+                            target: callerId
+                        });
+                    }
+                };
+
+                // Handle remote stream
+                peerConnection.ontrack = (event) => {
+                    remoteVideo.srcObject = event.streams[0];
+                    log('Remote stream received');
+                };
+
+                // Set remote description and create answer
+                await peerConnection.setRemoteDescription(data.offer);
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                
+                socket.emit('answer', {
+                    answer: answer,
+                    target: callerId
+                });
+
+                log('Call answered');
+                updateStatus('Connected');
+                answerBtn.disabled = true;
+                hangupBtn.disabled = false;
+                callerInfo.style.display = 'none';
+
+            } catch (error) {
+                log(`Error answering call: ${error.message}`);
+            }
+        });
+
+        // Handle ICE candidates from caller
+        socket.on('ice-candidate', async (data) => {
+            try {
+                await peerConnection.addIceCandidate(data.candidate);
+                log('ICE candidate added');
+            } catch (error) {
+                log(`Error adding ICE candidate: ${error.message}`);
+            }
+        });
+
+        // Hang up
+        hangupBtn.addEventListener('click', () => {
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            localVideo.srcObject = null;
+            remoteVideo.srcObject = null;
+            
+            log('Call ended');
+            updateStatus('Call ended');
+            answerBtn.disabled = true;
+            hangupBtn.disabled = true;
+            callerInfo.style.display = 'none';
+            callerId = null;
+        });
+
+        // Initialize
+        updateStatus('Connecting...');
+    </script>
+</body>
+</html> 

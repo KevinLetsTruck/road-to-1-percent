@@ -1,8 +1,15 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"name": "🎯 Road to 1%",
+			"path": "./road-to-1-percent"
+		},
+		{
+			"name": "🎙️ AudioRoad Radio System",
+			"path": "./AudioRoad-Radio-System"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"typescript.preferences.includePackageJsonAutoImports": "on"
+	}
 }

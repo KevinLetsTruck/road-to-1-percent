@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -31,14 +26,7 @@ export const metadata: Metadata = {
     description: "Join the Road to 1% program and unlock your full potential as a professional driver.",
     url: 'https://spiassessment.com',
     siteName: 'Road to 1%',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Road to 1% - Transform Your Driving Career',
-      },
-    ],
+    images: [],
     locale: 'en_US',
     type: 'website',
   },
@@ -46,7 +34,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Road to 1% - Transform Your Driving Career",
     description: "Join the Road to 1% program and unlock your full potential as a professional driver.",
-    images: ['/og-image.jpg'],
+    images: [],
   },
   robots: {
     index: true,
@@ -73,12 +61,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.json" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} antialiased`}
       >
         <AuthProvider>
           {children}

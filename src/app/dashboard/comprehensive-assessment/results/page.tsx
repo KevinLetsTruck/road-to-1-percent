@@ -731,35 +731,40 @@ function ComprehensiveAssessmentResultsContent() {
 
           {/* Enhanced Strength Profile Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
-                <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
-                Your Standout Strength Profile
-              </h2>
-              <div className="text-right">
-                <div className="text-sm text-gray-600 dark:text-gray-300">Bonus Points</div>
-                <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
-              </div>
-            </div>
-            
             {(() => {
               const insights = getStrengthInsights(strengthCombo)
               return (
                 <>
-                  {/* Title and Type Badge */}
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
+                      <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
+                      Your Standout Strength Profile - {insights.title}
+                    </h2>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-600 dark:text-gray-300">Bonus Points</div>
+                      <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Description and Type Badge */}
                   <div className="mb-6">
                     <div className="flex items-center gap-4 mb-3">
-                      <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{insights.title}</h3>
                       <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                        standoutTier === 'Power Combination' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                        standoutTier === 'Strong Combination' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        standoutTier === 'Supportive Combination' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                        standoutTier.includes('Elite') ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                        standoutTier.includes('Strong') ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        standoutTier.includes('Good') ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                        'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
                       }`}>
                         {standoutTier}
                       </span>
                     </div>
-                    <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">{insights.description}</p>
+                    <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-3">{insights.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                      {standoutTier.includes('Elite') ? 'Your strength combination creates exceptional synergy, giving you rare competitive advantages.' :
+                       standoutTier.includes('Strong') ? 'Your strengths work very well together, creating powerful opportunities.' :
+                       standoutTier.includes('Good') ? 'Your strengths complement each other nicely, providing solid advantages.' :
+                       'Your strengths are developing synergy. Focus on leveraging them together for maximum impact.'}
+                    </p>
                   </div>
 
                   {/* Success Profile Card */}

@@ -68,8 +68,8 @@ export function calculateStandoutScore(strength1: string, strength2: string): { 
 
 // Function to get tier based on standout score
 export function getStandoutTier(score: number): string {
-  if (score >= 8) return 'Power Combination';
-  if (score >= 6) return 'Strong Combination';
-  if (score >= 4) return 'Supportive Combination';
-  return 'Developing Combination';
+  if (score >= 8) return 'Elite Synergy (Top 10%)';
+  if (score >= 6) return 'Strong Synergy (Top 25%)';
+  if (score >= 4) return 'Good Synergy (Top 50%)';
+  return 'Building Synergy';
 }

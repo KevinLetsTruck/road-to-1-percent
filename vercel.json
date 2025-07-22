@@ -2,10 +2,5 @@
   "buildCommand": "cd road-to-1-percent && npm run build",
   "outputDirectory": "road-to-1-percent/.next",
   "installCommand": "cd road-to-1-percent && npm install",
-  "framework": "nextjs",
-  "functions": {
-    "road-to-1-percent/src/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "framework": "nextjs"
 }

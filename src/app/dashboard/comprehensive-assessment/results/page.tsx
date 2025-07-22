@@ -953,8 +953,14 @@ function ComprehensiveAssessmentResultsContent() {
               document={
                 <AssessmentResultsPDF 
                   userProgress={userProgress}
-                  spiScore={spiScore}
-                  dimensions={dimensions}
+                  spiScore={totalScore}
+                  dimensions={dimensionBreakdowns.map(d => ({
+                    name: d.name,
+                    score: d.score,
+                    max: d.maxScore,
+                    percentage: d.percentage,
+                    color: d.color
+                  }))}
                 />
               }
               fileName={`SPI_Assessment_Results_${new Date().toISOString().split('T')[0]}.pdf`}

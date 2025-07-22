@@ -599,18 +599,25 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
           </div>
 
-          {/* Update Assessment Button */}
-          <div className="flex justify-center">
-            <button
-              onClick={() => router.push('/dashboard/comprehensive-assessment')}
-              className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
-            >
-              Update Your Assessment
-            </button>
-          </div>
+                  {/* Update Assessment Button */}
+        <div className="flex flex-col items-center space-y-4">
+          <button
+            onClick={() => router.push('/dashboard/comprehensive-assessment')}
+            className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
+          >
+            Update Your Assessment
+          </button>
+          
+          {/* Link to Dashboard View */}
+          <button
+            onClick={() => router.push('/dashboard/comprehensive-assessment/results-dashboard')}
+            className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium"
+          >
+            🚛 Try the Truck Dashboard View
+          </button>
+                  </div>
         </div>
       </main>
-
     </div>
   )
 }

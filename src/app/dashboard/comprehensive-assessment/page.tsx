@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info, X } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, CheckCircle, AlertCircle, Info, X, Calculator } from 'lucide-react'
 import { calculateStandoutScore } from '@/lib/standoutScoring'
+import CalculatorModal from '@/components/CalculatorModal'
+import NetWorthCalculator from '@/components/calculators/NetWorthCalculator'
+import MonthlySavingsCalculator from '@/components/calculators/MonthlySavingsCalculator'
 
 type CurrentSituation = 'Employee Driver' | 'Carrier Authority' | 'Leased O/O' | 'Small Fleet'
 
@@ -69,7 +72,7 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
       ? 'What is your current net worth (assets minus liabilities)?'
       : 'What is your current net worth (assets minus liabilities)?',
     options: [
-      { value: -1, label: '📋 Use Net Worth Calculator', description: 'Get help calculating your exact net worth' },
+      { value: -1, label: '🧮 Open Net Worth Calculator', description: 'Click to calculate your exact net worth' },
       { value: 0, label: 'Negative $25,000+', description: 'Significant debt burden' },
       { value: 3, label: 'Negative $10,000 to $25,000', description: 'Moderate debt' },
       { value: 6, label: 'Negative $10,000 to $0', description: 'Minor debt' },
@@ -85,7 +88,7 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     dimension: 'Financial Foundation',
     question: 'How much do you save monthly after all expenses?',
     options: [
-      { value: -1, label: '📋 Use Monthly Savings Calculator', description: 'Get help calculating your exact monthly savings' },
+      { value: -1, label: '💰 Open Monthly Savings Calculator', description: 'Click to calculate your exact monthly savings' },
       { value: 0, label: 'Negative (spending more than earning)', description: 'Living beyond means' },
       { value: 4, label: '$0 to $500', description: 'Breaking even' },
       { value: 7, label: '$500 to $1,000', description: 'Moderate savings' },
@@ -375,9 +378,6 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     maxPoints: 2
   }
 ]
-
-// Net Worth Calculator Component
-function NetWorthCalculator({ onCalculate, onCancel }: { onCalculate: (netWorth: number) => void; onCancel: () => void }) {
   const [assets, setAssets] = useState({
     cash: 0,
     savings: 0,
@@ -1062,6 +1062,42 @@ export default function ComprehensiveAssessmentPage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  // Helper function to render option with special styling for calculators
+  const renderOption = (option: any, question: any) => {
+    const isCalculatorOption = option.value === -1
+    const isSelected = formData[question.id as keyof ComprehensiveAssessmentData] === option.value
+    
+    return (
+      <label 
+        key={option.value} 
+        className={`flex items-start p-3 border rounded-lg cursor-pointer transition-all ${
+          isCalculatorOption 
+            ? 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30' 
+            : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
+        } ${isSelected ? 'ring-2 ring-indigo-500' : ''}`}
+      >
+        <input
+          type="radio"
+          name={question.id}
+          value={option.value}
+          checked={isSelected}
+          onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
+          className="mt-1 mr-3"
+        />
+        <div>
+          <div className={`font-medium ${isCalculatorOption ? 'text-indigo-900 dark:text-indigo-100' : 'text-gray-900 dark:text-gray-100'}`}>
+            {option.label}
+          </div>
+          {option.description && (
+            <div className={`text-sm ${isCalculatorOption ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-400'}`}>
+              {option.description}
+            </div>
+          )}
+        </div>
+      </label>
+    )
+  }
+
   const handleSituationChange = (situation: CurrentSituation) => {
     setFormData(prev => ({ ...prev, current_situation: situation }))
   }
@@ -1407,72 +1443,13 @@ export default function ComprehensiveAssessmentPage() {
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
-                        {question.options.map((option) => (
-                          <label key={option.value} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input
-                              type="radio"
-                              name={question.id}
-                              value={option.value}
-                              checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
-                              onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
-                              className="mt-1 mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900">{option.label}</div>
-                              {option.description && (
-                                <div className="text-sm text-gray-600">{option.description}</div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
+                        {question.options.map((option) => renderOption(option, question))}
                       </div>
                     </div>
                   ))}
               </div>
 
-              {/* Calculator Components */}
-              {showNetWorthCalculator && (
-                <div className="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
-                  <h3 className="text-xl font-bold text-blue-900 mb-4">📊 Net Worth Calculator</h3>
-                  <NetWorthCalculator 
-                    onCalculate={(netWorth) => {
-                      setCalculatorResults(prev => ({ ...prev, netWorth }))
-                      setShowNetWorthCalculator(false)
-                      // Auto-select the appropriate range based on calculated value
-                      let selectedValue = 0
-                      if (netWorth < -25000) selectedValue = 0
-                      else if (netWorth < -10000) selectedValue = 3
-                      else if (netWorth < 0) selectedValue = 6
-                      else if (netWorth < 10000) selectedValue = 10
-                      else if (netWorth < 50000) selectedValue = 12
-                      else selectedValue = 14
-                      setFormData(prev => ({ ...prev, net_worth: selectedValue }))
-                    }}
-                    onCancel={() => setShowNetWorthCalculator(false)}
-                  />
-                </div>
-              )}
 
-              {showSavingsCalculator && (
-                <div className="mb-8 p-6 bg-green-50 border-2 border-green-200 rounded-lg">
-                  <h3 className="text-xl font-bold text-green-900 mb-4">💰 Monthly Savings Calculator</h3>
-                  <MonthlySavingsCalculator 
-                    onCalculate={(monthlySavings) => {
-                      setCalculatorResults(prev => ({ ...prev, monthlySavings }))
-                      setShowSavingsCalculator(false)
-                      // Auto-select the appropriate range based on calculated value
-                      let selectedValue = 0
-                      if (monthlySavings < 0) selectedValue = 0
-                      else if (monthlySavings < 500) selectedValue = 4
-                      else if (monthlySavings < 1000) selectedValue = 7
-                      else if (monthlySavings < 2000) selectedValue = 9
-                      else selectedValue = 10.5
-                      setFormData(prev => ({ ...prev, monthly_savings: selectedValue }))
-                    }}
-                    onCancel={() => setShowSavingsCalculator(false)}
-                  />
-                </div>
-              )}
 
               {/* Market Intelligence Section */}
               <div>
@@ -1656,6 +1633,54 @@ export default function ComprehensiveAssessmentPage() {
           </div>
         </div>
       </main>
+
+      {/* Calculator Modals */}
+      <CalculatorModal
+        isOpen={showNetWorthCalculator}
+        onClose={() => setShowNetWorthCalculator(false)}
+        title="Net Worth Calculator"
+        icon={<Calculator className="w-6 h-6 text-blue-600" />}
+      >
+        <NetWorthCalculator 
+          onCalculate={(netWorth) => {
+            setCalculatorResults(prev => ({ ...prev, netWorth }))
+            setShowNetWorthCalculator(false)
+            // Auto-select the appropriate range based on calculated value
+            let selectedValue = 0
+            if (netWorth < -25000) selectedValue = 0
+            else if (netWorth < -10000) selectedValue = 3
+            else if (netWorth < 0) selectedValue = 6
+            else if (netWorth < 10000) selectedValue = 10
+            else if (netWorth < 50000) selectedValue = 12
+            else selectedValue = 14
+            setFormData(prev => ({ ...prev, net_worth: selectedValue }))
+          }}
+          onCancel={() => setShowNetWorthCalculator(false)}
+        />
+      </CalculatorModal>
+
+      <CalculatorModal
+        isOpen={showSavingsCalculator}
+        onClose={() => setShowSavingsCalculator(false)}
+        title="Monthly Savings Calculator"
+        icon={<DollarSign className="w-6 h-6 text-green-600" />}
+      >
+        <MonthlySavingsCalculator 
+          onCalculate={(monthlySavings) => {
+            setCalculatorResults(prev => ({ ...prev, monthlySavings }))
+            setShowSavingsCalculator(false)
+            // Auto-select the appropriate range based on calculated value
+            let selectedValue = 0
+            if (monthlySavings < 0) selectedValue = 0
+            else if (monthlySavings < 500) selectedValue = 4
+            else if (monthlySavings < 1000) selectedValue = 7
+            else if (monthlySavings < 2000) selectedValue = 9
+            else selectedValue = 10.5
+            setFormData(prev => ({ ...prev, monthly_savings: selectedValue }))
+          }}
+          onCancel={() => setShowSavingsCalculator(false)}
+        />
+      </CalculatorModal>
     </div>
   )
 } 

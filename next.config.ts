@@ -45,9 +45,6 @@ const nextConfig: NextConfig = {
     domains: [], // Add any external image domains you use
   },
 
-  // Enable SWC minification (faster than Terser)
-  swcMinify: true,
-
   // Disable powered by header for security
   poweredByHeader: false,
 };

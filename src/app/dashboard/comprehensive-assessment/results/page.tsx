@@ -9,17 +9,18 @@ import { useAuth } from '@/contexts/AuthContext'
 import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
 import dynamic from 'next/dynamic'
 
-// Dynamically import PDF components to avoid SSR issues
-const PDFDownloadLink = dynamic(
-  () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
-  {
-    ssr: false,
-    loading: () => <span className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold opacity-50 cursor-not-allowed text-lg inline-flex items-center gap-2">Loading PDF...</span>
-  }
-)
-
-const AssessmentResultsPDF = dynamic(() => import('@/components/AssessmentResultsPDF'), {
+// Dynamically import PDF download button to avoid SSR issues
+const PDFDownloadButton = dynamic(() => import('@/components/PDFDownloadButton'), {
   ssr: false,
+  loading: () => (
+    <button
+      disabled
+      className="bg-gray-400 text-white px-8 py-4 rounded-lg font-semibold cursor-not-allowed text-lg flex items-center gap-2"
+    >
+      <Download className="w-5 h-5" />
+      Loading PDF...
+    </button>
+  )
 })
 
 interface DimensionBreakdown {
@@ -961,51 +962,18 @@ function ComprehensiveAssessmentResultsContent() {
             </button>
             
             {/* PDF Download Button */}
-            {isClient ? (
-              <PDFDownloadLink
-                document={
-                  <AssessmentResultsPDF 
-                    userProgress={userProgress}
-                    spiScore={totalScore}
-                    dimensions={dimensionBreakdowns.map(d => ({
-                      name: d.name,
-                      score: d.score,
-                      max: d.maxScore,
-                      percentage: d.percentage,
-                      color: d.color
-                    }))}
-                  />
-                }
-                fileName={`SPI_Assessment_Results_${new Date().toISOString().split('T')[0]}.pdf`}
-                className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg flex items-center gap-2"
-              >
-                {({ blob, url, loading, error }) =>
-                  loading ? (
-                    <span className="flex items-center gap-2">
-                      <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
-                      Generating PDF...
-                    </span>
-                  ) : error ? (
-                    <span className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5" />
-                      Error generating PDF
-                    </span>
-                  ) : (
-                    <>
-                      <Download className="w-5 h-5" />
-                      Download PDF
-                    </>
-                  )
-                }
-              </PDFDownloadLink>
-            ) : (
-              <button
-                disabled
-                className="bg-gray-400 text-white px-8 py-4 rounded-lg font-semibold cursor-not-allowed text-lg flex items-center gap-2"
-              >
-                <Download className="w-5 h-5" />
-                Loading PDF...
-              </button>
+            {isClient && (
+              <PDFDownloadButton 
+                userProgress={userProgress}
+                spiScore={totalScore}
+                dimensions={dimensionBreakdowns.map(d => ({
+                  name: d.name,
+                  score: d.score,
+                  max: d.maxScore,
+                  percentage: d.percentage,
+                  color: d.color
+                }))}
+              />
             )}
           </div>
           

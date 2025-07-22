@@ -61,7 +61,7 @@
   - Dark mode support
 - **Admin Access**: 
   - Admin button appears in results pages for authorized users
-  - Currently uses email-based authentication (admin@spiassessment.com, kevin@spiassessment.com)
+  - Now uses database `is_admin` field from profiles table (more secure)
   - Seamless navigation from user results to admin dashboard
 
 ### Technical Details

@@ -30,9 +30,14 @@ function TruckDashboardResultsContent() {
             }
       setUser(user)
       
-      // Check if user is admin
-      const adminEmails = ['admin@spiassessment.com', 'kevin@spiassessment.com'] // Add your admin emails
-      setIsAdmin(adminEmails.includes(user.email || ''))
+      // Check if user is admin from database
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+      
+      setIsAdmin(profile?.is_admin || false)
 
       // Get user progress
       const { data: progress } = await supabase

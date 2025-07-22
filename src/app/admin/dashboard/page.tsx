@@ -82,11 +82,14 @@ export default function AdminDashboard() {
       return
     }
 
-    // Check if user is admin - you'll need to add an is_admin field to profiles table
-    // For now, we'll check if the email matches your admin email
-    const adminEmails = ['admin@spiassessment.com', 'kevin@spiassessment.com'] // Add your admin emails
+    // Check if user is admin from database
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
     
-    if (!adminEmails.includes(user.email || '')) {
+    if (!profile?.is_admin) {
       router.push('/dashboard')
       return
     }

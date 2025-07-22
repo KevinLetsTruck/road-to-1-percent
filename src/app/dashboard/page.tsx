@@ -366,11 +366,8 @@ export default function DashboardPage() {
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
           {/* Success Probability Graphic */}
           <div className="lg:w-3/4">
-            <div className="card-orange-gradient relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-2">
-                <Target className="w-20 h-20 text-white/10" />
-              </div>
-              <div className="relative z-10 p-6">
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-6 text-white relative overflow-hidden">
+              <div className="relative z-10">
                 <h2 className="text-xl font-semibold text-white/90 mb-4 tracking-wider">
                   SUCCESS PROBABILITY
                 </h2>
@@ -379,7 +376,7 @@ export default function DashboardPage() {
                 <div className="mb-3">
                   <span
                     className="text-6xl font-bold"
-                    style={{ color: "#ff7b00" }}
+                    style={{ color: "#ffffff" }}
                   >
                     {stats?.successProbability || 30}%
                   </span>
@@ -389,29 +386,30 @@ export default function DashboardPage() {
                 <div className="mb-3">
                   <span
                     className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-white/90"
-                    style={{ backgroundColor: "rgba(255, 123, 0, 0.3)" }}
+                    style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
                   >
-                    {getProbabilityRange(stats?.successProbability || 30)}
+                    {getProbabilityRange(stats?.successProbability || 30)}{" "}
+                    Probability Range
                   </span>
                 </div>
 
                 {/* Description */}
-                <p className="text-white/70 text-sm mb-6">
+                <p className="text-white/80 text-sm mb-6">
                   {getProbabilityDescription(stats?.successProbability || 30)}
                 </p>
 
                 {/* Progress Bar */}
                 <div className="mt-4">
-                  <div className="flex justify-between text-xs mb-1 text-white/50">
+                  <div className="flex justify-between text-xs mb-1 text-white/60">
                     <span>0%</span>
                     <span>25%</span>
                     <span>50%</span>
                     <span>75%</span>
                     <span>100%</span>
                   </div>
-                  <div className="relative h-3 bg-gray-700/50 rounded-full overflow-hidden">
+                  <div className="relative h-3 bg-white/20 rounded-full overflow-hidden">
                     {/* Gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 via-blue-500 to-green-500 opacity-20" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-600 via-yellow-500 via-blue-500 to-green-500 opacity-30" />
                     {/* Progress indicator */}
                     <div
                       className="relative h-full rounded-full transition-all duration-1000"
@@ -437,12 +435,13 @@ export default function DashboardPage() {
               userProgress={userProgress}
               standoutStrength1={stats?.standoutStrength1 || ""}
               standoutStrength2={stats?.standoutStrength2 || ""}
-              className="btn-primary w-full rounded-lg"
+              className="w-full"
             />
 
             <button
               onClick={() => router.push("/dashboard/progress")}
-              className="btn-secondary w-full flex items-center justify-center gap-2 rounded-lg"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 px-6 transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg w-full flex items-center justify-center gap-2"
+              style={{ borderRadius: "16px" }}
             >
               <FileText className="w-4 h-4" />
               Progress Update
@@ -450,7 +449,8 @@ export default function DashboardPage() {
 
             <button
               onClick={() => router.push("/dashboard/comprehensive-assessment")}
-              className="btn-secondary w-full flex items-center justify-center gap-2 rounded-lg"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 px-6 transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg w-full flex items-center justify-center gap-2"
+              style={{ borderRadius: "16px" }}
             >
               <RefreshCw className="w-4 h-4" />
               Retake Assessment

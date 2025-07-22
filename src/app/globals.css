@@ -140,21 +140,24 @@ html {
 
   /* Modern buttons */
   .btn-primary {
-    @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg 
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-6 
            transition-all duration-300 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    border-radius: 16px !important;
   }
 
   .btn-secondary {
-    @apply bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 px-6 rounded-lg 
+    @apply bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 px-6 
            transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    border-radius: 16px !important;
   }
 
   .btn-outline {
-    @apply border-2 border-gray-600 text-gray-300 font-semibold py-3 px-6 rounded-lg 
+    @apply border-2 border-gray-600 text-gray-300 font-semibold py-3 px-6 
            transition-all duration-300 hover:border-gray-500 hover:bg-gray-800
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    border-radius: 16px !important;
   }
 
   /* Dark theme specific buttons */

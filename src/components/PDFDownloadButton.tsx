@@ -110,7 +110,12 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
     return (
       <button
         disabled
-        className={`bg-gray-400 text-white px-4 py-2 rounded-lg font-semibold cursor-not-allowed flex items-center gap-2 ${className}`}
+        className={`font-semibold cursor-not-allowed flex items-center gap-2 px-4 py-3 ${className}`}
+        style={{
+          backgroundColor: "#9ca3af",
+          color: "white",
+          borderRadius: "16px",
+        }}
       >
         <Download className="w-4 h-4" />
         PDF not available
@@ -118,19 +123,23 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({
     );
   }
 
-  const baseClasses = `font-semibold transition-colors flex items-center justify-center gap-2 px-4 py-2 rounded-lg ${className}`;
+  const baseClasses = `font-semibold transition-colors flex items-center justify-center gap-2 px-4 py-3`;
 
   return (
     <button
       onClick={handleDownload}
       disabled={isGenerating}
-      className={`${baseClasses} ${
-        isGenerating
-          ? "bg-gray-500 cursor-not-allowed"
+      className={`${baseClasses} ${className}`}
+      style={{
+        background: isGenerating
+          ? "#9ca3af"
           : error
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-primary hover:bg-primary-dark"
-      } text-white`}
+            ? "#dc2626"
+            : "linear-gradient(to right, #3b82f6, #2563eb)",
+        color: "white",
+        borderRadius: "16px",
+        opacity: isGenerating ? 0.7 : 1,
+      }}
     >
       {isGenerating ? (
         <>

@@ -355,34 +355,53 @@ function ComprehensiveAssessmentResultsContent() {
     }
 
     // Handle combinations
-    if (combo.includes(' + ')) {
-      const [first, second] = combo.split(' + ')
-      const firstInsights = insights[first]
-      const secondInsights = insights[second]
-      
-      if (firstInsights && secondInsights) {
-        return {
-          title: `${firstInsights.title} + ${secondInsights.title}`,
-          description: `You possess a rare combination: ${firstInsights.description.split('.')[0].toLowerCase()} while also ${secondInsights.description.split('.')[0].toLowerCase()}. This dual strength creates unique opportunities in trucking.`,
-          strengths: [
-            ...firstInsights.strengths.slice(0, 2),
-            ...secondInsights.strengths.slice(0, 2)
-          ],
-          watchOuts: [
-            ...firstInsights.watchOuts.slice(0, 2),
-            ...secondInsights.watchOuts.slice(0, 1)
-          ],
-          leverageTips: [
-            `Combine ${first} and ${second} strengths for maximum impact`,
-            ...firstInsights.leverageTips.slice(0, 2),
-            ...secondInsights.leverageTips.slice(0, 2)
-          ],
-          successProfile: `This powerful combination allows you to ${firstInsights.successProfile.split(' by ')[1].split('.')[0]} while ${secondInsights.successProfile.split(' by ')[1].split('.')[0]}, creating a unique competitive advantage.`
+    if (combo && combo.includes(' + ')) {
+      const parts = combo.split(' + ')
+      if (parts.length === 2) {
+        const [first, second] = parts
+        const firstInsights = insights[first.trim()]
+        const secondInsights = insights[second.trim()]
+        
+        if (firstInsights && secondInsights) {
+          // Safely extract description parts
+          const firstDesc = firstInsights.description?.split('.')[0]?.toLowerCase() || 'excel in your primary area'
+          const secondDesc = secondInsights.description?.split('.')[0]?.toLowerCase() || 'bring additional strengths'
+          
+          // Safely extract success profile parts
+          const firstSuccess = firstInsights.successProfile?.split(' by ')[1]?.split('.')[0] || 'leveraging your primary strength'
+          const secondSuccess = secondInsights.successProfile?.split(' by ')[1]?.split('.')[0] || 'utilizing your secondary strength'
+          
+          return {
+            title: `${firstInsights.title} + ${secondInsights.title}`,
+            description: `You possess a rare combination: ${firstDesc} while also ${secondDesc}. This dual strength creates unique opportunities in trucking.`,
+            strengths: [
+              ...(firstInsights.strengths?.slice(0, 2) || []),
+              ...(secondInsights.strengths?.slice(0, 2) || [])
+            ],
+            watchOuts: [
+              ...(firstInsights.watchOuts?.slice(0, 2) || []),
+              ...(secondInsights.watchOuts?.slice(0, 1) || [])
+            ],
+            leverageTips: [
+              `Combine ${first} and ${second} strengths for maximum impact`,
+              ...(firstInsights.leverageTips?.slice(0, 2) || []),
+              ...(secondInsights.leverageTips?.slice(0, 2) || [])
+            ],
+            successProfile: `This powerful combination allows you to ${firstSuccess} while ${secondSuccess}, creating a unique competitive advantage.`
+          }
         }
       }
     }
     
-    return insights[combo] || insights['Pioneer'] // Default fallback
+    // Return specific insights or default
+    return insights[combo] || insights['Pioneer'] || {
+      title: 'Balanced Leader',
+      description: 'You have a balanced approach to business ownership with strengths across multiple areas.',
+      strengths: ['Adaptable to various situations', 'Well-rounded skill set', 'Flexible approach', 'Steady progress'],
+      watchOuts: ['May lack specialized expertise', 'Could be overlooked for specific roles', 'Need to develop signature strength'],
+      leverageTips: ['Identify your strongest area to specialize', 'Build a team with complementary strengths', 'Focus on consistency', 'Develop systems for all areas'],
+      successProfile: 'Balanced leaders succeed through consistency and adaptability, building stable businesses that weather market changes.'
+    }
   }
 
   const dimensionBreakdowns: DimensionBreakdown[] = [

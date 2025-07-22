@@ -662,12 +662,28 @@ export default function ComprehensiveAssessmentPage() {
     const isCalculatorOption = option.value === -1
     const isSelected = formData[question.id as keyof ComprehensiveAssessmentData] === option.value
     
+    // Check if we have a calculated value for this calculator
+    const hasCalculatedValue = (question.id === 'net_worth' && calculatorResults.netWorth !== null) ||
+                             (question.id === 'monthly_savings' && calculatorResults.monthlySavings !== null)
+    
+    // Get the display label for calculator options
+    let displayLabel = option.label
+    if (isCalculatorOption && hasCalculatedValue) {
+      if (question.id === 'net_worth') {
+        displayLabel = `${option.label} (Calculated: $${calculatorResults.netWorth?.toLocaleString()})`
+      } else if (question.id === 'monthly_savings') {
+        displayLabel = `${option.label} (Calculated: $${calculatorResults.monthlySavings?.toLocaleString()}/month)`
+      }
+    }
+    
     return (
       <label 
         key={option.value} 
         className={`flex items-start p-3 border rounded-lg cursor-pointer transition-all ${
           isCalculatorOption 
-            ? 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 dark:border-indigo-600' 
+            ? hasCalculatedValue
+              ? 'border-green-400 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:border-green-600'
+              : 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 dark:border-indigo-600' 
             : 'border-gray-200 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700'
         } ${isSelected ? 'ring-2 ring-indigo-500' : ''}`}
         onClick={() => {
@@ -686,11 +702,23 @@ export default function ComprehensiveAssessmentPage() {
           className="mt-1 mr-3"
         />
         <div>
-          <div className={`font-medium ${isCalculatorOption ? 'text-indigo-900 dark:text-indigo-100' : 'text-gray-900 dark:text-gray-100'}`}>
-            {option.label}
+          <div className={`font-medium ${
+            isCalculatorOption 
+              ? hasCalculatedValue
+                ? 'text-green-900 dark:text-green-100'
+                : 'text-indigo-900 dark:text-indigo-100' 
+              : 'text-gray-900 dark:text-gray-100'
+          }`}>
+            {displayLabel}
           </div>
           {option.description && (
-            <div className={`text-sm ${isCalculatorOption ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-400'}`}>
+            <div className={`text-sm ${
+              isCalculatorOption 
+                ? hasCalculatedValue
+                  ? 'text-green-700 dark:text-green-300'
+                  : 'text-indigo-700 dark:text-indigo-300' 
+                : 'text-gray-600 dark:text-gray-400'
+            }`}>
               {option.description}
             </div>
           )}
@@ -1249,6 +1277,7 @@ export default function ComprehensiveAssessmentPage() {
         icon={<Calculator className="w-6 h-6 text-blue-600" />}
       >
         <NetWorthCalculator 
+          initialValue={calculatorResults.netWorth ?? undefined}
           onCalculate={(netWorth) => {
             setCalculatorResults(prev => ({ ...prev, netWorth }))
             setShowNetWorthCalculator(false)
@@ -1285,6 +1314,7 @@ export default function ComprehensiveAssessmentPage() {
         icon={<DollarSign className="w-6 h-6 text-green-600" />}
       >
         <MonthlySavingsCalculator 
+          initialValue={calculatorResults.monthlySavings ?? undefined}
           onCalculate={(monthlySavings) => {
             setCalculatorResults(prev => ({ ...prev, monthlySavings }))
             setShowSavingsCalculator(false)

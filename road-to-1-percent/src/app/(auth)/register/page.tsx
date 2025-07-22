@@ -53,14 +53,18 @@ export default function RegisterPage() {
 
       if (error) throw error
       
-      // For now, let's create the profile and user progress immediately
-      // This bypasses email verification for development
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (user) {
+      // Sign in the user immediately after registration
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      })
+
+      if (signInError) throw signInError
+
+      if (signInData.user) {
         // Create profile
         await supabase.from('profiles').insert({
-          id: user.id,
+          id: signInData.user.id,
           email: formData.email,
           first_name: formData.firstName,
           last_name: formData.lastName,
@@ -69,26 +73,13 @@ export default function RegisterPage() {
         
         // Create user progress record
         await supabase.from('user_progress').insert({
-          user_id: user.id,
+          user_id: signInData.user.id,
         })
-
-        // Send welcome email
-        try {
-          await fetch('/api/email/welcome', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          })
-        } catch (emailError) {
-          console.error('Failed to send welcome email:', emailError)
-          // Don't fail registration if email fails
-        }
         
-        // Redirect to dashboard
-        router.push('/dashboard?message=Account created successfully!')
+        // Redirect directly to assessment
+        router.push('/dashboard')
       } else {
-        router.push('/login?message=Account created! Please sign in.')
+        throw new Error('Failed to sign in after registration')
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

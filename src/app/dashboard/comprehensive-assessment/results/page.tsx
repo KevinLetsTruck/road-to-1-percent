@@ -8,9 +8,16 @@ import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarCha
 import { useAuth } from '@/contexts/AuthContext'
 import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
 import dynamic from 'next/dynamic'
-import { PDFDownloadLink } from '@react-pdf/renderer'
 
-// Dynamically import the PDF component to avoid SSR issues
+// Dynamically import PDF components to avoid SSR issues
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
+  {
+    ssr: false,
+    loading: () => <span className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold opacity-50 cursor-not-allowed text-lg inline-flex items-center gap-2">Loading PDF...</span>
+  }
+)
+
 const AssessmentResultsPDF = dynamic(() => import('@/components/AssessmentResultsPDF'), {
   ssr: false,
 })
@@ -33,6 +40,7 @@ function ComprehensiveAssessmentResultsContent() {
   const [loading, setLoading] = useState(true)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
   const supabase = createClient()
@@ -43,6 +51,10 @@ function ComprehensiveAssessmentResultsContent() {
     router.push('/login')
   }
 
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     const getUser = async () => {
@@ -949,32 +961,52 @@ function ComprehensiveAssessmentResultsContent() {
             </button>
             
             {/* PDF Download Button */}
-            <PDFDownloadLink
-              document={
-                <AssessmentResultsPDF 
-                  userProgress={userProgress}
-                  spiScore={totalScore}
-                  dimensions={dimensionBreakdowns.map(d => ({
-                    name: d.name,
-                    score: d.score,
-                    max: d.maxScore,
-                    percentage: d.percentage,
-                    color: d.color
-                  }))}
-                />
-              }
-              fileName={`SPI_Assessment_Results_${new Date().toISOString().split('T')[0]}.pdf`}
-              className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg flex items-center gap-2"
-            >
-              {({ blob, url, loading, error }) =>
-                loading ? 'Generating PDF...' : (
-                  <>
-                    <Download className="w-5 h-5" />
-                    Download PDF
-                  </>
-                )
-              }
-            </PDFDownloadLink>
+            {isClient ? (
+              <PDFDownloadLink
+                document={
+                  <AssessmentResultsPDF 
+                    userProgress={userProgress}
+                    spiScore={totalScore}
+                    dimensions={dimensionBreakdowns.map(d => ({
+                      name: d.name,
+                      score: d.score,
+                      max: d.maxScore,
+                      percentage: d.percentage,
+                      color: d.color
+                    }))}
+                  />
+                }
+                fileName={`SPI_Assessment_Results_${new Date().toISOString().split('T')[0]}.pdf`}
+                className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg flex items-center gap-2"
+              >
+                {({ blob, url, loading, error }) =>
+                  loading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+                      Generating PDF...
+                    </span>
+                  ) : error ? (
+                    <span className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" />
+                      Error generating PDF
+                    </span>
+                  ) : (
+                    <>
+                      <Download className="w-5 h-5" />
+                      Download PDF
+                    </>
+                  )
+                }
+              </PDFDownloadLink>
+            ) : (
+              <button
+                disabled
+                className="bg-gray-400 text-white px-8 py-4 rounded-lg font-semibold cursor-not-allowed text-lg flex items-center gap-2"
+              >
+                <Download className="w-5 h-5" />
+                Loading PDF...
+              </button>
+            )}
           </div>
           
           {/* Link to Dashboard View */}

@@ -89,11 +89,17 @@ function ComprehensiveAssessmentResultsContent() {
   const getSPITierDescription = (tier: string) => {
     switch (tier) {
       case '1%':
-        return 'High probability of success. You have strong foundations across all dimensions.'
+        return 'Elite Performer - Top 1%'
       case '9%':
-        return 'Moderate probability of success. Focus on your weakest dimensions for rapid improvement.'
+        return 'High Achiever - Top 9%'
+      case '25%':
+        return 'Above Average - Top 25%'
+      case '50%':
+        return 'Average Performer - Top 50%'
+      case '75%':
+        return 'Foundation Level - Bottom 25%'
       default:
-        return 'Low probability of success. Systematic improvement needed across all dimensions.'
+        return 'Building Foundation'
     }
   }
 
@@ -257,30 +263,41 @@ function ComprehensiveAssessmentResultsContent() {
     let message = ''
     let icon = ''
     
-    if (score >= 70) {
-      probability = 76 + Math.floor((score - 70) / 30 * 24) // 76-100%
-      tier = '76-100%'
+    if (score >= 85) {
+      // Score 85-100 → Probability 85-100%
+      probability = 85 + Math.floor((score - 85) / 15 * 15)
+      tier = '85-100%'
       color = 'green'
       icon = '🚀'
-      message = 'Exceptional - You have the foundation for extraordinary success'
-    } else if (score >= 50) {
-      probability = 51 + Math.floor((score - 50) / 20 * 25) // 51-75%
-      tier = '51-75%'
+      message = 'Elite Performance - You\'re in the top 1% with exceptional foundation'
+    } else if (score >= 70) {
+      // Score 70-84 → Probability 70-84%
+      probability = 70 + Math.floor((score - 70) / 15 * 15)
+      tier = '70-84%'
       color = 'blue'
       icon = '📈'
-      message = 'Strong - You\'re on the right path with room to optimize'
-    } else if (score >= 30) {
-      probability = 26 + Math.floor((score - 30) / 20 * 25) // 26-50%
-      tier = '26-50%'
+      message = 'High Performance - Top 9% with strong success indicators'
+    } else if (score >= 50) {
+      // Score 50-69 → Probability 50-69%
+      probability = 50 + Math.floor((score - 50) / 20 * 20)
+      tier = '50-69%'
       color = 'yellow'
       icon = '⚡'
-      message = 'Developing - Focus on fundamentals to accelerate growth'
-    } else {
-      probability = Math.floor(score / 30 * 26) // 0-25%
-      tier = '0-25%'
-      color = 'red'
+      message = 'Above Average - Top 25% with solid potential for growth'
+    } else if (score >= 30) {
+      // Score 30-49 → Probability 30-49%
+      probability = 30 + Math.floor((score - 30) / 20 * 20)
+      tier = '30-49%'
+      color = 'orange'
       icon = '🎯'
-      message = 'Foundation Phase - Build core systems for sustainable success'
+      message = 'Developing - Building foundation with focused improvement needed'
+    } else {
+      // Score 0-29 → Probability 10-29%
+      probability = 10 + Math.floor(score / 30 * 20)
+      tier = '10-29%'
+      color = 'red'
+      icon = '🔧'
+      message = 'Foundation Phase - Significant improvements needed across multiple areas'
     }
     
     return { probability, tier, color, message, icon }
@@ -365,12 +382,14 @@ function ComprehensiveAssessmentResultsContent() {
               probabilityData.color === 'green' ? 'border-green-500' :
               probabilityData.color === 'blue' ? 'border-blue-500' :
               probabilityData.color === 'yellow' ? 'border-yellow-500' :
+              probabilityData.color === 'orange' ? 'border-orange-500' :
               'border-red-500'
             }`}>
               <div className={`absolute top-0 left-0 w-40 h-40 rounded-full blur-3xl ${
                 probabilityData.color === 'green' ? 'bg-green-400/20 dark:bg-green-600/20' :
                 probabilityData.color === 'blue' ? 'bg-blue-400/20 dark:bg-blue-600/20' :
                 probabilityData.color === 'yellow' ? 'bg-yellow-400/20 dark:bg-yellow-600/20' :
+                probabilityData.color === 'orange' ? 'bg-orange-400/20 dark:bg-orange-600/20' :
                 'bg-red-400/20 dark:bg-red-600/20'
               }`}></div>
               <div className="relative z-10">
@@ -383,6 +402,7 @@ function ComprehensiveAssessmentResultsContent() {
                     probabilityData.color === 'green' ? 'text-green-600 dark:text-green-400' :
                     probabilityData.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
                     probabilityData.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+                    probabilityData.color === 'orange' ? 'text-orange-600 dark:text-orange-400' :
                     'text-red-600 dark:text-red-400'
                   }`}>{probabilityData.probability}%</span>
                 </div>
@@ -390,6 +410,7 @@ function ComprehensiveAssessmentResultsContent() {
                   probabilityData.color === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                   probabilityData.color === 'blue' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
                   probabilityData.color === 'yellow' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                  probabilityData.color === 'orange' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
                   'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                 }`}>
                   {probabilityData.tier} Probability Range
@@ -409,16 +430,18 @@ function ComprehensiveAssessmentResultsContent() {
                   </div>
                   <div className="relative w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div className="absolute inset-0 flex">
-                      <div className="w-1/4 bg-red-200 dark:bg-red-900/50"></div>
-                      <div className="w-1/4 bg-yellow-200 dark:bg-yellow-900/50"></div>
-                      <div className="w-1/4 bg-blue-200 dark:bg-blue-900/50"></div>
-                      <div className="w-1/4 bg-green-200 dark:bg-green-900/50"></div>
+                      <div className="w-1/5 bg-red-200 dark:bg-red-900/50"></div>
+                      <div className="w-1/5 bg-orange-200 dark:bg-orange-900/50"></div>
+                      <div className="w-1/5 bg-yellow-200 dark:bg-yellow-900/50"></div>
+                      <div className="w-1/5 bg-blue-200 dark:bg-blue-900/50"></div>
+                      <div className="w-1/5 bg-green-200 dark:bg-green-900/50"></div>
                     </div>
                     <div 
                       className={`absolute top-0 left-0 h-full transition-all duration-1000 ease-out ${
                         probabilityData.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-600' :
                         probabilityData.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
                         probabilityData.color === 'yellow' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
+                        probabilityData.color === 'orange' ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
                         'bg-gradient-to-r from-red-500 to-red-600'
                       }`}
                       style={{ width: `${probabilityData.probability}%` }}

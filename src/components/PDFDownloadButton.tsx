@@ -1,9 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import React, { useState, useEffect } from 'react'
 import { Download } from 'lucide-react'
-import AssessmentResultsPDF from './AssessmentResultsPDF'
+import dynamic from 'next/dynamic'
+
+// Dynamically import react-pdf components to avoid SSR issues
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
+  { ssr: false }
+)
 
 interface PDFDownloadButtonProps {
   userProgress: any
@@ -19,8 +24,18 @@ interface PDFDownloadButtonProps {
 
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ userProgress, spiScore, dimensions }) => {
   const [isReady, setIsReady] = useState(false)
+  const [PDFDocument, setPDFDocument] = useState<any>(null)
 
-  // Don't render PDFDownloadLink until user clicks
+  useEffect(() => {
+    // Dynamically import the PDF component
+    import('./AssessmentResultsPDF').then((module) => {
+      setPDFDocument(() => module.default)
+    }).catch((error) => {
+      console.error('Error loading PDF component:', error)
+    })
+  }, [])
+
+  // Don't render anything until user clicks
   if (!isReady) {
     return (
       <button
@@ -34,7 +49,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ userProgress, spi
   }
 
   // Validate data before rendering PDF
-  if (!userProgress || !dimensions || dimensions.length === 0) {
+  if (!userProgress || !dimensions || dimensions.length === 0 || !PDFDocument) {
     return (
       <button
         disabled
@@ -49,7 +64,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ userProgress, spi
   return (
     <PDFDownloadLink
       document={
-        <AssessmentResultsPDF 
+        <PDFDocument 
           userProgress={userProgress}
           spiScore={spiScore}
           dimensions={dimensions}
@@ -58,8 +73,12 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ userProgress, spi
       fileName={`SPI_Assessment_Results_${new Date().toISOString().split('T')[0]}.pdf`}
       className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg flex items-center gap-2"
     >
-      {({ blob, url, loading, error }) =>
-        loading ? (
+      {({ blob, url, loading, error }) => {
+        if (error) {
+          console.error('PDF Generation Error:', error)
+        }
+        
+        return loading ? (
           <span className="flex items-center gap-2">
             <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
             Generating PDF...
@@ -69,13 +88,13 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ userProgress, spi
             <Download className="w-5 h-5" />
             Error generating PDF - Try again
           </span>
-        ) : (
+        ) : blob ? (
           <>
             <Download className="w-5 h-5" />
             Download PDF
           </>
-        )
-      }
+        ) : null
+      }}
     </PDFDownloadLink>
   )
 }

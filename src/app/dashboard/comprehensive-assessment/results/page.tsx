@@ -74,7 +74,7 @@ function ComprehensiveAssessmentResultsContent() {
         .single()
       
       if (assessment) {
-        setUserProgress(prev => ({ 
+        setUserProgress((prev: any) => ({ 
           ...prev, 
           standout_strength_1: assessment.standout_strength_1,
           standout_strength_2: assessment.standout_strength_2

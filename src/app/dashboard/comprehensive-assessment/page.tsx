@@ -1007,7 +1007,7 @@ export default function ComprehensiveAssessmentPage() {
           dimensionScores: {
             financial_foundation: calculateDimensionScore('Financial Foundation'),
             market_intelligence: calculateDimensionScore('Market Intelligence'),
-            personal_strengths: calculateDimensionScore('Personal Strengths'),
+    
             risk_management: calculateDimensionScore('Risk Management'),
             support_systems: calculateDimensionScore('Support Systems')
           }
@@ -1179,7 +1179,7 @@ export default function ComprehensiveAssessmentPage() {
               <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg">
                 <h3 className="text-xl font-bold text-purple-900 mb-3">🎯 Standout Assessment</h3>
                 <p className="text-purple-700 mb-4 font-medium">
-                  Before completing this assessment, please take the Standout 2.0 assessment to discover your unique strengths.
+                  Before completing this assessment, please take the Standout 2.0 assessment to discover your unique strengths. OR if you know your top two strengths you can enter them below now.
                 </p>
                 
                 <div className="mb-6">
@@ -1339,31 +1339,38 @@ export default function ComprehensiveAssessmentPage() {
 
             {/* Live Score Display */}
             <div className="mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold">{calculateDimensionScore('Financial Foundation')}</div>
                   <div className="text-indigo-100 text-sm">Financial Foundation</div>
-                  <div className="text-xs text-indigo-200">(35 max)</div>
+                  <div className="text-xs text-indigo-200">(35 points)</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold">{calculateDimensionScore('Market Intelligence')}</div>
                   <div className="text-indigo-100 text-sm">Market Intelligence</div>
-                  <div className="text-xs text-indigo-200">(20 max)</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{calculateDimensionScore('Personal Strengths')}</div>
-                  <div className="text-indigo-100 text-sm">Personal Strengths</div>
-                  <div className="text-xs text-indigo-200">(20 max)</div>
+                  <div className="text-xs text-indigo-200">(20 points)</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold">{calculateDimensionScore('Risk Management')}</div>
                   <div className="text-indigo-100 text-sm">Risk Management</div>
-                  <div className="text-xs text-indigo-200">(15 max)</div>
+                  <div className="text-xs text-indigo-200">(15 points)</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold">{calculateDimensionScore('Support Systems')}</div>
                   <div className="text-indigo-100 text-sm">Support Systems</div>
-                  <div className="text-xs text-indigo-200">(10 max)</div>
+                  <div className="text-xs text-indigo-200">(10 points)</div>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-white/10 rounded-lg">
+                  <div className="text-lg font-semibold">Standout Strengths</div>
+                  <div className="text-2xl font-bold">{strengthCombo}</div>
+                  <div className="text-xs text-indigo-200">+{Math.round(calculateStandoutScore(formData.standout_strength_1, formData.standout_strength_2).score * 2)} bonus points</div>
+                </div>
+                <div className="text-center p-3 bg-white/10 rounded-lg">
+                  <div className="text-lg font-semibold">Total Assessment Score</div>
+                  <div className="text-3xl font-bold">{calculateDimensionScore('Financial Foundation') + calculateDimensionScore('Market Intelligence') + calculateDimensionScore('Risk Management') + calculateDimensionScore('Support Systems')}/80</div>
+                  <div className="text-xs text-indigo-200">Base score before standout bonus</div>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-indigo-400">

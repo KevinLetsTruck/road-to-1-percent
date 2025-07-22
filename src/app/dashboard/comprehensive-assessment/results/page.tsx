@@ -745,7 +745,7 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
             
             {(() => {
-              const insights = getStrengthInsights(strengthCombo)
+              const insights = getStrengthInsights(actualStrengthCombo)
               return (
                 <>
                   {/* Subtitle with descriptive titles */}
@@ -881,7 +881,14 @@ function ComprehensiveAssessmentResultsContent() {
                   {/* Progress Bar */}
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
                     <div 
-                      className={`bg-${dimension.color}-600 dark:bg-${dimension.color}-400 h-2 rounded-full transition-all duration-300`}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        dimension.color === 'indigo' ? 'bg-indigo-600 dark:bg-indigo-400' :
+                        dimension.color === 'green' ? 'bg-green-600 dark:bg-green-400' :
+                        dimension.color === 'blue' ? 'bg-blue-600 dark:bg-blue-400' :
+                        dimension.color === 'orange' ? 'bg-orange-600 dark:bg-orange-400' :
+                        dimension.color === 'yellow' ? 'bg-yellow-600 dark:bg-yellow-400' :
+                        'bg-gray-600 dark:bg-gray-400'
+                      }`}
                       style={{ width: `${dimension.percentage}%` }}
                     ></div>
                   </div>
@@ -922,40 +929,7 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
           </div>
 
-          {/* Next Steps */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-              <Target className="w-6 h-6 mr-2 text-green-600 dark:text-green-400" />
-              Your Action Plan
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Immediate Focus</h3>
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <p className="text-green-800 dark:text-green-200 font-medium mb-2">{nextSteps.focus}</p>
-                  <ul className="space-y-1">
-                    {nextSteps.quickWins.map((win, index) => (
-                      <li key={index} className="text-sm text-green-700 dark:text-green-300 flex items-start">
-                        <span className="text-green-500 dark:text-green-400 mr-2">•</span>
-                        {win}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Timeline</h3>
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                  <p className="text-blue-800 dark:text-blue-200 font-medium mb-2">{nextSteps.timeline}</p>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    Focus on gaining 1 point per week through systematic improvement in your weakest dimensions.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+
 
                   {/* Update Assessment Button */}
         <div className="flex flex-col items-center space-y-4">

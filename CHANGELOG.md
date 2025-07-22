@@ -2,6 +2,15 @@
 
 ## [Unreleased] - 2024-01-XX
 
+### Added - PDF Export
+- **PDF Download**: Users can now download their assessment results as a professional PDF report
+  - Added download button next to "Update Your Assessment" button
+  - PDF includes user information, date, overall score, tier, and probability
+  - Shows standout strengths with synergy level and bonus points
+  - Displays dimension breakdown with scores and progress bars
+  - Professional formatting with SPI branding
+  - Auto-generated filename with current date
+
 ### Fixed
 - **Assessment Results**: Fixed strength combination display to show "Pioneer + Influencer" instead of "Pioneer + Creator" to match the assessment form options
 - **Support Systems Scoring**: Fixed scoring issue where Support Systems could exceed 10 points (was showing 12/10 or 120%)

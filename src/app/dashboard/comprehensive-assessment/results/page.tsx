@@ -4,9 +4,16 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut, Settings, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut, Settings, AlertTriangle, Download } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
+import dynamic from 'next/dynamic'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+
+// Dynamically import the PDF component to avoid SSR issues
+const AssessmentResultsPDF = dynamic(() => import('@/components/AssessmentResultsPDF'), {
+  ssr: false,
+})
 
 interface DimensionBreakdown {
   name: string
@@ -931,14 +938,38 @@ function ComprehensiveAssessmentResultsContent() {
 
 
 
-                  {/* Update Assessment Button */}
+                  {/* Action Buttons */}
         <div className="flex flex-col items-center space-y-4">
-          <button
-            onClick={() => router.push('/dashboard/comprehensive-assessment')}
-            className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
-          >
-            Update Your Assessment
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <button
+              onClick={() => router.push('/dashboard/comprehensive-assessment')}
+              className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
+            >
+              Update Your Assessment
+            </button>
+            
+            {/* PDF Download Button */}
+            <PDFDownloadLink
+              document={
+                <AssessmentResultsPDF 
+                  userProgress={userProgress}
+                  spiScore={spiScore}
+                  dimensions={dimensions}
+                />
+              }
+              fileName={`SPI_Assessment_Results_${new Date().toISOString().split('T')[0]}.pdf`}
+              className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg flex items-center gap-2"
+            >
+              {({ blob, url, loading, error }) =>
+                loading ? 'Generating PDF...' : (
+                  <>
+                    <Download className="w-5 h-5" />
+                    Download PDF
+                  </>
+                )
+              }
+            </PDFDownloadLink>
+          </div>
           
           {/* Link to Dashboard View */}
           <button

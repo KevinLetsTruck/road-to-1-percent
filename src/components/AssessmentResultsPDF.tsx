@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
-import { calculateStandoutScore } from '@/lib/standoutScoring'
+import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
 
 // Register fonts
 Font.register({
@@ -175,6 +175,7 @@ const AssessmentResultsPDF: React.FC<AssessmentResultsPDFProps> = ({ userProgres
   const strength2 = userProgress.standout_strength_2 || ''
   const actualStrengthCombo = strength1 && strength2 ? `${strength1} + ${strength2}` : 'Balanced'
   const standoutResult = calculateStandoutScore(strength1, strength2)
+  const standoutSynergy = getStandoutTier(standoutResult.score)
   const probabilityData = getProbabilityData(spiScore, tier)
   const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 
@@ -207,7 +208,7 @@ const AssessmentResultsPDF: React.FC<AssessmentResultsPDFProps> = ({ userProgres
           <Text style={styles.sectionTitle}>Standout Strengths</Text>
           <View style={styles.strengthBox}>
             <Text style={styles.strengthTitle}>{actualStrengthCombo}</Text>
-            <Text style={styles.scoreLabel}>Synergy Level: {standoutResult.synergy}</Text>
+            <Text style={styles.scoreLabel}>Synergy Level: {standoutSynergy}</Text>
             <Text style={styles.scoreLabel}>Bonus Points: +{Math.round(standoutResult.score * 2)}</Text>
           </View>
         </View>

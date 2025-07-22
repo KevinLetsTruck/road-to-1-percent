@@ -57,7 +57,7 @@ BEGIN
         0,
         0,
         0,
-        ARRAY[]::text[],
+        '[]'::jsonb,
         NOW()
     )
     ON CONFLICT (user_id) DO NOTHING;
@@ -126,7 +126,7 @@ BEGIN
             0,
             0,
             0,
-            ARRAY[]::text[],
+            '[]'::jsonb,
             NOW()
         )
         ON CONFLICT (user_id) DO UPDATE 
@@ -169,7 +169,7 @@ SELECT
     0,
     0,
     0,
-    ARRAY[]::text[],
+    '[]'::jsonb,
     NOW()
 FROM auth.users
 WHERE id NOT IN (SELECT user_id FROM user_progress)

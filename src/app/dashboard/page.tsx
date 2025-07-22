@@ -4,29 +4,27 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { calculateStandoutScore } from "@/lib/standoutScoring";
 import {
-  TrendingUp,
-  Target,
-  Users,
+  Download,
+  FileText,
+  RefreshCw,
   BarChart3,
-  ArrowRight,
-  Trophy,
+  Target,
+  CheckCircle,
+  AlertTriangle,
   Lightbulb,
   Calendar,
-  CheckCircle,
-  Activity,
-  Shield,
-  AlertTriangle,
   Zap,
   DollarSign,
   Globe,
+  Shield,
   Users2,
   Check,
 } from "lucide-react";
+import PDFDownloadButton from "@/components/PDFDownloadButton";
 
 interface DashboardStats {
-  assessmentScore: number;
-  standoutBonus: number;
   successProbability: number;
   completedAssessments: number;
   strongestDimension: string;
@@ -92,18 +90,22 @@ export default function DashboardPage() {
             {
               name: "Financial Foundation",
               score: progressData.financial_foundation_score || 0,
+              max: 35,
             },
             {
               name: "Market Intelligence",
               score: progressData.market_intelligence_score || 0,
+              max: 20,
             },
             {
               name: "Risk Management",
               score: progressData.risk_management_score || 0,
+              max: 15,
             },
             {
               name: "Support Systems",
               score: progressData.support_systems_score || 0,
+              max: 10,
             },
           ];
 
@@ -114,41 +116,59 @@ export default function DashboardPage() {
             a.score < b.score ? a : b
           );
 
-          // Calculate assessment score (sum of all dimensions)
-          const assessmentScore = dimensions.reduce(
-            (sum, dim) => sum + dim.score,
-            0
-          );
+          // Calculate base score (sum of all dimensions out of 80)
+          const baseScore = dimensions.reduce((sum, dim) => sum + dim.score, 0);
 
-          // Calculate standout bonus based on standout strengths
+          // Calculate standout bonus (0-20 points)
           let standoutBonus = 0;
           if (
             assessmentData?.standout_strength_1 &&
             assessmentData?.standout_strength_2
           ) {
-            standoutBonus = progressData.standout_score || 0; // Get from user_progress
+            const standoutResult = calculateStandoutScore(
+              assessmentData.standout_strength_1,
+              assessmentData.standout_strength_2
+            );
+            // Scale standout score (0-10) to bonus points (0-20)
+            standoutBonus = standoutResult.score * 2;
           }
 
-          // Calculate success probability
-          const totalScore = assessmentScore + standoutBonus;
-          let successProbability = 30; // Base probability
+          // Calculate total score out of 100
+          const totalScore = baseScore + standoutBonus;
 
-          if (totalScore >= 80) {
-            successProbability = 75 + Math.round((totalScore - 80) / 2);
+          // Calculate success probability with progressive scaling
+          let successProbability = 0;
+
+          if (totalScore >= 90) {
+            // 90-100 -> 85-95%
+            successProbability = 85 + (totalScore - 90);
+          } else if (totalScore >= 80) {
+            // 80-89 -> 75-84%
+            successProbability = 75 + (totalScore - 80) * 0.9;
+          } else if (totalScore >= 70) {
+            // 70-79 -> 65-74%
+            successProbability = 65 + (totalScore - 70) * 0.9;
           } else if (totalScore >= 60) {
-            successProbability = 60 + Math.round((totalScore - 60) * 0.75);
+            // 60-69 -> 55-64%
+            successProbability = 55 + (totalScore - 60) * 0.9;
+          } else if (totalScore >= 50) {
+            // 50-59 -> 45-54%
+            successProbability = 45 + (totalScore - 50) * 0.9;
           } else if (totalScore >= 40) {
-            successProbability = 45 + Math.round((totalScore - 40) * 0.75);
+            // 40-49 -> 35-44%
+            successProbability = 35 + (totalScore - 40) * 0.9;
+          } else if (totalScore >= 30) {
+            // 30-39 -> 25-34%
+            successProbability = 25 + (totalScore - 30) * 0.9;
           } else {
-            successProbability = 30 + Math.round(totalScore * 0.375);
+            // Below 30 -> 15-24%
+            successProbability = 15 + totalScore * 0.33;
           }
 
-          // Cap at 95%
-          successProbability = Math.min(successProbability, 95);
+          // Round and cap at 95%
+          successProbability = Math.min(Math.round(successProbability), 95);
 
           setStats({
-            assessmentScore,
-            standoutBonus,
             successProbability,
             completedAssessments: progressData.assessments_completed || 0,
             strongestDimension: strongestDim.name,
@@ -179,13 +199,13 @@ export default function DashboardPage() {
     );
   }
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-400";
-    if (score >= 60) return "text-yellow-400";
-    return "text-orange-400";
+  const getSuccessProbabilityColor = () => {
+    const prob = stats?.successProbability || 0;
+    if (prob >= 75) return "#10b981"; // green
+    if (prob >= 50) return "#3b82f6"; // blue
+    if (prob >= 25) return "#f59e0b"; // orange
+    return "#ef4444"; // red
   };
-
-  const getProgressWidth = (score: number) => `${Math.min(score, 100)}%`;
 
   // Define dimension data with quick wins and long-term goals
   const dimensionsData: DimensionData[] = [
@@ -295,182 +315,200 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-100">
-                Your Assessment Results
+                Your Assessment Dashboard
               </h1>
               <p className="text-gray-400 mt-1">
                 {user?.email || "Entrepreneur"}
               </p>
             </div>
-            <button
-              onClick={() => router.push("/dashboard/comprehensive-assessment")}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <Activity className="w-4 h-4" />
-              New Assessment
-            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Success Probability Card */}
-        <div className="mb-8">
-          <div className="card-orange-gradient relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-2">
-              <Target className="w-20 h-20 text-white/10" />
-            </div>
-            <div className="relative z-10">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Success Probability
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* Success Probability Percentage */}
-                <div>
-                  <p className="text-white/80 text-sm mb-2">
-                    Probability Score
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-bold">
-                      {stats?.successProbability || 30}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Assessment Score */}
-                <div>
-                  <p className="text-white/80 text-sm mb-2">Assessment Score</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold">
-                      {stats?.assessmentScore || 0}
-                    </span>
-                    <span className="text-white/60">/80</span>
-                  </div>
-                </div>
-
-                {/* Standout Bonus */}
-                <div>
-                  <p className="text-white/80 text-sm mb-2">Standout Bonus</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold">
-                      +{stats?.standoutBonus || 0}
-                    </span>
-                    <span className="text-white/60">/20</span>
-                  </div>
-                  {stats?.standoutStrength1 && stats?.standoutStrength2 && (
-                    <p className="text-xs text-white/60 mt-1">
-                      {stats.standoutStrength1} + {stats.standoutStrength2}
-                    </p>
-                  )}
-                </div>
+        {/* Success Probability Section */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-8">
+          {/* Success Probability Graphic */}
+          <div className="lg:w-3/4">
+            <div className="card-orange-gradient relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-2">
+                <Target className="w-20 h-20 text-white/10" />
               </div>
+              <div className="relative z-10 p-8">
+                <h2 className="text-2xl font-bold text-white mb-6">
+                  SUCCESS PROBABILITY
+                </h2>
 
-              {/* Progress Bar */}
-              <div className="mt-6">
-                <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full transition-all duration-500"
-                    style={{ width: `${stats?.successProbability || 30}%` }}
-                  />
+                {/* Large Percentage Display */}
+                <div className="mb-8">
+                  <span
+                    className="text-7xl font-bold"
+                    style={{ color: "#ff7b00" }}
+                  >
+                    {stats?.successProbability || 30}%
+                  </span>
                 </div>
-                <div className="flex justify-between text-xs mt-2 text-white/60">
-                  <span>0%</span>
-                  <span>25%</span>
-                  <span>50%</span>
-                  <span>75%</span>
-                  <span>100%</span>
+
+                {/* Progress Bar */}
+                <div className="mt-8">
+                  <div className="flex justify-between text-sm mb-2 text-white/60">
+                    <span>0%</span>
+                    <span>25%</span>
+                    <span>50%</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                  </div>
+                  <div className="relative h-4 bg-gray-700 rounded-full overflow-hidden">
+                    {/* Gradient background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 via-blue-500 to-green-500 opacity-30" />
+                    {/* Progress indicator */}
+                    <div
+                      className="relative h-full rounded-full transition-all duration-1000"
+                      style={{
+                        width: `${stats?.successProbability || 30}%`,
+                        backgroundColor: "#ff7b00",
+                      }}
+                    />
+                    {/* White marker */}
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 w-1 h-6 bg-white"
+                      style={{ left: `${stats?.successProbability || 30}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="lg:w-1/4 flex flex-col gap-4">
+            <PDFDownloadButton
+              userProgress={userProgress}
+              standoutStrength1={stats?.standoutStrength1 || ""}
+              standoutStrength2={stats?.standoutStrength2 || ""}
+              className="btn-primary w-full"
+            />
+
+            <button
+              onClick={() => router.push("/dashboard/progress")}
+              className="btn-secondary w-full flex items-center justify-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Progress Update
+            </button>
+
+            <button
+              onClick={() => router.push("/dashboard/comprehensive-assessment")}
+              className="btn-secondary w-full flex items-center justify-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retake Assessment
+            </button>
           </div>
         </div>
 
         {/* Standout Strength Profile */}
-        <div className="card-dark mb-8">
-          <h2 className="section-header">
-            <Lightbulb className="w-6 h-6 text-yellow-400" />
-            Your Standout Strength Profile
-          </h2>
+        {stats?.standoutStrength1 && stats?.standoutStrength2 && (
+          <div className="card-dark mb-8">
+            <h2 className="section-header">
+              <Lightbulb className="w-6 h-6 text-yellow-400" />
+              Your Standout Strength Profile
+            </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Strengths */}
-            <div className="card-dark-gradient">
-              <h3 className="text-green-400 font-semibold mb-4 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                Your Strengths
-              </h3>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">✓</span>
-                  <span>Motivates drivers during tough times</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">✓</span>
-                  <span>Creates energy around company vision</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">✓</span>
-                  <span>First to spot emerging market trends</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">✓</span>
-                  <span>Creates new revenue streams</span>
-                </li>
-              </ul>
+            <div className="text-center mb-6">
+              <p className="text-2xl font-bold text-gray-100">
+                {stats.standoutStrength1} + {stats.standoutStrength2}
+              </p>
+              <p className="text-gray-400 mt-2">
+                {
+                  calculateStandoutScore(
+                    stats.standoutStrength1,
+                    stats.standoutStrength2
+                  ).description
+                }
+              </p>
             </div>
 
-            {/* Watch Out For */}
-            <div className="card-dark-gradient border-orange-500/30">
-              <h3 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5" />
-                Watch Out For
-              </h3>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <span className="text-orange-400 mt-1">!</span>
-                  <span>May underestimate real challenges</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-orange-400 mt-1">!</span>
-                  <span>Could burn out from constant high energy</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-orange-400 mt-1">!</span>
-                  <span>May overlook proven traditional methods</span>
-                </li>
-              </ul>
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Strengths */}
+              <div className="card-dark-gradient">
+                <h3 className="text-green-400 font-semibold mb-4 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Your Strengths
+                </h3>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400 mt-1">✓</span>
+                    <span>Motivates drivers during tough times</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400 mt-1">✓</span>
+                    <span>Creates energy around company vision</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400 mt-1">✓</span>
+                    <span>First to spot emerging market trends</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-400 mt-1">✓</span>
+                    <span>Creates new revenue streams</span>
+                  </li>
+                </ul>
+              </div>
 
-            {/* How to Leverage */}
-            <div className="card-dark-gradient">
-              <h3 className="text-blue-400 font-semibold mb-4 flex items-center gap-2">
-                <Zap className="w-5 h-5" />
-                How to Leverage
-              </h3>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-1">→</span>
-                  <span>
-                    Combine Stimulator and Pioneer strengths for maximum impact
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-1">→</span>
-                  <span>Channel enthusiasm into driver retention programs</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-1">→</span>
-                  <span>Create exciting incentive structures</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-1">→</span>
-                  <span>Focus on specialized or niche freight markets</span>
-                </li>
-              </ul>
+              {/* Watch Out For */}
+              <div className="card-dark-gradient border-orange-500/30">
+                <h3 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5" />
+                  Watch Out For
+                </h3>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-400 mt-1">!</span>
+                    <span>May underestimate real challenges</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-400 mt-1">!</span>
+                    <span>Could burn out from constant high energy</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-orange-400 mt-1">!</span>
+                    <span>May overlook proven traditional methods</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* How to Leverage */}
+              <div className="card-dark-gradient">
+                <h3 className="text-blue-400 font-semibold mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  How to Leverage
+                </h3>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">→</span>
+                    <span>Combine your strengths for maximum impact</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">→</span>
+                    <span>
+                      Channel enthusiasm into driver retention programs
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">→</span>
+                    <span>Create exciting incentive structures</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-1">→</span>
+                    <span>Focus on specialized or niche freight markets</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Dimension Breakdown */}
         <div className="space-y-6">
@@ -576,56 +614,6 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <button
-            onClick={() =>
-              router.push("/dashboard/comprehensive-assessment/results")
-            }
-            className="card-dark hover:border-gray-600 transition-all group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-100">
-                  View Detailed Results
-                </h3>
-                <p className="text-gray-400 text-sm mt-1">
-                  See your complete analysis
-                </p>
-              </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-200 transition-colors" />
-            </div>
-          </button>
-
-          <button
-            onClick={() => router.push("/dashboard/insights")}
-            className="card-dark hover:border-gray-600 transition-all group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-100">Get Insights</h3>
-                <p className="text-gray-400 text-sm mt-1">
-                  Personalized recommendations
-                </p>
-              </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-200 transition-colors" />
-            </div>
-          </button>
-
-          <button
-            onClick={() => router.push("/dashboard/community")}
-            className="card-dark hover:border-gray-600 transition-all group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-100">Join Community</h3>
-                <p className="text-gray-400 text-sm mt-1">Connect with peers</p>
-              </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-200 transition-colors" />
-            </div>
-          </button>
         </div>
       </div>
     </div>

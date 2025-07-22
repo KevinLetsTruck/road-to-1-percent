@@ -37,11 +37,7 @@ interface ComprehensiveAssessmentData {
   strategic_planning: number
   
   // Personal Strengths (20 points)
-  pioneer_strength: number
-  creator_strength: number
-  innovator_strength: number
-  connector_strength: number
-  advisor_strength: number
+
   
   // Risk Management (15 points)
   contingency_planning: number
@@ -238,38 +234,6 @@ const getAssessmentQuestions = (currentSituation: CurrentSituation): AssessmentQ
     ],
     weight: 0.2,
     maxPoints: 4
-  },
-  
-  // Personal Strengths Questions
-  {
-    id: 'pioneer_strength',
-    dimension: 'Personal Strengths',
-    question: 'How do you typically approach new challenges?',
-    options: [
-      { value: 0, label: 'I avoid new challenges', description: 'Risk-averse' },
-      { value: 2, label: 'I follow proven methods', description: 'Conservative' },
-      { value: 4, label: 'I research before acting', description: 'Cautious' },
-      { value: 6, label: 'I experiment with new approaches', description: 'Innovative' },
-      { value: 8, label: 'I seek out new opportunities', description: 'Pioneering' },
-      { value: 10, label: 'I create new paths where none exist', description: 'Trailblazing' }
-    ],
-    weight: 0.5,
-    maxPoints: 10
-  },
-  {
-    id: 'creator_strength',
-    dimension: 'Personal Strengths',
-    question: 'When you see an inefficient system, what\'s your first instinct?',
-    options: [
-      { value: 0, label: 'Follow it anyway to avoid trouble', description: 'Compliant' },
-      { value: 2, label: 'Complain about it to others', description: 'Frustrated' },
-      { value: 4, label: 'Accept it as the way things are', description: 'Resigned' },
-      { value: 6, label: 'Figure out a better way and test it', description: 'Problem-solver' },
-      { value: 8, label: 'Immediately try to change it officially', description: 'Change agent' },
-      { value: 10, label: 'Create a completely new system', description: 'Creator' }
-    ],
-    weight: 0.5,
-    maxPoints: 10
   },
   
   // Risk Management Questions
@@ -854,11 +818,7 @@ export default function ComprehensiveAssessmentPage() {
     customer_knowledge: 0,
     industry_trends: 0,
     strategic_planning: 0,
-    pioneer_strength: 0,
-    creator_strength: 0,
-    innovator_strength: 0,
-    connector_strength: 0,
-    advisor_strength: 0,
+
     contingency_planning: 0,
     business_continuity: 0,
     risk_assessment: 0,
@@ -916,11 +876,7 @@ export default function ComprehensiveAssessmentPage() {
             customer_knowledge: existingAssessment.customer_knowledge || 0,
             industry_trends: existingAssessment.industry_trends || 0,
             strategic_planning: existingAssessment.strategic_planning || 0,
-            pioneer_strength: existingAssessment.pioneer_strength || 0,
-            creator_strength: existingAssessment.creator_strength || 0,
-            innovator_strength: existingAssessment.innovator_strength || 0,
-            connector_strength: existingAssessment.connector_strength || 0,
-            advisor_strength: existingAssessment.advisor_strength || 0,
+
             contingency_planning: existingAssessment.contingency_planning || 0,
             business_continuity: existingAssessment.business_continuity || 0,
             risk_assessment: existingAssessment.risk_assessment || 0,
@@ -956,24 +912,27 @@ export default function ComprehensiveAssessmentPage() {
   const calculateTotalSPIScore = () => {
     const financialScore = calculateDimensionScore('Financial Foundation')
     const marketScore = calculateDimensionScore('Market Intelligence')
-    const strengthsScore = calculateDimensionScore('Personal Strengths')
     const riskScore = calculateDimensionScore('Risk Management')
     const supportScore = calculateDimensionScore('Support Systems')
     
-    // Calculate base score (out of 100)
-    const baseScore = financialScore + marketScore + strengthsScore + riskScore + supportScore
+    // Calculate base score from 4 dimensions (out of 90)
+    // Financial: 35, Market: 20, Risk: 15, Support: 10 = 80 points
+    const baseScore = financialScore + marketScore + riskScore + supportScore
     
     // Add standout strength bonus (up to 10 points)
     const standoutBonus = calculateStandoutScore(formData.standout_strength_1, formData.standout_strength_2).score
     
-    // Total score is now out of 110
-    return baseScore + standoutBonus
+    // Scale to ensure max is 100
+    // Base (80) + Standout (10) = 90, so we scale by 100/90
+    const scaledScore = Math.round((baseScore + standoutBonus) * (100/90))
+    
+    // Ensure score doesn't exceed 100
+    return Math.min(scaledScore, 100)
   }
 
   const getSPITier = (score: number) => {
-    // Adjusted for new 110 max score (same percentages)
-    if (score >= 94) return '1%'  // Top 1% - Exceptional performers (85% of 110)
-    if (score >= 77) return '9%'  // Top 9% - High performers (70% of 110)
+    if (score >= 85) return '1%'  // Top 1% - Exceptional performers
+    if (score >= 70) return '9%'  // Top 9% - High performers
     return '90%' // Bottom 90% - Building foundation
   }
 

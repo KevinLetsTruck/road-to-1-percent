@@ -196,27 +196,6 @@ function ComprehensiveAssessmentResultsContent() {
       ]
     },
     {
-      name: 'Personal Strengths',
-      score: userProgress.personal_strengths_score || 0,
-      maxScore: 20,
-      percentage: Math.round(((userProgress.personal_strengths_score || 0) / 20) * 100),
-      color: 'purple',
-      icon: <Target className="w-5 h-5" />,
-      description: 'Your natural strengths determine how you approach challenges and opportunities.',
-      quickWins: [
-        'Identify your top 3 strengths',
-        'Find accountability partner with complementary strengths',
-        'Document innovative ideas in opportunity journal',
-        'Practice strength-based problem solving'
-      ],
-      longTermGoals: [
-        'Develop systematic approach to innovation',
-        'Build team around complementary strengths',
-        'Create strength-based business model',
-        'Become mentor for others with similar strengths'
-      ]
-    },
-    {
       name: 'Risk Management',
       score: userProgress.risk_management_score || 0,
       maxScore: 15,
@@ -282,7 +261,7 @@ function ComprehensiveAssessmentResultsContent() {
 
   const nextSteps = getNextSteps()
 
-  // Calculate probability of success based on SPI score (now out of 110)
+  // Calculate probability of success based on SPI score
   const getProbabilityData = (score: number) => {
     let probability = 0
     let tier = ''
@@ -290,37 +269,37 @@ function ComprehensiveAssessmentResultsContent() {
     let message = ''
     let icon = ''
     
-    if (score >= 94) {
-      // Score 94-110 → Probability 85-100%
-      probability = 85 + Math.floor((score - 94) / 16 * 15)
+    if (score >= 85) {
+      // Score 85-100 → Probability 85-100%
+      probability = 85 + Math.floor((score - 85) / 15 * 15)
       tier = '85-100%'
       color = 'green'
       icon = '🚀'
       message = 'Elite Performance - You\'re in the top 1% with exceptional foundation'
-    } else if (score >= 77) {
-      // Score 77-93 → Probability 70-84%
-      probability = 70 + Math.floor((score - 77) / 17 * 15)
+    } else if (score >= 70) {
+      // Score 70-84 → Probability 70-84%
+      probability = 70 + Math.floor((score - 70) / 15 * 15)
       tier = '70-84%'
       color = 'blue'
       icon = '📈'
       message = 'High Performance - Top 9% with strong success indicators'
-    } else if (score >= 55) {
-      // Score 55-76 → Probability 50-69%
-      probability = 50 + Math.floor((score - 55) / 22 * 20)
+    } else if (score >= 50) {
+      // Score 50-69 → Probability 50-69%
+      probability = 50 + Math.floor((score - 50) / 20 * 20)
       tier = '50-69%'
       color = 'yellow'
       icon = '⚡'
       message = 'Above Average - Building strong foundation with growth potential'
-    } else if (score >= 33) {
-      // Score 33-54 → Probability 30-49%
-      probability = 30 + Math.floor((score - 33) / 22 * 20)
+    } else if (score >= 30) {
+      // Score 30-49 → Probability 30-49%
+      probability = 30 + Math.floor((score - 30) / 20 * 20)
       tier = '30-49%'
       color = 'orange'
       icon = '🎯'
       message = 'Developing - Building foundation with focused improvement needed'
     } else {
-      // Score 0-32 → Probability 10-29%
-      probability = 10 + Math.floor(score / 33 * 20)
+      // Score 0-29 → Probability 10-29%
+      probability = 10 + Math.floor(score / 30 * 20)
       tier = '10-29%'
       color = 'red'
       icon = '🔧'
@@ -389,16 +368,16 @@ function ComprehensiveAssessmentResultsContent() {
                 <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">SPI Total Score</h2>
                 <div className="flex items-baseline mb-2">
                   <span className="text-6xl font-bold text-gray-900 dark:text-gray-100">{totalScore}</span>
-                  <span className="text-2xl text-gray-500 dark:text-gray-400 ml-2">/110</span>
+                  <span className="text-2xl text-gray-500 dark:text-gray-400 ml-2">/100</span>
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  <div>Base Score: {baseScore}/100</div>
-                  <div>Standout Bonus: +{standoutScore}/10</div>
+                  <div>Assessment Score: {Math.round(baseScore * 0.8)}/80</div>
+                  <div>Standout Bonus: +{Math.round(standoutScore * 2)}/20</div>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-4">
                   <div 
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${Math.min((totalScore / 110) * 100, 100)}%` }}
+                    style={{ width: `${totalScore}%` }}
                   ></div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -533,7 +512,7 @@ function ComprehensiveAssessmentResultsContent() {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-600 dark:text-gray-400">{standoutDescription}</p>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{standoutScore}</div>
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">Bonus Points</div>
                 </div>
               </div>

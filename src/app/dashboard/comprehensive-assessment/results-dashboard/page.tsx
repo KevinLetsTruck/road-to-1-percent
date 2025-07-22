@@ -80,7 +80,6 @@ function TruckDashboardResultsContent() {
   const dimensions = [
     { name: 'Financial', score: userProgress.financial_foundation_score || 0, max: 35, icon: '💰' },
     { name: 'Market Intel', score: userProgress.market_intelligence_score || 0, max: 20, icon: '📊' },
-    { name: 'Strengths', score: userProgress.personal_strengths_score || 0, max: 20, icon: '💪' },
     { name: 'Risk Mgmt', score: userProgress.risk_management_score || 0, max: 15, icon: '🛡️' },
     { name: 'Support', score: userProgress.support_systems_score || 0, max: 10, icon: '🤝' }
   ]

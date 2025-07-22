@@ -997,20 +997,34 @@ export default function ComprehensiveAssessmentPage() {
       const strengthCombo = getStrengthCombination()
 
       // Save or update comprehensive assessment data
-      const { error: assessmentError } = await supabase
-        .from('comprehensive_assessments')
-        .upsert({
-          user_id: user.id,
-          ...formData,
-          total_spi_score: totalScore,
-          tier,
-          strength_combination: strengthCombo,
-          assessment_date: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
-        })
-
-      if (assessmentError) throw assessmentError
+      if (hasExistingData) {
+        // Update existing assessment
+        const { error: assessmentError } = await supabase
+          .from('comprehensive_assessments')
+          .update({
+            ...formData,
+            total_spi_score: totalScore,
+            tier,
+            strength_combination: strengthCombo,
+            assessment_date: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
+        
+        if (assessmentError) throw assessmentError
+      } else {
+        // Insert new assessment
+        const { error: assessmentError } = await supabase
+          .from('comprehensive_assessments')
+          .insert({
+            user_id: user.id,
+            ...formData,
+            total_spi_score: totalScore,
+            tier,
+            strength_combination: strengthCombo,
+            assessment_date: new Date().toISOString()
+          })
+        
+      }
 
       // Update user progress
       const response = await fetch('/api/user-progress/comprehensive-assessment', {

@@ -16,11 +16,17 @@ DROP POLICY IF EXISTS "Users can update own progress" ON user_progress;
 CREATE OR REPLACE FUNCTION initialize_user_data()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Create profile entry
-  INSERT INTO public.profiles (id, email, created_at, updated_at)
+  -- Create profile entry with all required fields
+  INSERT INTO public.profiles (id, email, first_name, last_name, username, avatar_url, is_admin, verified, created_at, updated_at)
   VALUES (
     NEW.id,
     NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1)),
+    COALESCE(NEW.raw_user_meta_data->>'avatar_url', ''),
+    false,
+    false,
     NOW(),
     NOW()
   )
@@ -115,10 +121,16 @@ BEGIN
   
   -- If not found, create it
   IF NOT FOUND THEN
-    INSERT INTO profiles (id, email, created_at, updated_at)
+    INSERT INTO profiles (id, email, first_name, last_name, username, avatar_url, is_admin, verified, created_at, updated_at)
     SELECT 
       auth.uid(),
       email,
+      COALESCE(raw_user_meta_data->>'first_name', ''),
+      COALESCE(raw_user_meta_data->>'last_name', ''),
+      COALESCE(raw_user_meta_data->>'username', SPLIT_PART(email, '@', 1)),
+      COALESCE(raw_user_meta_data->>'avatar_url', ''),
+      false,
+      false,
       NOW(),
       NOW()
     FROM auth.users
@@ -192,10 +204,16 @@ GRANT EXECUTE ON FUNCTION get_or_create_profile() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_or_create_user_progress() TO authenticated;
 
 -- 8. Initialize data for any existing users missing records
-INSERT INTO profiles (id, email, created_at, updated_at)
+INSERT INTO profiles (id, email, first_name, last_name, username, avatar_url, is_admin, verified, created_at, updated_at)
 SELECT 
   id,
   email,
+  COALESCE(raw_user_meta_data->>'first_name', ''),
+  COALESCE(raw_user_meta_data->>'last_name', ''),
+  COALESCE(raw_user_meta_data->>'username', SPLIT_PART(email, '@', 1)),
+  COALESCE(raw_user_meta_data->>'avatar_url', ''),
+  false,
+  false,
   COALESCE(created_at, NOW()),
   NOW()
 FROM auth.users

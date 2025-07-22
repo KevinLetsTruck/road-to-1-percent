@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 export default function EmbedTestPage() {
   const [isEmbedded, setIsEmbedded] = useState(false)
@@ -107,12 +108,12 @@ export default function EmbedTestPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
           >
             Go to Assessment →
-          </a>
+          </Link>
         </div>
       </div>
     </div>

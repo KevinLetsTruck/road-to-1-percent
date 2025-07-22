@@ -975,6 +975,15 @@ function ComprehensiveAssessmentResultsContent() {
                 }))}
               />
             )}
+            
+            {/* Progress Tracking Button */}
+            <button
+              onClick={() => router.push('/dashboard/progress')}
+              className="bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-purple-700 transition-colors text-lg flex items-center gap-2"
+            >
+              <TrendingUp className="w-5 h-5" />
+              View Progress
+            </button>
           </div>
           
           {/* Link to Dashboard View */}

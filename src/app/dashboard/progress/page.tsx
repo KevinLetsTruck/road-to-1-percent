@@ -1,357 +1,405 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeft, TrendingUp, Target, Calendar, Trophy, Star, CheckCircle } from 'lucide-react'
+import { User } from '@supabase/supabase-js'
+import { ArrowLeft, TrendingUp, Calendar, Target, BarChart3, LineChart, Activity } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import SPIProgressChart from '@/components/charts/SPIProgressChart'
+import { Line } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartOptions
+} from 'chart.js'
 
-interface ProgressData {
-  currentTier: string
-  spiScore: number
-  overallProgress: number
-  assessmentsCompleted: number
-  totalAssessments: number
-  daysInProgram: number
-  nextMilestone: string
-  recentAchievements: string[]
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
+
+interface AssessmentVersion {
+  id: number
+  version_number: number
+  total_spi_score: number
+  financial_foundation_score: number
+  market_intelligence_score: number
+  risk_management_score: number
+  support_systems_score: number
+  standout_bonus: number
+  current_tier: string
+  standout_strength_1: string
+  standout_strength_2: string
+  created_at: string
+  is_current: boolean
 }
 
 export default function ProgressPage() {
-  const { user, loading: authLoading } = useAuth()
-  const [progressData, setProgressData] = useState<ProgressData | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [assessmentHistory, setAssessmentHistory] = useState<AssessmentVersion[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedTimeframe, setSelectedTimeframe] = useState<'3m' | '6m' | '1y'>('3m')
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
+  
   const router = useRouter()
   const supabase = createClient()
+  const { signOut } = useAuth()
 
   useEffect(() => {
-    if (authLoading) return
-
-    if (!user) {
-      router.push('/login')
-      return
-    }
-
-    const loadProgressData = async () => {
-      try {
-        const { data: userProgress } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
-
-        if (userProgress) {
-          const assessmentsCompleted = [
-            userProgress.spi_completed,
-            userProgress.financial_foundation_completed,
-            userProgress.market_intelligence_completed,
-            userProgress.personal_strengths_completed,
-            userProgress.risk_management_completed,
-            userProgress.support_systems_completed
-          ].filter(Boolean).length
-
-          const totalAssessments = 6
-          const overallProgress = Math.round((assessmentsCompleted / totalAssessments) * 100)
-          
-          const startDate = new Date(userProgress.program_start_date)
-          const today = new Date()
-          const daysInProgram = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-
-          const nextMilestone = getNextMilestone(userProgress.current_tier, userProgress.spi_score || 0)
-
-          const recentAchievements = getRecentAchievements(userProgress)
-
-          setProgressData({
-            currentTier: userProgress.current_tier,
-            spiScore: userProgress.spi_score || 0,
-            overallProgress,
-            assessmentsCompleted,
-            totalAssessments,
-            daysInProgram,
-            nextMilestone,
-            recentAchievements
-          })
-        }
-
-        setLoading(false)
-      } catch (error) {
-        console.error('Error loading progress data:', error)
-        setLoading(false)
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+        return
       }
+      setUser(user)
+
+      // Fetch assessment history
+      const { data: history, error } = await supabase
+        .from('assessment_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('version_number', { ascending: true })
+
+      if (!error && history) {
+        setAssessmentHistory(history)
+        // Set the current version as selected by default
+        const currentVersion = history.find(h => h.is_current)
+        if (currentVersion) {
+          setSelectedVersion(currentVersion.version_number)
+        }
+      }
+
+      setLoading(false)
     }
 
-    loadProgressData()
-  }, [user, authLoading, router, supabase])
+    getUser()
+  }, [router, supabase])
 
-  const getNextMilestone = (currentTier: string, spiScore: number): string => {
-    if (currentTier === '90%') {
-      if (spiScore < 70) return 'Complete comprehensive assessment'
-      if (spiScore < 85) return 'Reach 85 SPI score'
-      return 'Advance to 9% tier'
-    } else if (currentTier === '9%') {
-      if (spiScore < 85) return 'Reach 85 SPI score'
-      if (spiScore < 95) return 'Reach 95 SPI score'
-      return 'Advance to 1% tier'
-    } else {
-      return 'Maintain 1% status'
-    }
-  }
-
-  const getRecentAchievements = (userProgress: any): string[] => {
-    const achievements = []
-    
-    if (userProgress.spi_completed) {
-      achievements.push('Completed comprehensive SPI assessment')
-    }
-    if (userProgress.financial_foundation_completed) {
-      achievements.push('Completed financial foundation assessment')
-    }
-    if (userProgress.market_intelligence_completed) {
-      achievements.push('Completed market intelligence assessment')
-    }
-    if (userProgress.personal_strengths_completed) {
-      achievements.push('Completed personal strengths assessment')
-    }
-    if (userProgress.risk_management_completed) {
-      achievements.push('Completed risk management assessment')
-    }
-    if (userProgress.support_systems_completed) {
-      achievements.push('Completed support systems assessment')
-    }
-
-    return achievements.slice(-3) // Return last 3 achievements
-  }
-
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case '1%': return 'text-purple-600 bg-purple-50'
-      case '9%': return 'text-blue-600 bg-blue-50'
-      case '90%': return 'text-green-600 bg-green-50'
-      default: return 'text-gray-600 bg-gray-50'
-    }
-  }
-
-  const getProgressColor = (progress: number) => {
-    if (progress >= 80) return 'text-green-600'
-    if (progress >= 60) return 'text-yellow-600'
-    return 'text-red-600'
-  }
-
-  if (authLoading || loading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <div className="text-lg text-gray-600">Loading your progress...</div>
-        </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     )
   }
 
-  if (!progressData) {
+  if (!user || assessmentHistory.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg text-gray-600">No progress data found. Complete your first assessment to get started.</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">No Assessment History</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">Complete your first assessment to start tracking progress.</p>
           <button
-            onClick={() => router.push('/dashboard/comprehensive-assessment')}
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            onClick={() => router.push('/dashboard')}
+            className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
           >
-            Start Assessment
+            Go to Dashboard
           </button>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <button
-                onClick={() => router.back()}
-                className="mr-4 p-2 rounded-md hover:bg-gray-100"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Progress Tracking</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+  // Prepare chart data
+  const chartData = {
+    labels: assessmentHistory.map(h => 
+      new Date(h.created_at).toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: '2-digit'
+      })
+    ),
+    datasets: [
+      {
+        label: 'Total SPI Score',
+        data: assessmentHistory.map(h => h.total_spi_score),
+        borderColor: 'rgb(99, 102, 241)',
+        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        tension: 0.4,
+        borderWidth: 3,
+      },
+      {
+        label: 'Financial Foundation',
+        data: assessmentHistory.map(h => h.financial_foundation_score),
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        tension: 0.4,
+        borderWidth: 2,
+      },
+      {
+        label: 'Market Intelligence',
+        data: assessmentHistory.map(h => h.market_intelligence_score),
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+        borderWidth: 2,
+      },
+      {
+        label: 'Risk Management',
+        data: assessmentHistory.map(h => h.risk_management_score),
+        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.4,
+        borderWidth: 2,
+      },
+      {
+        label: 'Support Systems',
+        data: assessmentHistory.map(h => h.support_systems_score),
+        borderColor: 'rgb(251, 146, 60)',
+        backgroundColor: 'rgba(251, 146, 60, 0.1)',
+        tension: 0.4,
+        borderWidth: 2,
+      }
+    ]
+  }
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+  const chartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Assessment Score Progress',
+        font: {
+          size: 18
+        }
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 10
+        }
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
+    }
+  }
+
+  const selectedAssessment = selectedVersion 
+    ? assessmentHistory.find(h => h.version_number === selectedVersion)
+    : null
+
+  // Calculate improvements
+  const firstAssessment = assessmentHistory[0]
+  const latestAssessment = assessmentHistory[assessmentHistory.length - 1]
+  const totalImprovement = latestAssessment.total_spi_score - firstAssessment.total_spi_score
+  const percentageImprovement = ((totalImprovement / firstAssessment.total_spi_score) * 100).toFixed(1)
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Progress</h1>
-          <p className="text-gray-600">
-            Track your journey to the 1% and celebrate your achievements along the way.
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </button>
+          
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Your Progress Journey
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Track your improvement over {assessmentHistory.length} assessment{assessmentHistory.length > 1 ? 's' : ''}
           </p>
         </div>
 
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Trophy className="w-8 h-8 text-yellow-500" />
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTierColor(progressData.currentTier)}`}>
-                {progressData.currentTier}
-              </span>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Current Score</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {latestAssessment.total_spi_score}
+                </p>
+              </div>
+              <Target className="w-8 h-8 text-indigo-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">Current Tier</div>
-            <div className="text-sm text-gray-600">Your current level</div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Target className="w-8 h-8 text-blue-500" />
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getProgressColor(progressData.spiScore)}`}>
-                {progressData.spiScore}/100
-              </span>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Total Improvement</p>
+                <p className="text-2xl font-bold text-green-600">
+                  +{totalImprovement}
+                </p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-green-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">SPI Score</div>
-            <div className="text-sm text-gray-600">Success Probability Index</div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <CheckCircle className="w-8 h-8 text-green-500" />
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">
-                {progressData.assessmentsCompleted}/{progressData.totalAssessments}
-              </span>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">% Improvement</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {percentageImprovement}%
+                </p>
+              </div>
+              <BarChart3 className="w-8 h-8 text-blue-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">Assessments</div>
-            <div className="text-sm text-gray-600">Completed</div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Calendar className="w-8 h-8 text-purple-500" />
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-600">
-                {progressData.daysInProgram}
-              </span>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Current Tier</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {latestAssessment.current_tier}
+                </p>
+              </div>
+              <Activity className="w-8 h-8 text-purple-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">Days</div>
-            <div className="text-sm text-gray-600">In program</div>
           </div>
         </div>
 
         {/* Progress Chart */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Progress Over Time</h2>
-            <div className="flex space-x-2">
-              {(['3m', '6m', '1y'] as const).map(timeframe => (
-                <button
-                  key={timeframe}
-                  onClick={() => setSelectedTimeframe(timeframe)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                    selectedTimeframe === timeframe
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {timeframe}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="h-64">
-            <SPIProgressChart timeframe={selectedTimeframe} />
-          </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm mb-8">
+          <Line data={chartData} options={chartOptions} />
         </div>
 
-        {/* Next Milestone */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-sm p-6 mb-8 text-white">
-          <div className="flex items-center mb-4">
-            <Star className="w-6 h-6 mr-2" />
-            <h2 className="text-xl font-bold">Next Milestone</h2>
-          </div>
-          <p className="text-lg mb-2">{progressData.nextMilestone}</p>
-          <div className="w-full bg-white/20 rounded-full h-2">
-            <div 
-              className="bg-white h-2 rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(progressData.spiScore, 100)}%` }}
-            ></div>
-          </div>
-          <p className="text-sm text-blue-100 mt-2">
-            {progressData.spiScore < 100 ? `${100 - progressData.spiScore} points to go` : 'Milestone achieved!'}
-          </p>
-        </div>
-
-        {/* Recent Achievements */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Achievements</h2>
-          {progressData.recentAchievements.length > 0 ? (
-            <div className="space-y-3">
-              {progressData.recentAchievements.map((achievement, index) => (
-                <div key={index} className="flex items-center p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                  <span className="text-green-800">{achievement}</span>
+        {/* Assessment History Timeline */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+            <Calendar className="w-5 h-5 mr-2" />
+            Assessment History
+          </h2>
+          
+          <div className="space-y-4">
+            {assessmentHistory.map((assessment, index) => (
+              <div
+                key={assessment.id}
+                className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                  selectedVersion === assessment.version_number
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+                onClick={() => setSelectedVersion(assessment.version_number)}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                      Version {assessment.version_number}
+                      {assessment.is_current && (
+                        <span className="ml-2 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">
+                          Current
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {new Date(assessment.created_at).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-indigo-600">
+                      {assessment.total_spi_score}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {assessment.current_tier} Tier
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Complete your first assessment to see achievements here.</p>
-              <button
-                onClick={() => router.push('/dashboard/comprehensive-assessment')}
-                className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-              >
-                Start Assessment
-              </button>
-            </div>
-          )}
+                
+                {selectedVersion === assessment.version_number && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400">Financial</p>
+                        <p className="font-semibold">{assessment.financial_foundation_score}/35</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400">Market Intel</p>
+                        <p className="font-semibold">{assessment.market_intelligence_score}/20</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400">Risk Mgmt</p>
+                        <p className="font-semibold">{assessment.risk_management_score}/15</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400">Support</p>
+                        <p className="font-semibold">{assessment.support_systems_score}/10</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">Standout Strengths</p>
+                      <p className="font-semibold">
+                        {assessment.standout_strength_1} + {assessment.standout_strength_2}
+                        <span className="text-sm text-indigo-600 ml-2">
+                          (+{assessment.standout_bonus} bonus)
+                        </span>
+                      </p>
+                    </div>
+                    {index > 0 && (
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Change from previous: 
+                          <span className={`ml-2 font-semibold ${
+                            assessment.total_spi_score > assessmentHistory[index - 1].total_spi_score
+                              ? 'text-green-600'
+                              : assessment.total_spi_score < assessmentHistory[index - 1].total_spi_score
+                              ? 'text-red-600'
+                              : 'text-gray-600'
+                          }`}>
+                            {assessment.total_spi_score > assessmentHistory[index - 1].total_spi_score ? '+' : ''}
+                            {assessment.total_spi_score - assessmentHistory[index - 1].total_spi_score}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Continue Your Journey</h3>
-            <div className="space-y-3">
-              <button
-                onClick={() => router.push('/dashboard/comprehensive-assessment')}
-                className="w-full text-left p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-              >
-                <div className="font-medium text-blue-900">Take Comprehensive Assessment</div>
-                <div className="text-sm text-blue-700">Complete your full SPI evaluation</div>
-              </button>
-              <button
-                onClick={() => router.push('/dashboard/quarterly-assessment')}
-                className="w-full text-left p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-              >
-                <div className="font-medium text-green-900">Quarterly Review</div>
-                <div className="text-sm text-green-700">Track your quarterly progress</div>
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Resources</h3>
-            <div className="space-y-3">
-              <button
-                onClick={() => router.push('/dashboard/community')}
-                className="w-full text-left p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
-              >
-                <div className="font-medium text-purple-900">Join Community</div>
-                <div className="text-sm text-purple-700">Connect with other drivers</div>
-              </button>
-              <button
-                onClick={() => router.push('/dashboard/insights')}
-                className="w-full text-left p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
-              >
-                <div className="font-medium text-orange-900">View Insights</div>
-                <div className="text-sm text-orange-700">Get personalized recommendations</div>
-              </button>
-            </div>
-          </div>
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => router.push('/dashboard/comprehensive-assessment')}
+            className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
+          >
+            Take New Assessment
+          </button>
+          <button
+            onClick={() => router.push('/dashboard/comprehensive-assessment/results')}
+            className="bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors text-lg"
+          >
+            View Current Results
+          </button>
         </div>
       </main>
     </div>

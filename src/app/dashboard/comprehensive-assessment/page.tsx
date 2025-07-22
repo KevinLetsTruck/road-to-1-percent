@@ -544,9 +544,53 @@ export default function ComprehensiveAssessmentPage() {
       const tier = getSPITier(totalScore)
       const strengthCombo = getStrengthCombination()
 
-      // Save or update comprehensive assessment data
+      // Calculate dimension scores
+      const dimensionScores = {
+        financial_foundation: calculateDimensionScore('Financial Foundation'),
+        market_intelligence: calculateDimensionScore('Market Intelligence'),
+        risk_management: calculateDimensionScore('Risk Management'),
+        support_systems: calculateDimensionScore('Support Systems')
+      }
+
+      // Calculate standout bonus
+      const standoutBonus = Math.round(calculateStandoutScore(formData.standout_strength_1, formData.standout_strength_2).score * 2)
+
+      // Get next version number
+      const { data: versionData, error: versionError } = await supabase
+        .rpc('get_next_version_number', { p_user_id: user.id })
+      
+      if (versionError) throw versionError
+      const versionNumber = versionData || 1
+
+      // Save to assessment history
+      const { error: historyError } = await supabase
+        .from('assessment_history')
+        .insert({
+          user_id: user.id,
+          assessment_data: formData,
+          total_spi_score: totalScore,
+          financial_foundation_score: dimensionScores.financial_foundation,
+          market_intelligence_score: dimensionScores.market_intelligence,
+          risk_management_score: dimensionScores.risk_management,
+          support_systems_score: dimensionScores.support_systems,
+          standout_bonus: standoutBonus,
+          current_tier: tier,
+          standout_strength_1: formData.standout_strength_1,
+          standout_strength_2: formData.standout_strength_2,
+          version_number: versionNumber,
+          is_current: true
+        })
+
+      if (historyError) throw historyError
+
+      // Set this version as current
+      await supabase.rpc('set_current_assessment', { 
+        p_user_id: user.id, 
+        p_version_number: versionNumber 
+      })
+
+      // Update or insert comprehensive assessment (for backward compatibility)
       if (hasExistingData) {
-        // Update existing assessment
         const { error: assessmentError } = await supabase
           .from('comprehensive_assessments')
           .update({
@@ -560,7 +604,6 @@ export default function ComprehensiveAssessmentPage() {
         
         if (assessmentError) throw assessmentError
       } else {
-        // Insert new assessment
         const { error: assessmentError } = await supabase
           .from('comprehensive_assessments')
           .insert({
@@ -572,6 +615,7 @@ export default function ComprehensiveAssessmentPage() {
             assessment_date: new Date().toISOString()
           })
         
+        if (assessmentError) throw assessmentError
       }
 
       // Update user progress
@@ -584,13 +628,7 @@ export default function ComprehensiveAssessmentPage() {
           totalScore,
           tier,
           strengthCombo,
-          dimensionScores: {
-            financial_foundation: calculateDimensionScore('Financial Foundation'),
-            market_intelligence: calculateDimensionScore('Market Intelligence'),
-    
-            risk_management: calculateDimensionScore('Risk Management'),
-            support_systems: calculateDimensionScore('Support Systems')
-          }
+          dimensionScores
         })
       })
 

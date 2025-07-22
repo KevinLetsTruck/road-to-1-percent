@@ -64,19 +64,67 @@ export default function RegisterPage() {
       if (signInError) throw signInError
 
       if (signInData.user) {
-        // Create profile
-        await supabase.from('profiles').insert({
-          id: signInData.user.id,
-          email: formData.email,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          phone: formData.phone,
-        })
+        // Check if profile already exists
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', signInData.user.id)
+          .single()
+
+        // Create or update profile
+        if (!existingProfile) {
+          const { error: profileError } = await supabase.from('profiles').insert({
+            id: signInData.user.id,
+            email: formData.email,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+          })
+          
+          if (profileError) {
+            console.error('Profile creation error:', profileError)
+            throw new Error('Failed to create user profile')
+          }
+        } else {
+          // Update existing profile
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              email: formData.email,
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              phone: formData.phone,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', signInData.user.id)
+            
+          if (updateError) {
+            console.error('Profile update error:', updateError)
+            throw new Error('Failed to update user profile')
+          }
+        }
         
-        // Create user progress record
-        await supabase.from('user_progress').insert({
-          user_id: signInData.user.id,
-        })
+        // Check if user progress exists
+        const { data: existingProgress } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', signInData.user.id)
+          .single()
+          
+        // Create user progress record if it doesn't exist
+        if (!existingProgress) {
+          const { error: progressError } = await supabase.from('user_progress').insert({
+            user_id: signInData.user.id,
+          })
+          
+          if (progressError) {
+            console.error('User progress creation error:', progressError)
+            throw new Error('Failed to create user progress record')
+          }
+        }
+        
+        // Clear any client-side cache
+        router.refresh()
         
         // Redirect directly to assessment
         router.push('/dashboard')

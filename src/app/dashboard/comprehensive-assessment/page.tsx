@@ -1002,64 +1002,14 @@ export default function ComprehensiveAssessmentPage() {
               </div>
             </div>
 
-            {/* Live Score Display */}
-            <div className="mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{calculateDimensionScore('Financial Foundation')}</div>
-                  <div className="text-indigo-100 text-sm">Financial Foundation</div>
-                  <div className="text-xs text-indigo-200">(35 points)</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{calculateDimensionScore('Market Intelligence')}</div>
-                  <div className="text-indigo-100 text-sm">Market Intelligence</div>
-                  <div className="text-xs text-indigo-200">(20 points)</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{calculateDimensionScore('Risk Management')}</div>
-                  <div className="text-indigo-100 text-sm">Risk Management</div>
-                  <div className="text-xs text-indigo-200">(15 points)</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{calculateDimensionScore('Support Systems')}</div>
-                  <div className="text-indigo-100 text-sm">Support Systems</div>
-                  <div className="text-xs text-indigo-200">(10 points)</div>
-                </div>
-              </div>
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-white/10 rounded-lg">
-                  <div className="text-lg font-semibold">Standout Strengths</div>
-                  <div className="text-2xl font-bold">{strengthCombo}</div>
-                  <div className="text-xs text-indigo-200">+{Math.round(calculateStandoutScore(formData.standout_strength_1, formData.standout_strength_2).score * 2)} bonus points</div>
-                </div>
-                <div className="text-center p-3 bg-white/10 rounded-lg">
-                  <div className="text-lg font-semibold">Total Assessment Score</div>
-                  <div className="text-3xl font-bold">{calculateDimensionScore('Financial Foundation') + calculateDimensionScore('Market Intelligence') + calculateDimensionScore('Risk Management') + calculateDimensionScore('Support Systems')}/80</div>
-                  <div className="text-xs text-indigo-200">Base score before standout bonus</div>
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t border-indigo-400">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold">Total SPI Score: {totalScore}/100</h2>
-                    <p className="text-indigo-100">Current Tier: {tier} | Strength: {strengthCombo}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-indigo-200">Success Probability</div>
-                    <div className="text-lg font-bold">
-                      {tier === '1%' ? '75%+' : tier === '9%' ? '25-75%' : '<25%'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+
 
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Financial Foundation Section */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                   <DollarSign className="w-5 h-5 mr-2 text-green-600" />
-                  Financial Foundation (35 points)
+                  Financial Foundation
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Your financial foundation determines your ability to invest in opportunities and weather challenges.
@@ -1092,7 +1042,7 @@ export default function ComprehensiveAssessmentPage() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                   <Brain className="w-5 h-5 mr-2 text-blue-600" />
-                  Market Intelligence (20 points)
+                  Market Intelligence
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Understanding the market, rates, and customer needs is crucial for making profitable decisions.
@@ -1128,51 +1078,13 @@ export default function ComprehensiveAssessmentPage() {
                   ))}
               </div>
 
-              {/* Personal Strengths Section */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                  <Target className="w-5 h-5 mr-2 text-purple-600" />
-                  Personal Strengths (20 points)
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Your natural strengths determine how you approach challenges and opportunities.
-                </p>
-                {getAssessmentQuestions(formData.current_situation)
-                  .filter(q => q.dimension === 'Personal Strengths')
-                  .map((question, index) => (
-                    <div key={question.id} className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
-                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
-                        {index + 1}. {question.question}
-                      </label>
-                      <div className="space-y-2">
-                        {question.options.map((option) => (
-                          <label key={option.value} className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer">
-                            <input
-                              type="radio"
-                              name={question.id}
-                              value={option.value}
-                              checked={formData[question.id as keyof ComprehensiveAssessmentData] === option.value}
-                              onChange={() => handleInputChange(question.id as keyof ComprehensiveAssessmentData, option.value)}
-                              className="mt-1 mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-gray-100">{option.label}</div>
-                              {option.description && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-              </div>
+
 
               {/* Risk Management Section */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                   <Shield className="w-5 h-5 mr-2 text-red-600" />
-                  Risk Management (15 points)
+                  Risk Management
                 </h3>
                 <p className="text-gray-600 mb-4">
                   How well you prepare for and manage risks determines your business sustainability.
@@ -1212,7 +1124,7 @@ export default function ComprehensiveAssessmentPage() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                   <Users className="w-5 h-5 mr-2 text-orange-600" />
-                  Support Systems (10 points)
+                  Support Systems
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Your network, family support, and mentorship multiply your individual efforts.

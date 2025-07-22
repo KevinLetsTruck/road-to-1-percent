@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut, Settings } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Brain, Shield, Users, Target, BarChart3, Lightbulb, Calendar, Users2, LogOut, Settings, AlertTriangle } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { calculateStandoutScore, getStandoutTier } from '@/lib/standoutScoring'
 
@@ -141,25 +141,248 @@ function ComprehensiveAssessmentResultsContent() {
   }
 
   const getStrengthDescription = (combo: string) => {
-    // Handle combination strengths
+    // This is now replaced by getStrengthInsights below
+    return ''
+  }
+
+  const getStrengthInsights = (combo: string) => {
+    const insights: Record<string, {
+      title: string
+      description: string
+      strengths: string[]
+      watchOuts: string[]
+      leverageTips: string[]
+      successProfile: string
+    }> = {
+      'Pioneer': {
+        title: 'The Trailblazer',
+        description: 'You see opportunities where others see obstacles. Your innovative mindset is perfect for finding new lanes, untapped markets, and creative solutions in the trucking industry.',
+        strengths: [
+          'First to spot emerging market trends',
+          'Creates new revenue streams',
+          'Innovates operational processes',
+          'Takes calculated risks others avoid'
+        ],
+        watchOuts: [
+          'May overlook proven traditional methods',
+          'Could move too fast for partners/employees',
+          'Might neglect necessary but boring tasks'
+        ],
+        leverageTips: [
+          'Focus on specialized or niche freight markets',
+          'Be the first in your area to adopt new technologies',
+          'Create unique service offerings competitors don\'t have',
+          'Document your innovations to build systematic processes'
+        ],
+        successProfile: 'Pioneers succeed by finding blue ocean opportunities - new routes, underserved markets, or innovative service models that set them apart.'
+      },
+      'Influencer': {
+        title: 'The Leader',
+        description: 'Your natural charisma and leadership abilities help you build strong relationships with shippers, brokers, and drivers. People trust and want to work with you.',
+        strengths: [
+          'Builds loyal customer relationships',
+          'Attracts and retains quality drivers',
+          'Negotiates favorable rates',
+          'Creates positive company culture'
+        ],
+        watchOuts: [
+          'May over-promise to please others',
+          'Could focus too much on relationships over numbers',
+          'Might avoid difficult conversations'
+        ],
+        leverageTips: [
+          'Use your influence to secure dedicated lanes',
+          'Build a reputation that attracts owner-operators',
+          'Create content/videos to establish industry authority',
+          'Leverage relationships for better freight rates'
+        ],
+        successProfile: 'Influencers thrive by becoming the preferred carrier through relationship strength, often commanding premium rates due to trust and reliability.'
+      },
+      'Stimulator': {
+        title: 'The Energizer',
+        description: 'Your enthusiasm is contagious. You excel at motivating others and creating excitement around goals, making you great at rallying teams and pushing through challenges.',
+        strengths: [
+          'Motivates drivers during tough times',
+          'Creates energy around company vision',
+          'Pushes through obstacles with optimism',
+          'Inspires others to exceed expectations'
+        ],
+        watchOuts: [
+          'May underestimate real challenges',
+          'Could burn out from constant high energy',
+          'Might frustrate detail-oriented team members'
+        ],
+        leverageTips: [
+          'Channel enthusiasm into driver retention programs',
+          'Create exciting incentive structures',
+          'Use energy to push through slow seasons',
+          'Build a positive, can-do company culture'
+        ],
+        successProfile: 'Stimulators build successful companies by maintaining high morale and momentum, especially valuable during industry downturns.'
+      },
+      'Advisor': {
+        title: 'The Strategist',
+        description: 'Your analytical mind and wisdom help you make calculated decisions. You excel at seeing the big picture and guiding others through complex situations.',
+        strengths: [
+          'Makes data-driven decisions',
+          'Provides valuable guidance to others',
+          'Sees problems before they occur',
+          'Builds trust through expertise'
+        ],
+        watchOuts: [
+          'May over-analyze and delay decisions',
+          'Could seem detached or overly logical',
+          'Might struggle with quick pivots'
+        ],
+        leverageTips: [
+          'Become the go-to expert in your niche',
+          'Offer consulting to other owner-operators',
+          'Use analysis to find most profitable lanes',
+          'Build systems based on your insights'
+        ],
+        successProfile: 'Advisors succeed through careful planning and risk management, often achieving the best profit margins through strategic decision-making.'
+      },
+      'Connector': {
+        title: 'The Network Builder',
+        description: 'You naturally bring people together and see connections others miss. Your networking abilities open doors and create opportunities in the relationship-driven trucking industry.',
+        strengths: [
+          'Builds extensive industry networks',
+          'Connects shippers with solutions',
+          'Creates win-win partnerships',
+          'Finds resources through relationships'
+        ],
+        watchOuts: [
+          'May spread yourself too thin',
+          'Could rely too heavily on others',
+          'Might struggle working in isolation'
+        ],
+        leverageTips: [
+          'Build a network of reliable freight sources',
+          'Create partnerships with other carriers',
+          'Connect shippers to build dedicated routes',
+          'Use connections to find best deals on equipment/fuel'
+        ],
+        successProfile: 'Connectors thrive by becoming the hub of their local trucking ecosystem, often handling overflow freight and building carrier networks.'
+      },
+      'Provider': {
+        title: 'The Reliable One',
+        description: 'Your commitment to taking care of others makes you a trusted partner. You excel at ensuring everyone has what they need to succeed.',
+        strengths: [
+          'Builds unshakeable customer loyalty',
+          'Takes care of drivers like family',
+          'Always delivers on promises',
+          'Creates stable, long-term relationships'
+        ],
+        watchOuts: [
+          'May sacrifice profits to help others',
+          'Could neglect own needs',
+          'Might be taken advantage of'
+        ],
+        leverageTips: [
+          'Build reputation as most reliable carrier',
+          'Focus on consistent, repeat customers',
+          'Create driver-first policies for retention',
+          'Develop backup plans for everything'
+        ],
+        successProfile: 'Providers succeed through consistency and reliability, often becoming the carrier of choice for shippers who value dependability over price.'
+      },
+      'Equalizer': {
+        title: 'The Fair Dealer',
+        description: 'Your strong sense of fairness and justice helps you build trust with everyone. You create win-win situations and ensure everyone gets a fair deal.',
+        strengths: [
+          'Negotiates fair deals for all parties',
+          'Resolves conflicts effectively',
+          'Builds trust through transparency',
+          'Creates sustainable partnerships'
+        ],
+        watchOuts: [
+          'May spend too much time on fairness',
+          'Could miss opportunities while deliberating',
+          'Might struggle with tough business decisions'
+        ],
+        leverageTips: [
+          'Become known for honest, fair dealings',
+          'Mediate between shippers and carriers',
+          'Build transparent pricing models',
+          'Create fair driver compensation plans'
+        ],
+        successProfile: 'Equalizers build lasting success through reputation, often becoming the preferred partner for companies tired of unfair practices.'
+      },
+      'Teacher': {
+        title: 'The Mentor',
+        description: 'Your ability to explain and educate makes you valuable in an industry full of complexity. You help others understand and succeed.',
+        strengths: [
+          'Trains drivers to excellence',
+          'Educates customers on logistics',
+          'Builds knowledgeable teams',
+          'Simplifies complex regulations'
+        ],
+        watchOuts: [
+          'May over-explain simple things',
+          'Could create dependent relationships',
+          'Might focus too much on teaching vs doing'
+        ],
+        leverageTips: [
+          'Create training programs for new drivers',
+          'Educate shippers to build partnerships',
+          'Develop SOPs and documentation',
+          'Mentor other owner-operators for additional income'
+        ],
+        successProfile: 'Teachers succeed by building the most capable teams and educated partners, often commanding premium rates for superior service quality.'
+      },
+      'Creator': {
+        title: 'The Innovator',
+        description: 'Your creative problem-solving abilities help you find unique solutions. You excel at building new systems and improving existing ones.',
+        strengths: [
+          'Develops innovative solutions',
+          'Improves operational efficiency',
+          'Creates unique service offerings',
+          'Solves problems others can\'t'
+        ],
+        watchOuts: [
+          'May over-engineer simple solutions',
+          'Could get distracted by new ideas',
+          'Might struggle with routine tasks'
+        ],
+        leverageTips: [
+          'Create proprietary logistics solutions',
+          'Develop apps or tools for efficiency',
+          'Design unique service packages',
+          'Patent innovative equipment modifications'
+        ],
+        successProfile: 'Creators succeed by solving industry problems in new ways, often developing solutions that become industry standards.'
+      }
+    }
+
+    // Handle combinations
     if (combo.includes(' + ')) {
-      return 'This unique combination of strengths provides you with exceptional capabilities. Focus on leveraging both strengths to maximize your potential.'
+      const [first, second] = combo.split(' + ')
+      const firstInsights = insights[first]
+      const secondInsights = insights[second]
+      
+      if (firstInsights && secondInsights) {
+        return {
+          title: `${firstInsights.title} + ${secondInsights.title}`,
+          description: `You possess a rare combination: ${firstInsights.description.split('.')[0].toLowerCase()} while also ${secondInsights.description.split('.')[0].toLowerCase()}. This dual strength creates unique opportunities in trucking.`,
+          strengths: [
+            ...firstInsights.strengths.slice(0, 2),
+            ...secondInsights.strengths.slice(0, 2)
+          ],
+          watchOuts: [
+            ...firstInsights.watchOuts.slice(0, 2),
+            ...secondInsights.watchOuts.slice(0, 1)
+          ],
+          leverageTips: [
+            `Combine ${first} and ${second} strengths for maximum impact`,
+            ...firstInsights.leverageTips.slice(0, 2),
+            ...secondInsights.leverageTips.slice(0, 2)
+          ],
+          successProfile: `This powerful combination allows you to ${firstInsights.successProfile.split(' by ')[1].split('.')[0]} while ${secondInsights.successProfile.split(' by ')[1].split('.')[0]}, creating a unique competitive advantage.`
+        }
+      }
     }
     
-    // Handle individual strengths
-    const strengthDescriptions: Record<string, string> = {
-      'Pioneer': 'Natural innovator who sees opportunities others miss. Focus on building systematic foundations.',
-      'Influencer': 'Natural leader who inspires and motivates others. Use this to build strong networks and partnerships.',
-      'Stimulator': 'Energizes and excites others about possibilities. Channel this enthusiasm into concrete action plans.',
-      'Advisor': 'Trusted counselor who provides valuable guidance. Your insights help others make better decisions.',
-      'Connector': 'Builds bridges between people and ideas. Your networking abilities create valuable opportunities.',
-      'Provider': 'Reliable supporter who ensures others have what they need. Your consistency builds trust and loyalty.',
-      'Equalizer': 'Creates fairness and balance in all situations. Your sense of justice helps build sustainable systems.',
-      'Teacher': 'Natural educator who helps others grow. Your ability to explain complex ideas simply is invaluable.',
-      'Creator': 'Innovative problem-solver who builds new solutions. Your creativity drives progress and improvement.'
-    }
-    
-    return strengthDescriptions[combo] || 'Balanced strengths across multiple areas. Good foundation for steady improvement.'
+    return insights[combo] || insights['Pioneer'] // Default fallback
   }
 
   const dimensionBreakdowns: DimensionBreakdown[] = [
@@ -508,44 +731,113 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
           </div>
 
-          {/* Strength Combination Details */}
+          {/* Enhanced Strength Profile Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-              <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
-              Your Strength Profile
-            </h2>
-            
-            {/* Standout Combination Score */}
-            <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Standout Combination: {strengthCombo}</h3>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  standoutTier === 'Power Combination' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                  standoutTier === 'Strong Combination' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                  standoutTier === 'Supportive Combination' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                }`}>
-                  {standoutTier}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                                  <p className="text-sm text-gray-600 dark:text-gray-300">{standoutDescription}</p>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-300">Bonus Points</div>
-                </div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
+                <Lightbulb className="w-6 h-6 mr-2 text-yellow-600 dark:text-yellow-400" />
+                Your Standout Strength Profile
+              </h2>
+              <div className="text-right">
+                <div className="text-sm text-gray-600 dark:text-gray-300">Bonus Points</div>
+                <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">+{Math.round(standoutScore * 2)}</div>
               </div>
             </div>
             
-                          <p className="text-gray-600 dark:text-gray-300 mb-4">{getStrengthDescription(strengthCombo)}</p>
-            {strengthCombo.includes(' + ') && (
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  <strong>Special Note:</strong> Your {strengthCombo} combination is unique and powerful. 
-                  This dual strength gives you exceptional versatility in approaching challenges and opportunities.
-                </p>
-              </div>
-            )}
+            {(() => {
+              const insights = getStrengthInsights(strengthCombo)
+              return (
+                <>
+                  {/* Title and Type Badge */}
+                  <div className="mb-6">
+                    <div className="flex items-center gap-4 mb-3">
+                      <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{insights.title}</h3>
+                      <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                        standoutTier === 'Power Combination' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                        standoutTier === 'Strong Combination' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        standoutTier === 'Supportive Combination' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                      }`}>
+                        {standoutTier}
+                      </span>
+                    </div>
+                    <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">{insights.description}</p>
+                  </div>
+
+                  {/* Success Profile Card */}
+                  <div className="mb-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                    <div className="flex items-start">
+                      <Target className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 mr-2 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1">Your Success Profile</h4>
+                        <p className="text-sm text-indigo-800 dark:text-indigo-300">{insights.successProfile}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Three Column Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Your Strengths */}
+                    <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                      <h4 className="font-semibold text-green-900 dark:text-green-100 mb-3 flex items-center">
+                        <Shield className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
+                        Your Strengths
+                      </h4>
+                      <ul className="space-y-2">
+                        {insights.strengths.map((strength, index) => (
+                          <li key={index} className="text-sm text-green-800 dark:text-green-200 flex items-start">
+                            <span className="text-green-500 dark:text-green-400 mr-2">✓</span>
+                            {strength}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Watch Out For */}
+                    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                      <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center">
+                        <AlertTriangle className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                        Watch Out For
+                      </h4>
+                      <ul className="space-y-2">
+                        {insights.watchOuts.map((watchOut, index) => (
+                          <li key={index} className="text-sm text-amber-800 dark:text-amber-200 flex items-start">
+                            <span className="text-amber-500 dark:text-amber-400 mr-2">!</span>
+                            {watchOut}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* How to Leverage */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                      <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center">
+                        <TrendingUp className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
+                        How to Leverage
+                      </h4>
+                      <ul className="space-y-2">
+                        {insights.leverageTips.map((tip, index) => (
+                          <li key={index} className="text-sm text-blue-800 dark:text-blue-200 flex items-start">
+                            <span className="text-blue-500 dark:text-blue-400 mr-2">→</span>
+                            {tip}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Combination Special Note */}
+                  {strengthCombo.includes(' + ') && (
+                    <div className="mt-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                      <p className="text-sm text-purple-800 dark:text-purple-200">
+                        <strong>Dual Strength Advantage:</strong> Your combination of {strengthCombo} is rare and powerful. 
+                        Less than 15% of successful owner-operators have this dual strength profile. Use both strengths strategically to create unique competitive advantages.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )
+            })()}
           </div>
 
           {/* Dimension Breakdown */}

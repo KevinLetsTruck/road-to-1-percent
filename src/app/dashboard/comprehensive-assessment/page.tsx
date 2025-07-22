@@ -897,9 +897,38 @@ export default function ComprehensiveAssessmentPage() {
           .single()
         
         if (existingAssessment) {
-          // User has already completed the assessment, redirect to results
-          router.push('/dashboard/comprehensive-assessment/results')
-          return
+          // Load the existing data into the form for updating
+          setFormData({
+            current_situation: existingAssessment.current_situation || 'Employee Driver',
+            fleet_size: existingAssessment.fleet_size || 0,
+            load_sources: existingAssessment.load_sources || [],
+            standout_strength_1: existingAssessment.standout_strength_1 || '',
+            standout_strength_2: existingAssessment.standout_strength_2 || '',
+            net_worth: existingAssessment.net_worth || 0,
+            monthly_savings: existingAssessment.monthly_savings || 0,
+            emergency_fund_months: existingAssessment.emergency_fund_months || 0,
+            debt_to_income_ratio: existingAssessment.debt_to_income_ratio || 0,
+            business_capital: existingAssessment.business_capital || 0,
+            credit_score: existingAssessment.credit_score || 0,
+            rate_understanding: existingAssessment.rate_understanding || 0,
+            cost_analysis: existingAssessment.cost_analysis || 0,
+            customer_knowledge: existingAssessment.customer_knowledge || 0,
+            industry_trends: existingAssessment.industry_trends || 0,
+            strategic_planning: existingAssessment.strategic_planning || 0,
+            pioneer_strength: existingAssessment.pioneer_strength || 0,
+            creator_strength: existingAssessment.creator_strength || 0,
+            innovator_strength: existingAssessment.innovator_strength || 0,
+            connector_strength: existingAssessment.connector_strength || 0,
+            advisor_strength: existingAssessment.advisor_strength || 0,
+            contingency_planning: existingAssessment.contingency_planning || 0,
+            business_continuity: existingAssessment.business_continuity || 0,
+            risk_assessment: existingAssessment.risk_assessment || 0,
+            family_alignment: existingAssessment.family_alignment || 0,
+            professional_network: existingAssessment.professional_network || 0,
+            mentorship: existingAssessment.mentorship || 0,
+            industry_reputation: existingAssessment.industry_reputation || 0
+          })
+          setHasExistingData(true)
         }
       } catch (error) {
         console.log('No existing assessment found, starting fresh')
@@ -967,16 +996,18 @@ export default function ComprehensiveAssessmentPage() {
       const tier = getSPITier(totalScore)
       const strengthCombo = getStrengthCombination()
 
-      // Save comprehensive assessment data
+      // Save or update comprehensive assessment data
       const { error: assessmentError } = await supabase
         .from('comprehensive_assessments')
-        .insert({
+        .upsert({
           user_id: user.id,
           ...formData,
           total_spi_score: totalScore,
           tier,
           strength_combination: strengthCombo,
           assessment_date: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
 
       if (assessmentError) throw assessmentError
@@ -1079,19 +1110,13 @@ export default function ComprehensiveAssessmentPage() {
   const strengthCombo = getStrengthCombination()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <nav className="bg-white dark:bg-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <button
-                onClick={() => router.back()}
-                className="mr-4 p-2 rounded-md hover:bg-gray-100"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Comprehensive SPI Assessment</span>
+              <TrendingUp className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-2" />
+              <span className="text-xl font-bold text-gray-900 dark:text-gray-100">Comprehensive SPI Assessment</span>
             </div>
           </div>
         </div>
@@ -1635,7 +1660,7 @@ export default function ComprehensiveAssessmentPage() {
                   disabled={submitting}
                   className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {submitting ? 'Processing...' : 'Complete Assessment'}
+                  {submitting ? 'Processing...' : hasExistingData ? 'Update Assessment' : 'Complete Assessment'}
                 </button>
               </div>
             </form>

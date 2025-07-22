@@ -13,6 +13,17 @@
   --lets-truck-gray-light: #f3f4f6;
 }
 
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --lets-truck-blue: #3b82f6;
+  --lets-truck-blue-light: #60a5fa;
+  --lets-truck-orange: #f59e0b;
+  --lets-truck-orange-dark: #fbbf24;
+  --lets-truck-gray: #9ca3af;
+  --lets-truck-gray-light: #1f2937;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -26,13 +37,6 @@
   --color-lets-truck-orange-dark: var(--lets-truck-orange-dark);
   --color-lets-truck-gray: var(--lets-truck-gray);
   --color-lets-truck-gray-light: var(--lets-truck-gray-light);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

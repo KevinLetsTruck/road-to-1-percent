@@ -24,7 +24,7 @@ function ComprehensiveAssessmentResultsContent() {
   const [userProgress, setUserProgress] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
-  const [showRetakeModal, setShowRetakeModal] = useState(false)
+
   const router = useRouter()
   const supabase = createClient()
   const { signOut } = useAuth()
@@ -33,17 +33,7 @@ function ComprehensiveAssessmentResultsContent() {
     await signOut()
     router.push('/login')
   }
-  
-  const handleRetakeAssessment = async () => {
-    // Delete the existing assessment
-    await supabase
-      .from('comprehensive_assessments')
-      .delete()
-      .eq('user_id', user?.id)
-    
-    // Redirect to assessment
-    router.push('/dashboard/comprehensive-assessment')
-  }
+
 
   useEffect(() => {
     const getUser = async () => {
@@ -260,25 +250,19 @@ function ComprehensiveAssessmentResultsContent() {
   const nextSteps = getNextSteps()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <nav className="bg-white dark:bg-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Your SPI Assessment Results</span>
+              <TrendingUp className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-2" />
+              <span className="text-xl font-bold text-gray-900 dark:text-gray-100">Your SPI Assessment Results</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{user?.email}</span>
-              <button
-                onClick={() => setShowRetakeModal(true)}
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
-              >
-                Retake Assessment
-              </button>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</span>
               <button
                 onClick={handleSignOut}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
               >
                 <LogOut className="h-5 w-5 mr-1" />
                 <span className="text-sm font-medium">Sign Out</span>
@@ -461,76 +445,18 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
           </div>
 
-          {/* Community and Support */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <Users2 className="w-6 h-6 mr-2 text-purple-600" />
-              Community & Support
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <a href="#" className="text-center p-4 border border-gray-200 rounded-lg hover:border-indigo-500 transition-colors cursor-pointer">
-                <div className="text-2xl mb-2">📚</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Road Scholar</h3>
-                <p className="text-sm text-gray-600">Join our 52 week Program</p>
-              </a>
-              <a href="https://letstrucktribe.com" target="_blank" rel="noopener noreferrer" className="text-center p-4 border border-gray-200 rounded-lg hover:border-indigo-500 transition-colors cursor-pointer">
-                <div className="text-2xl mb-2">💬</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Community</h3>
-                <p className="text-sm text-gray-600">Connect with other drivers on similar journeys</p>
-              </a>
-              <a href="#" className="text-center p-4 border border-gray-200 rounded-lg hover:border-indigo-500 transition-colors cursor-pointer">
-                <div className="text-2xl mb-2">👥</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Apply to be a Mentor / Find a Mentor</h3>
-                <p className="text-sm text-gray-600">Get guidance from successful operators</p>
-              </a>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          {/* Update Assessment Button */}
+          <div className="flex justify-center">
             <button
-              onClick={() => router.push('/dashboard/progress')}
-              className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+              onClick={() => router.push('/dashboard/comprehensive-assessment')}
+              className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-lg"
             >
-              Track Progress
-            </button>
-            <button
-              onClick={() => router.push('/dashboard/insights')}
-              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-            >
-              View Insights
+              Update Your Assessment
             </button>
           </div>
         </div>
       </main>
-      
-      {/* Retake Assessment Modal */}
-      {showRetakeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Retake Assessment?</h3>
-            <p className="text-gray-600 mb-6">
-              This will delete your current assessment results and allow you to start over. 
-              Your previous results will be permanently removed.
-            </p>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setShowRetakeModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRetakeAssessment}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Yes, Retake Assessment
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }

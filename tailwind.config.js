@@ -65,4 +65,5 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  // Force rebuild - ensure TailwindCSS is working
 };

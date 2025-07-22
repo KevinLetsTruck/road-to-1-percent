@@ -14,6 +14,24 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  // Set iframe embedding headers
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Credentials', 'true')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  
+  // Set Content Security Policy to allow iframe embedding while maintaining security
+  response.headers.set(
+    'Content-Security-Policy',
+    "frame-ancestors 'self' https://*.mightynetworks.com https://mighty.co https://*.mighty.co *;"
+  )
+  
+  // Set Permissions Policy
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=()'
+  )
+
   try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -39,6 +57,13 @@ export async function middleware(request: NextRequest) {
               value,
               ...options,
             })
+            // Re-apply iframe headers after response recreation
+            response.headers.set('Access-Control-Allow-Origin', '*')
+            response.headers.set('Access-Control-Allow-Credentials', 'true')
+            response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            response.headers.set('Content-Security-Policy', "frame-ancestors 'self' https://*.mightynetworks.com https://mighty.co https://*.mighty.co *;")
+            response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
           },
           remove(name: string, options: CookieOptions) {
             request.cookies.set({
@@ -56,6 +81,13 @@ export async function middleware(request: NextRequest) {
               value: '',
               ...options,
             })
+            // Re-apply iframe headers after response recreation
+            response.headers.set('Access-Control-Allow-Origin', '*')
+            response.headers.set('Access-Control-Allow-Credentials', 'true')
+            response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            response.headers.set('Content-Security-Policy', "frame-ancestors 'self' https://*.mightynetworks.com https://mighty.co https://*.mighty.co *;")
+            response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
           },
         },
       }

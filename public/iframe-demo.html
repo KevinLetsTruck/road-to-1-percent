@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPI Assessment - Iframe Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .demo-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .demo-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+        .iframe-container {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .code-display {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .status-message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SPI Assessment Iframe Demo</h1>
+        <p class="subtitle">This page demonstrates how the SPI Assessment looks when embedded in an iframe</p>
+
+        <!-- Basic Iframe Demo -->
+        <div class="demo-section">
+            <h2 class="demo-title">Basic Iframe (Fixed Height)</h2>
+            <p>Standard iframe with fixed height of 800px</p>
+            <div class="iframe-container">
+                <iframe 
+                    src="/embed-test" 
+                    width="100%" 
+                    height="800" 
+                    frameborder="0"
+                    style="border: none; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
+                    allow="clipboard-write; clipboard-read"
+                    title="SPI Assessment - Basic">
+                </iframe>
+            </div>
+            <div class="code-display">
+&lt;iframe 
+    src="https://spiassessment.com" 
+    width="100%" 
+    height="800" 
+    frameborder="0"
+    style="border: none; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
+    allow="clipboard-write; clipboard-read"
+    title="SPI Assessment"&gt;
+&lt;/iframe&gt;
+            </div>
+        </div>
+
+        <!-- Responsive Iframe Demo -->
+        <div class="demo-section">
+            <h2 class="demo-title">Responsive Iframe (16:9 Aspect Ratio)</h2>
+            <p>Automatically adjusts to container width while maintaining aspect ratio</p>
+            <div class="iframe-container">
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                    <iframe 
+                        src="/embed-test" 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
+                        frameborder="0"
+                        allow="clipboard-write; clipboard-read"
+                        title="SPI Assessment - Responsive">
+                    </iframe>
+                </div>
+            </div>
+            <div class="code-display">
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"&gt;
+    &lt;iframe 
+        src="https://spiassessment.com" 
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
+        frameborder="0"
+        allow="clipboard-write; clipboard-read"
+        title="SPI Assessment"&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+            </div>
+        </div>
+
+        <!-- Message Status -->
+        <div id="status-message" class="status-message">
+            <strong>✓ Success!</strong> The iframe has loaded and sent a confirmation message.
+        </div>
+    </div>
+
+    <script>
+        // Listen for messages from the iframe
+        window.addEventListener('message', function(event) {
+            console.log('Received message from iframe:', event.data);
+            
+            if (event.data && event.data.type === 'spi-assessment-loaded') {
+                document.getElementById('status-message').classList.add('success');
+            }
+        });
+    </script>
+</body>
+</html>

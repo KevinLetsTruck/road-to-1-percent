@@ -2,6 +2,17 @@
 
 ## [Unreleased] - 2024-01-XX
 
+### Added
+- **Iframe Embedding Support** for Mighty Networks integration
+  - Created comprehensive iframe embed guide at `/iframe-embed.html`
+  - Added embed test page at `/embed-test` to verify iframe functionality
+  - Created demo page at `/iframe-demo.html` showing live examples
+  - Removed X-Frame-Options header to allow embedding
+  - Added Content-Security-Policy with frame-ancestors for Mighty Networks
+  - Implemented CORS headers for cross-origin embedding
+  - Added postMessage communication for iframe status confirmation
+  - Provided three embedding options: basic, responsive, and auto-resize
+
 ### Added - PDF Export
 - **PDF Download**: Users can now download their assessment results as a professional PDF report
   - Added download button next to "Update Your Assessment" button
@@ -95,6 +106,14 @@
   - Streamlined to focus only on assessment flow
 - Created `src/contexts/ThemeContext.tsx`:
   - New context for theme management
+
+### Fixed - Text Contrast
+- **Assessment Form Text Contrast** improved in both light and dark modes
+  - Changed gray-600 to gray-700 for better readability in light mode
+  - Added dark mode support to all form sections and containers
+  - Fixed situation selector, standout section, and contextual questions styling
+  - Improved contrast for all descriptive text, labels, and section headers
+  - Updated all form elements to have proper dark mode backgrounds and borders
   - Automatic system preference detection
   - Theme persistence in localStorage
 - Modified `src/app/(auth)/register/page.tsx`:

@@ -202,6 +202,46 @@ function ComprehensiveAssessmentResultsContent() {
   };
 
   const getStrengthInsights = (combo: string) => {
+    // Import the dynamic combination insights
+    const combinationInsights = require('@/lib/strengthCombinationInsights').strengthCombinationInsights;
+    
+    // Check if this is a combination
+    if (combo.includes(' + ')) {
+      const combinationKey = combo.trim();
+      const dynamicInsights = combinationInsights[combinationKey];
+      
+      if (dynamicInsights) {
+        // Parse the combination to get individual strengths
+        const [first, second] = combo.split(' + ').map(s => s.trim());
+        
+        // Get individual strength descriptions for the title
+        const strengthDescriptions: Record<string, { title: string; description: string }> = {
+          Pioneer: { title: "The Trailblazer", description: "visionary innovation" },
+          Influencer: { title: "The Leader", description: "charismatic leadership" },
+          Creator: { title: "The Innovator", description: "creative problem-solving" },
+          Advisor: { title: "The Strategist", description: "strategic wisdom" },
+          Connector: { title: "The Network Builder", description: "relationship building" },
+          Stimulator: { title: "The Energizer", description: "motivational energy" },
+          Teacher: { title: "The Mentor", description: "educational expertise" },
+          Provider: { title: "The Reliable One", description: "dependable support" },
+          Equalizer: { title: "The Fair Dealer", description: "balanced fairness" }
+        };
+        
+        const firstDesc = strengthDescriptions[first] || { title: first, description: first.toLowerCase() };
+        const secondDesc = strengthDescriptions[second] || { title: second, description: second.toLowerCase() };
+        
+        return {
+          title: `${firstDesc.title} + ${secondDesc.title}`,
+          description: `You possess a rare combination that merges ${firstDesc.description} with ${secondDesc.description}. This unique pairing creates powerful synergies in the trucking industry.`,
+          strengths: dynamicInsights.strengths,
+          watchOuts: dynamicInsights.watchOuts,
+          leverageTips: dynamicInsights.leverageTips,
+          successProfile: `Your ${combo} combination positions you to leverage both strengths for exceptional results.`
+        };
+      }
+    }
+    
+    // Original individual strength insights
     const insights: Record<
       string,
       {
@@ -985,7 +1025,7 @@ function ComprehensiveAssessmentResultsContent() {
                         Your Strengths
                       </h4>
                       <ul className="space-y-2">
-                        {insights.strengths.map((strength, index) => (
+                        {insights.strengths.map((strength: string, index: number) => (
                           <li
                             key={index}
                             className="text-sm text-green-800 dark:text-green-200 flex items-start"
@@ -1006,7 +1046,7 @@ function ComprehensiveAssessmentResultsContent() {
                         Watch Out For
                       </h4>
                       <ul className="space-y-2">
-                        {insights.watchOuts.map((watchOut, index) => (
+                        {insights.watchOuts.map((watchOut: string, index: number) => (
                           <li
                             key={index}
                             className="text-sm text-amber-800 dark:text-amber-200 flex items-start"
@@ -1027,7 +1067,7 @@ function ComprehensiveAssessmentResultsContent() {
                         How to Leverage
                       </h4>
                       <ul className="space-y-2">
-                        {insights.leverageTips.map((tip, index) => (
+                        {insights.leverageTips.map((tip: string, index: number) => (
                           <li
                             key={index}
                             className="text-sm text-blue-800 dark:text-blue-200 flex items-start"

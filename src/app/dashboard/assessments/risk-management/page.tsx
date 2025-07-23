@@ -183,7 +183,9 @@ export default function RiskManagementAssessment() {
         categoryScores[category] = Math.round((categoryScores[category] / questionsPerCategory) * 3) // 3 points per category (15% total)
       })
 
-      const overallScore = Math.round((totalScore / questionsAnswered) * 3) // Convert to percentage of 15%
+      // Fix scoring to properly scale to 15 points maximum
+      // Average score is 4 when all highest options selected, so multiply by 3.75 to get 15
+      const overallScore = Math.round((totalScore / questionsAnswered) * 3.75) // Convert to percentage of 15%
 
       // Save to database
       const { error } = await supabase

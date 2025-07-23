@@ -380,6 +380,18 @@ export default function DashboardPage() {
                 {user?.email || "Entrepreneur"}
               </p>
             </div>
+            <div>
+              <button
+                onClick={() =>
+                  router.push("/dashboard/comprehensive-assessment")
+                }
+                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 px-6 transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg flex items-center justify-center gap-2"
+                style={{ borderRadius: "16px" }}
+              >
+                <RefreshCw className="w-4 h-4" />
+                Retake Assessment
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -454,6 +466,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Action Buttons */}
+          {/* Hidden for now - PDF Download and Progress Update buttons
           <div className="lg:w-1/4 flex flex-col gap-4">
             <PDFDownloadButton
               userProgress={userProgress}
@@ -480,6 +493,7 @@ export default function DashboardPage() {
               Retake Assessment
             </button>
           </div>
+          */}
         </div>
 
         {/* Standout Strength Profile */}

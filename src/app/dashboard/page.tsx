@@ -265,6 +265,13 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, [user, authLoading, router, supabase]);
 
+  // Redirect to assessment if no assessments completed
+  useEffect(() => {
+    if (!loading && !authLoading && stats && !stats.hasCompletedAssessments) {
+      router.push("/dashboard/comprehensive-assessment");
+    }
+  }, [loading, authLoading, stats, router]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-navy-gradient flex items-center justify-center">

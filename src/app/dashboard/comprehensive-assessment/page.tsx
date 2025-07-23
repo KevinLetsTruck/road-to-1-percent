@@ -17,6 +17,7 @@ import {
   Info,
   X,
   Calculator,
+  Save,
 } from "lucide-react";
 import { calculateStandoutScore } from "@/lib/standoutScoring";
 import CalculatorModal from "@/components/CalculatorModal";
@@ -1229,13 +1230,13 @@ export default function ComprehensiveAssessmentPage() {
     return (
       <label
         key={option.value}
-        className={`flex items-start p-3 border rounded-lg cursor-pointer transition-all ${
+        className={`flex items-start p-3 border rounded-xl cursor-pointer transition-all ${
           isCalculatorOption
             ? hasCalculatedValue
-              ? "border-green-400 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:border-green-600"
-              : "border-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 dark:border-indigo-600"
-            : "border-gray-200 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
-        } ${isSelected ? "ring-2 ring-indigo-500" : ""}`}
+              ? "border-green-600 bg-green-900/20 hover:bg-green-900/30"
+              : "border-indigo-600 bg-indigo-900/20 hover:bg-indigo-900/30"
+            : "border-gray-700 bg-gray-800 hover:bg-gray-700"
+        } ${isSelected ? "ring-2 ring-orange-500" : ""}`}
         onClick={() => {
           if (isCalculatorOption && isSelected) {
             // If calculator option is already selected, still open the calculator
@@ -1264,9 +1265,9 @@ export default function ComprehensiveAssessmentPage() {
             className={`font-medium ${
               isCalculatorOption
                 ? hasCalculatedValue
-                  ? "text-green-900 dark:text-green-100"
-                  : "text-indigo-900 dark:text-indigo-100"
-                : "text-gray-900 dark:text-gray-100"
+                  ? "text-green-100"
+                  : "text-indigo-100"
+                : "text-gray-100"
             }`}
           >
             {displayLabel}
@@ -1276,9 +1277,9 @@ export default function ComprehensiveAssessmentPage() {
               className={`text-sm ${
                 isCalculatorOption
                   ? hasCalculatedValue
-                    ? "text-green-700 dark:text-green-300"
-                    : "text-indigo-700 dark:text-indigo-300"
-                  : "text-gray-700 dark:text-gray-400"
+                    ? "text-green-300"
+                    : "text-indigo-300"
+                  : "text-gray-400"
               }`}
             >
               {option.description}
@@ -1319,28 +1320,50 @@ export default function ComprehensiveAssessmentPage() {
   const strengthCombo = getStrengthCombination();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <nav className="bg-white dark:bg-gray-800 shadow-lg">
+    <div className="min-h-screen bg-navy-gradient">
+      {/* Floating Header */}
+      <div className="fixed top-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-2" />
-              <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="flex justify-between items-center h-16">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-xl border border-gray-700 hover:border-gray-600"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </button>
+
+            <div className="flex items-center gap-2">
+              <Target className="h-6 w-6 text-orange-500" />
+              <span className="text-lg font-semibold text-gray-100 hidden sm:inline">
                 Comprehensive SPI Assessment
               </span>
             </div>
+
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-xl font-medium hover:from-orange-600 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="w-4 h-4" />
+              {submitting
+                ? "Processing..."
+                : hasExistingData
+                  ? "Update Assessment"
+                  : "Complete Assessment"}
+            </button>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+      <main className="pt-20 pb-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl p-8">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                Complete SPI Assessment
+              <h1 className="text-3xl font-bold text-gray-100 mb-4">
+                Complete Your SPI Assessment
               </h1>
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-gray-400 mb-4">
                 This comprehensive assessment evaluates all five dimensions of
                 your Success Probability Index. Be honest—this assessment is
                 designed to show you exactly where you stand and where to focus
@@ -1349,26 +1372,16 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Existing Data Banner */}
               {hasExistingData && (
-                <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="mb-6 bg-blue-900/20 border border-blue-800 rounded-xl p-4">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="w-5 h-5 text-blue-600"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <Info className="w-5 h-5 text-blue-400" />
                     </div>
                     <div className="ml-3">
-                      <h3 className="text-sm font-medium text-blue-800">
+                      <h3 className="text-sm font-medium text-blue-300">
                         Previous Assessment Data Loaded
                       </h3>
-                      <p className="text-sm text-blue-700 mt-1">
+                      <p className="text-sm text-blue-400 mt-1">
                         Your previous assessment responses have been loaded. You
                         can review and modify them as needed.
                       </p>
@@ -1378,11 +1391,11 @@ export default function ComprehensiveAssessmentPage() {
               )}
 
               {/* Current Situation Selector */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg">
-                <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 mb-3">
+              <div className="mb-8 p-6 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-800 rounded-xl">
+                <h3 className="text-xl font-bold text-blue-100 mb-3">
                   🚛 What is your current situation?
                 </h3>
-                <p className="text-blue-700 dark:text-blue-300 mb-4 font-medium">
+                <p className="text-blue-300 mb-4 font-medium">
                   Please select your current situation so we can provide
                   questions that are relevant to your specific circumstances.
                 </p>
@@ -1397,10 +1410,10 @@ export default function ComprehensiveAssessmentPage() {
                   ).map((situation) => (
                     <label
                       key={situation}
-                      className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
                         formData.current_situation === situation
-                          ? "border-blue-500 bg-blue-100 dark:bg-blue-900/30 shadow-md"
-                          : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                          ? "border-blue-500 bg-blue-900/30 shadow-md"
+                          : "border-gray-700 hover:border-blue-600 hover:bg-blue-900/10"
                       }`}
                     >
                       <input
@@ -1412,10 +1425,10 @@ export default function ComprehensiveAssessmentPage() {
                         className="mr-3 w-4 h-4 text-blue-600"
                       />
                       <div>
-                        <div className="font-semibold text-gray-900 dark:text-gray-100">
+                        <div className="font-semibold text-gray-100">
                           {situation}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-gray-400">
                           {situation === "Employee Driver" &&
                             "Driving for a company as an employee"}
                           {situation === "Carrier Authority" &&
@@ -1437,44 +1450,44 @@ export default function ComprehensiveAssessmentPage() {
                 </div>
               </div>
 
-              {/* Standout Assessment Section */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-lg">
-                <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-3">
-                  🎯 Standout Assessment
+              {/* Standout Strengths Assessment */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-800 rounded-xl">
+                <h3 className="text-xl font-bold text-purple-100 mb-3">
+                  ✨ Take the StandOut Assessment
                 </h3>
-                <p className="text-purple-700 dark:text-purple-300 mb-4 font-medium">
-                  Before completing this assessment, please take the Standout
-                  2.0 assessment to discover your unique strengths. OR if you
-                  know your top two strengths you can enter them below now.
+                <p className="text-purple-300 mb-6">
+                  Discover your top 2 strengths using the StandOut assessment to
+                  understand your unique talents and how they contribute to your
+                  success.
                 </p>
 
-                <div className="mb-6">
-                  <a
-                    href="https://www.tmbc.com/standout-assessment/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
-                  >
-                    Take Standout 2.0 Assessment
-                    <svg
-                      className="ml-2 w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </a>
+                <div className="mb-6 p-4 bg-purple-900/20 border border-purple-700 rounded-xl">
+                  <h4 className="text-lg font-semibold text-purple-100 mb-2">
+                    How to find your Standout Strengths:
+                  </h4>
+                  <ol className="list-decimal list-inside space-y-2 text-purple-200">
+                    <li>
+                      Take the free assessment at:{" "}
+                      <a
+                        href="https://www.marcusbuckingham.com/the-standout-assessment"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-400 hover:text-purple-300 underline"
+                      >
+                        StandOut Assessment
+                      </a>
+                    </li>
+                    <li>Complete the quick questionnaire (about 15 minutes)</li>
+                    <li>Get your top 2 strengths from the report</li>
+                    <li>
+                      Select them below to integrate into your SPI results
+                    </li>
+                  </ol>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">
                       Your Top Strength #1
                     </label>
                     <select
@@ -1485,9 +1498,9 @@ export default function ComprehensiveAssessmentPage() {
                           standout_strength_1: e.target.value,
                         }))
                       }
-                      className="w-full p-3 border border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full p-3 border border-purple-700 bg-gray-800 text-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
-                      <option value="">Select your top strength</option>
+                      <option value="">Select your primary strength</option>
                       {[
                         "Pioneer",
                         "Influencer",
@@ -1511,7 +1524,7 @@ export default function ComprehensiveAssessmentPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">
                       Your Top Strength #2
                     </label>
                     <select
@@ -1522,7 +1535,7 @@ export default function ComprehensiveAssessmentPage() {
                           standout_strength_2: e.target.value,
                         }))
                       }
-                      className="w-full p-3 border border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full p-3 border border-purple-700 bg-gray-800 text-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       <option value="">Select your second strength</option>
                       {[
@@ -1549,8 +1562,8 @@ export default function ComprehensiveAssessmentPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <p className="text-sm text-purple-800 dark:text-purple-200">
+                <div className="mt-4 p-3 bg-purple-900/30 rounded-xl">
+                  <p className="text-sm text-purple-200">
                     <strong>Note:</strong> These strengths will be integrated
                     into your SPI assessment results to provide personalized
                     insights.
@@ -1561,25 +1574,25 @@ export default function ComprehensiveAssessmentPage() {
               {/* Contextual Questions Based on Situation */}
               {(formData.current_situation === "Small Fleet" ||
                 formData.current_situation === "Carrier Authority") && (
-                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-700 rounded-lg">
-                  <h3 className="text-xl font-bold text-green-900 dark:text-green-100 mb-3">
+                <div className="mb-8 p-6 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-800 rounded-xl">
+                  <h3 className="text-xl font-bold text-green-100 mb-3">
                     📋 Additional Information
                   </h3>
 
                   {/* Fleet Size Question (Small Fleet only) */}
                   {formData.current_situation === "Small Fleet" && (
                     <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-3">
+                      <h4 className="text-lg font-semibold text-green-200 mb-3">
                         How many trucks do you own?
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[2, 3, 4, 5, 6, 7, 8, 9, 10, "10+"].map((size) => (
                           <label
                             key={size}
-                            className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                            className={`flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
                               formData.fleet_size === size
-                                ? "border-green-500 bg-green-100 dark:bg-green-900/30 shadow-md"
-                                : "border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                                ? "border-green-500 bg-green-900/30 shadow-md"
+                                : "border-gray-700 hover:border-green-600 hover:bg-green-900/20"
                             }`}
                           >
                             <input
@@ -1592,7 +1605,7 @@ export default function ComprehensiveAssessmentPage() {
                               }
                               className="mr-2 w-4 h-4 text-green-600"
                             />
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                            <span className="font-medium text-gray-100">
                               {size} {size === 1 ? "Truck" : "Trucks"}
                             </span>
                           </label>
@@ -1603,7 +1616,7 @@ export default function ComprehensiveAssessmentPage() {
 
                   {/* Load Sources Question */}
                   <div className="mb-4">
-                    <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-3">
+                    <h4 className="text-lg font-semibold text-green-200 mb-3">
                       Where do you get your loads? (Select all that apply)
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1643,14 +1656,14 @@ export default function ComprehensiveAssessmentPage() {
                   </div>
                 </div>
               )}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4">
                 <div className="flex items-start">
-                  <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
+                  <Info className="w-5 h-5 text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                    <p className="text-sm text-blue-200 font-medium">
                       Assessment Overview
                     </p>
-                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    <p className="text-sm text-blue-300 mt-1">
                       This assessment contains{" "}
                       {
                         getAssessmentQuestions(formData.current_situation)
@@ -1668,11 +1681,11 @@ export default function ComprehensiveAssessmentPage() {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Financial Foundation Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2 text-green-600" />
+                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                  <DollarSign className="w-5 h-5 mr-2 text-green-500" />
                   Financial Foundation
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                <p className="text-gray-300 mb-4">
                   Your financial foundation determines your ability to invest in
                   opportunities and weather challenges.
                 </p>
@@ -1681,16 +1694,16 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg"
+                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+                      <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       {/* Add helpful instructions for calculator questions */}
                       {(question.id === "net_worth" ||
                         question.id === "monthly_savings") && (
-                        <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-                          <p className="text-sm text-blue-800 dark:text-blue-200">
+                        <div className="mb-3 p-3 bg-blue-900/20 border border-blue-700 rounded-xl">
+                          <p className="text-sm text-blue-200">
                             <strong>💡 Tip:</strong> You can either use the
                             calculator for a precise calculation or select a
                             range if you already know your{" "}
@@ -1712,11 +1725,11 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Market Intelligence Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                  <Brain className="w-5 h-5 mr-2 text-blue-600" />
+                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                  <Brain className="w-5 h-5 mr-2 text-blue-500" />
                   Market Intelligence
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                <p className="text-gray-300 mb-4">
                   Understanding the market, rates, and customer needs is crucial
                   for making profitable decisions.
                 </p>
@@ -1725,16 +1738,16 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg"
+                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+                      <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
                           <label
                             key={option.value}
-                            className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                            className="flex items-start p-3 border border-gray-600 bg-gray-700 rounded-xl hover:bg-gray-600 cursor-pointer"
                           >
                             <input
                               type="radio"
@@ -1754,11 +1767,11 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-gray-100">
+                              <div className="font-medium text-gray-100">
                                 {option.label}
                               </div>
                               {option.description && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                <div className="text-sm text-gray-400">
                                   {option.description}
                                 </div>
                               )}
@@ -1772,11 +1785,11 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Risk Management Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                  <Shield className="w-5 h-5 mr-2 text-red-600" />
+                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                  <Shield className="w-5 h-5 mr-2 text-red-500" />
                   Risk Management
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                <p className="text-gray-300 mb-4">
                   How well you prepare for and manage risks determines your
                   business sustainability.
                 </p>
@@ -1785,16 +1798,16 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg"
+                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+                      <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
                           <label
                             key={option.value}
-                            className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                            className="flex items-start p-3 border border-gray-600 bg-gray-700 rounded-xl hover:bg-gray-600 cursor-pointer"
                           >
                             <input
                               type="radio"
@@ -1814,11 +1827,11 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-gray-100">
+                              <div className="font-medium text-gray-100">
                                 {option.label}
                               </div>
                               {option.description && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                <div className="text-sm text-gray-400">
                                   {option.description}
                                 </div>
                               )}
@@ -1832,11 +1845,11 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Support Systems Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                  <Users className="w-5 h-5 mr-2 text-orange-600" />
+                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-orange-500" />
                   Support Systems
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                <p className="text-gray-300 mb-4">
                   Your network, family support, and mentorship multiply your
                   individual efforts.
                 </p>
@@ -1845,16 +1858,16 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg"
+                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+                      <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
                       <div className="space-y-2">
                         {question.options.map((option) => (
                           <label
                             key={option.value}
-                            className="flex items-start p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                            className="flex items-start p-3 border border-gray-600 bg-gray-700 rounded-xl hover:bg-gray-600 cursor-pointer"
                           >
                             <input
                               type="radio"
@@ -1874,11 +1887,11 @@ export default function ComprehensiveAssessmentPage() {
                               className="mt-1 mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-gray-100">
+                              <div className="font-medium text-gray-100">
                                 {option.label}
                               </div>
                               {option.description && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                <div className="text-sm text-gray-400">
                                   {option.description}
                                 </div>
                               )}

@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { calculateStandoutScore, getStandoutTier } from "@/lib/standoutScoring";
 import { strengthCombinationInsights } from "@/lib/strengthCombinationInsights";
 import { strengthCombinationTitles } from "@/lib/strengthCombinationTitles";
+import { getDimensionInsights } from "@/lib/dimensionInsights";
 import {
   Download,
   FileText,
@@ -356,7 +357,7 @@ export default function DashboardPage() {
     router.push("/login");
   };
 
-  // Define dimension data with quick wins and long-term goals
+  // Define dimension data with dynamic insights based on scores
   const dimensionsData: DimensionData[] = [
     {
       name: "Financial Foundation",
@@ -367,20 +368,7 @@ export default function DashboardPage() {
       ),
       icon: <DollarSign className="w-6 h-6 text-white" />,
       color: "green",
-      description:
-        "Your financial foundation determines your ability to invest in opportunities and weather challenges.",
-      quickWins: [
-        "Track all expenses for one week",
-        "Cancel unused subscriptions",
-        "Review insurance policies for better rates",
-        "Start emergency fund with $500",
-      ],
-      longTermGoals: [
-        "Build 6-month emergency fund",
-        "Improve credit score to 700+",
-        "Create business capital fund",
-        "Develop passive income streams",
-      ],
+      ...getDimensionInsights("Financial Foundation", userProgress?.financial_foundation_score || 0, 35)
     },
     {
       name: "Market Intelligence",
@@ -391,20 +379,7 @@ export default function DashboardPage() {
       ),
       icon: <Globe className="w-6 h-6 text-white" />,
       color: "blue",
-      description:
-        "Understanding the market, rates, and customer needs is crucial for making profitable decisions.",
-      quickWins: [
-        "Calculate your true cost per mile",
-        "Research seasonal rate patterns",
-        "Build relationships with 3 customers",
-        "Join industry forums and groups",
-      ],
-      longTermGoals: [
-        "Develop direct customer relationships",
-        "Create rate optimization system",
-        "Build market prediction models",
-        "Establish industry reputation",
-      ],
+      ...getDimensionInsights("Market Intelligence", userProgress?.market_intelligence_score || 0, 20)
     },
     {
       name: "Risk Management",
@@ -415,20 +390,7 @@ export default function DashboardPage() {
       ),
       icon: <Shield className="w-6 h-6 text-white" />,
       color: "orange",
-      description:
-        "How well you prepare for and manage risks determines your business sustainability.",
-      quickWins: [
-        "Review and optimize insurance coverage",
-        "Create basic contingency plans",
-        "Document emergency procedures",
-        "Identify top 3 business risks",
-      ],
-      longTermGoals: [
-        "Build comprehensive risk management system",
-        "Develop business continuity plan",
-        "Create multiple income streams",
-        "Establish professional advisory team",
-      ],
+      ...getDimensionInsights("Risk Management", userProgress?.risk_management_score || 0, 15)
     },
     {
       name: "Support Systems",
@@ -439,20 +401,7 @@ export default function DashboardPage() {
       ),
       icon: <Users2 className="w-6 h-6 text-white" />,
       color: "orange",
-      description:
-        "Your network, family support, and mentorship multiply your individual efforts.",
-      quickWins: [
-        "Join industry networking groups",
-        "Connect with 3 successful operators",
-        "Involve family in business planning",
-        "Find accountability partner",
-      ],
-      longTermGoals: [
-        "Build extensive professional network",
-        "Develop mentor relationships",
-        "Create family business culture",
-        "Establish industry leadership position",
-      ],
+      ...getDimensionInsights("Support Systems", userProgress?.support_systems_score || 0, 10)
     },
   ];
 

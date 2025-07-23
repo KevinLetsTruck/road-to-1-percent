@@ -402,9 +402,9 @@ export default function DashboardPage() {
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
           {/* Success Probability Graphic */}
           <div className="lg:w-3/4">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-6 text-white relative overflow-hidden">
+            <div className="bg-gray-900 border-2 border-orange-500 rounded-3xl p-6 text-white relative overflow-hidden">
               <div className="relative z-10">
-                <h2 className="text-xl font-semibold text-white/90 mb-4 tracking-wider">
+                <h2 className="text-xl font-semibold text-gray-400 mb-4 tracking-wider">
                   SUCCESS PROBABILITY
                 </h2>
 
@@ -412,7 +412,7 @@ export default function DashboardPage() {
                 <div className="mb-3">
                   <span
                     className="text-6xl font-bold"
-                    style={{ color: "#ffffff" }}
+                    style={{ color: "#ff6b35" }}
                   >
                     {stats?.successProbability || 30}%
                   </span>
@@ -421,8 +421,8 @@ export default function DashboardPage() {
                 {/* Probability Range */}
                 <div className="mb-3">
                   <span
-                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-white/90"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-white"
+                    style={{ backgroundColor: "#ff6b35" }}
                   >
                     {getProbabilityRange(stats?.successProbability || 30)}{" "}
                     Probability Range
@@ -430,23 +430,44 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-white/80 text-sm mb-6">
+                <p className="text-gray-400 text-sm mb-6">
                   {getProbabilityDescription(stats?.successProbability || 30)}
                 </p>
 
                 {/* Progress Bar */}
                 <div className="mt-4">
-                  <div className="flex justify-between text-xs mb-1 text-white/60">
+                  <div className="flex justify-between text-xs mb-1 text-gray-500">
                     <span>0%</span>
                     <span>25%</span>
                     <span>50%</span>
                     <span>75%</span>
                     <span>100%</span>
                   </div>
-                  <div className="relative h-3 bg-white/20 rounded-full overflow-hidden">
-                    {/* Gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-600 via-yellow-500 via-blue-500 to-green-500 opacity-30" />
-                    {/* Progress indicator */}
+                  <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden">
+                    {/* Progress segments */}
+                    <div className="absolute inset-0 flex">
+                      {/* Orange segment (0-50%) */}
+                      <div
+                        className="h-full bg-orange-500"
+                        style={{ width: "50%" }}
+                      />
+                      {/* Brown segment (50-75%) */}
+                      <div
+                        className="h-full bg-amber-700"
+                        style={{ width: "25%" }}
+                      />
+                      {/* Blue segment (75-90%) */}
+                      <div
+                        className="h-full bg-blue-600"
+                        style={{ width: "15%" }}
+                      />
+                      {/* Green segment (90-100%) */}
+                      <div
+                        className="h-full bg-green-600"
+                        style={{ width: "10%" }}
+                      />
+                    </div>
+                    {/* Progress indicator - white line */}
                     <div
                       className="relative h-full rounded-full transition-all duration-1000"
                       style={{

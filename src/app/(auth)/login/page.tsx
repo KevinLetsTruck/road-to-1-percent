@@ -35,7 +35,18 @@ export default function LoginPage() {
       });
 
       if (error) {
-        throw error;
+        // Provide more helpful error messages
+        if (error.message.includes('Email not confirmed')) {
+          setError('Please check your email to confirm your account before logging in.');
+        } else if (error.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please try again.');
+        } else if (error.message.includes('User not found')) {
+          setError('No account found with this email. Please register first.');
+        } else {
+          setError(error.message);
+        }
+        setLoading(false);
+        return;
       }
 
       // Sync the session with the server

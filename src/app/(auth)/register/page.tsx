@@ -47,7 +47,7 @@ export default function RegisterPage() {
             last_name: formData.lastName,
             phone: formData.phone,
           },
-          emailRedirectTo: `${window.location.origin}/login`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
       if (signInData.user) {
         // Create profile
-        await supabase.from("profiles").insert({
+        const { error: profileError } = await supabase.from("profiles").insert({
           id: signInData.user.id,
           email: formData.email,
           first_name: formData.firstName,
@@ -72,12 +72,22 @@ export default function RegisterPage() {
           phone: formData.phone,
         });
 
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Continue even if profile creation fails
+        }
+
         // Create user progress record
-        await supabase.from("user_progress").insert({
+        const { error: progressError } = await supabase.from("user_progress").insert({
           user_id: signInData.user.id,
         });
 
-        // Redirect directly to assessment
+        if (progressError) {
+          console.error('Progress creation error:', progressError);
+          // Continue even if progress creation fails
+        }
+
+        // Redirect directly to dashboard
         router.push("/dashboard");
       } else {
         throw new Error("Failed to sign in after registration");

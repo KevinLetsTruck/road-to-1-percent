@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { calculateStandoutScore, getStandoutTier } from "@/lib/standoutScoring";
+import { strengthCombinationInsights } from "@/lib/strengthCombinationInsights";
 import dynamic from "next/dynamic";
 
 // Dynamically import PDF download button to avoid SSR issues
@@ -202,13 +203,10 @@ function ComprehensiveAssessmentResultsContent() {
   };
 
   const getStrengthInsights = (combo: string) => {
-    // Import the dynamic combination insights
-    const combinationInsights = require('@/lib/strengthCombinationInsights').strengthCombinationInsights;
-    
     // Check if this is a combination
     if (combo.includes(' + ')) {
       const combinationKey = combo.trim();
-      const dynamicInsights = combinationInsights[combinationKey];
+      const dynamicInsights = strengthCombinationInsights[combinationKey];
       
       if (dynamicInsights) {
         // Parse the combination to get individual strengths

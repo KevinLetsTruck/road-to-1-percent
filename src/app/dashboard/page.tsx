@@ -433,7 +433,7 @@ export default function DashboardPage() {
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
           {/* Success Probability Graphic */}
           <div className="lg:w-3/4">
-            <div className="bg-gray-900 border-2 border-orange-500 rounded-3xl p-6 text-white relative overflow-hidden">
+            <div className="border-2 border-orange-500 rounded-xl p-6 text-white relative overflow-hidden">
               <div className="relative z-10">
                 <h2 className="text-xl font-semibold text-gray-400 mb-4 tracking-wider">
                   SUCCESS PROBABILITY

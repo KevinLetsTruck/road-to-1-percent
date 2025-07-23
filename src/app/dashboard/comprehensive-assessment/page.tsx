@@ -45,13 +45,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   placeholder = "Select an option",
   disabled = false,
 }) => {
-  // Match the Standout dropdown style using native select
+  // Match the site's form input styling
   return (
     <select
       value={value || ""}
       onChange={(e) => onChange(Number(e.target.value))}
       disabled={disabled}
-      className="w-full p-3 border border-purple-700 bg-gray-800 text-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
     >
       <option value="">{placeholder}</option>
       {options.map((option) => (
@@ -1441,7 +1441,7 @@ export default function ComprehensiveAssessmentPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">
                       Your Top Strength #1
                     </label>
                     <select
@@ -1452,7 +1452,7 @@ export default function ComprehensiveAssessmentPage() {
                           standout_strength_1: e.target.value,
                         }))
                       }
-                      className="w-full p-3 border border-purple-700 bg-gray-800 text-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                     >
                       <option value="">Select your primary strength</option>
                       {[
@@ -1478,7 +1478,7 @@ export default function ComprehensiveAssessmentPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">
                       Your Top Strength #2
                     </label>
                     <select
@@ -1489,7 +1489,7 @@ export default function ComprehensiveAssessmentPage() {
                           standout_strength_2: e.target.value,
                         }))
                       }
-                      className="w-full p-3 border border-purple-700 bg-gray-800 text-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                     >
                       <option value="">Select your second strength</option>
                       {[

@@ -1459,16 +1459,17 @@ export default function ComprehensiveAssessmentPage() {
                     <label className="block text-sm font-semibold text-gray-300 mb-2">
                       Your Top Strength #1
                     </label>
-                    <select
-                      value={formData.standout_strength_1}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          standout_strength_1: e.target.value,
-                        }))
-                      }
-                      className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
-                    >
+                    <div className="relative">
+                      <select
+                        value={formData.standout_strength_1}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            standout_strength_1: e.target.value,
+                          }))
+                        }
+                        className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer pr-12"
+                      >
                       <option value="">Select your primary strength</option>
                       {[
                         "Pioneer",
@@ -1491,21 +1492,28 @@ export default function ComprehensiveAssessmentPage() {
                           </option>
                         ))}
                     </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">
                       Your Top Strength #2
                     </label>
-                    <select
-                      value={formData.standout_strength_2}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          standout_strength_2: e.target.value,
-                        }))
-                      }
-                      className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
-                    >
+                    <div className="relative">
+                      <select
+                        value={formData.standout_strength_2}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            standout_strength_2: e.target.value,
+                          }))
+                        }
+                        className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer pr-12"
+                      >
                       <option value="">Select your second strength</option>
                       {[
                         "Pioneer",
@@ -1528,6 +1536,12 @@ export default function ComprehensiveAssessmentPage() {
                           </option>
                         ))}
                     </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                   </div>
                 </div>
 

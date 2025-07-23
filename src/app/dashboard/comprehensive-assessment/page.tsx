@@ -1680,7 +1680,7 @@ export default function ComprehensiveAssessmentPage() {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Financial Foundation Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                <h3 className="font-semibold text-gray-100 mb-4 flex items-center" style={{ fontSize: '1.75rem' }}>
                   <DollarSign className="w-5 h-5 mr-2 text-green-500" />
                   Financial Foundation
                 </h3>
@@ -1695,7 +1695,7 @@ export default function ComprehensiveAssessmentPage() {
                       key={question.id}
                       className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-100 mb-3">
+                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
                         {index + 1}. {question.question}
                       </label>
                       {/* Add helpful instructions for calculator questions */}
@@ -1781,7 +1781,7 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Market Intelligence Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                <h3 className="font-semibold text-gray-100 mb-4 flex items-center" style={{ fontSize: '1.75rem' }}>
                   <Brain className="w-5 h-5 mr-2 text-blue-500" />
                   Market Intelligence
                 </h3>
@@ -1796,7 +1796,7 @@ export default function ComprehensiveAssessmentPage() {
                       key={question.id}
                       className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-100 mb-3">
+                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
                         {index + 1}. {question.question}
                       </label>
                       <CustomDropdown
@@ -1811,7 +1811,7 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Risk Management Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                <h3 className="font-semibold text-gray-100 mb-4 flex items-center" style={{ fontSize: '1.75rem' }}>
                   <Shield className="w-5 h-5 mr-2 text-red-500" />
                   Risk Management
                 </h3>
@@ -1826,7 +1826,7 @@ export default function ComprehensiveAssessmentPage() {
                       key={question.id}
                       className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-100 mb-3">
+                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
                         {index + 1}. {question.question}
                       </label>
                       <CustomDropdown
@@ -1841,7 +1841,7 @@ export default function ComprehensiveAssessmentPage() {
 
               {/* Support Systems Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+                <h3 className="font-semibold text-gray-100 mb-4 flex items-center" style={{ fontSize: '1.75rem' }}>
                   <Users className="w-5 h-5 mr-2 text-orange-500" />
                   Support Systems
                 </h3>
@@ -1856,7 +1856,7 @@ export default function ComprehensiveAssessmentPage() {
                       key={question.id}
                       className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
                     >
-                      <label className="block text-sm font-medium text-gray-100 mb-3">
+                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
                         {index + 1}. {question.question}
                       </label>
                       <CustomDropdown

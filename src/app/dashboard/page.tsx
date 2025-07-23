@@ -327,11 +327,11 @@ export default function DashboardPage() {
         
         return {
           title: `${firstDesc.title} + ${secondDesc.title}`,
-          description: `You possess a rare combination that merges ${firstDesc.description} with ${secondDesc.description}. This unique pairing creates powerful synergies in the trucking industry.`,
+          description: `Your combination of ${first} and ${second} creates a powerful synergy. This pairing merges ${firstDesc.description} with ${secondDesc.description}, giving you unique advantages in the trucking industry.`,
           strengths: dynamicInsights.strengths,
           watchOuts: dynamicInsights.watchOuts,
           leverageTips: dynamicInsights.leverageTips,
-          successProfile: `Your ${combo} combination positions you to leverage both strengths for exceptional results.`
+          successProfile: `Your ${first} + ${second} combination positions you to leverage both strengths for exceptional results.`
         };
       }
     }
@@ -641,10 +641,21 @@ export default function DashboardPage() {
               </h2>
 
               <div className="text-center mb-6">
-                <p className="text-2xl font-bold text-gray-100">
+                {/* Show actual strength names prominently */}
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <div className="bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/30 px-4 py-2 rounded-lg">
+                    <p className="text-xl font-bold text-orange-400">{stats.standoutStrength1}</p>
+                  </div>
+                  <span className="text-2xl text-gray-500">+</span>
+                  <div className="bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/30 px-4 py-2 rounded-lg">
+                    <p className="text-xl font-bold text-orange-400">{stats.standoutStrength2}</p>
+                  </div>
+                </div>
+                {/* Show descriptive titles as subtitle */}
+                <p className="text-lg text-gray-400 mb-4">
                   {insights.title}
                 </p>
-                <div className="flex items-center justify-center gap-4 mt-3">
+                <div className="flex items-center justify-center gap-4">
                   <span className={`px-4 py-2 rounded-full text-sm font-medium ${
                     standoutTier.includes("Elite")
                       ? "bg-purple-900/30 text-purple-400 border border-purple-700"
@@ -656,10 +667,27 @@ export default function DashboardPage() {
                   }`}>
                     {standoutTier}
                   </span>
+                  <span className="text-sm text-gray-500">
+                    Score: {standoutScore}/10
+                  </span>
                 </div>
                 <p className="text-gray-400 mt-4 max-w-3xl mx-auto">
                   {insights.description}
                 </p>
+              </div>
+
+              {/* Strength Legend */}
+              <div className="mb-6 flex justify-center">
+                <div className="inline-flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <span>Your Primary Strengths</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                    <span>Descriptive Roles</span>
+                  </div>
+                </div>
               </div>
 
               {/* Success Profile Card */}

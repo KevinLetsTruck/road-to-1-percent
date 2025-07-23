@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { calculateStandoutScore, getStandoutTier } from "@/lib/standoutScoring";
 import { strengthCombinationInsights } from "@/lib/strengthCombinationInsights";
+import { strengthCombinationTitles } from "@/lib/strengthCombinationTitles";
 import {
   Download,
   FileText,
@@ -325,13 +326,16 @@ export default function DashboardPage() {
         const firstDesc = strengthDescriptions[first] || { title: first, description: first.toLowerCase() };
         const secondDesc = strengthDescriptions[second] || { title: second, description: second.toLowerCase() };
         
+        // Get the unique combination title
+        const uniqueTitle = strengthCombinationTitles[combinationKey] || `${firstDesc.title} + ${secondDesc.title}`;
+        
         return {
-          title: `${firstDesc.title} + ${secondDesc.title}`,
+          title: uniqueTitle,
           description: `Your combination of ${first} and ${second} creates a powerful synergy. This pairing merges ${firstDesc.description} with ${secondDesc.description}, giving you unique advantages in the trucking industry.`,
           strengths: dynamicInsights.strengths,
           watchOuts: dynamicInsights.watchOuts,
           leverageTips: dynamicInsights.leverageTips,
-          successProfile: `Your ${first} + ${second} combination positions you to leverage both strengths for exceptional results.`
+          successProfile: `As ${uniqueTitle}, you're positioned to leverage both ${first} and ${second} strengths for exceptional results.`
         };
       }
     }
@@ -651,11 +655,11 @@ export default function DashboardPage() {
                     <p className="text-xl font-bold text-orange-400">{stats.standoutStrength2}</p>
                   </div>
                 </div>
-                {/* Show descriptive titles as subtitle */}
-                <p className="text-lg text-gray-400 mb-4">
+                {/* Show unique combination title */}
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">
                   {insights.title}
-                </p>
-                <div className="flex items-center justify-center gap-4">
+                </h3>
+                <div className="flex items-center justify-center gap-4 mb-4">
                   <span className={`px-4 py-2 rounded-full text-sm font-medium ${
                     standoutTier.includes("Elite")
                       ? "bg-purple-900/30 text-purple-400 border border-purple-700"
@@ -671,23 +675,9 @@ export default function DashboardPage() {
                     Score: {standoutScore}/10
                   </span>
                 </div>
-                <p className="text-gray-400 mt-4 max-w-3xl mx-auto">
+                <p className="text-gray-400 max-w-3xl mx-auto">
                   {insights.description}
                 </p>
-              </div>
-
-              {/* Strength Legend */}
-              <div className="mb-6 flex justify-center">
-                <div className="inline-flex items-center gap-6 text-sm text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                    <span>Your Primary Strengths</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-                    <span>Descriptive Roles</span>
-                  </div>
-                </div>
               </div>
 
               {/* Success Profile Card */}

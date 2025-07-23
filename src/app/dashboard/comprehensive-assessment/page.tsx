@@ -45,21 +45,36 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   placeholder = "Select an option",
   disabled = false,
 }) => {
-  // Match the site's form input styling
+  // Match calculator button styling with darker theme
+  const selectedOption = options.find(opt => opt.value === value);
+  
   return (
-    <select
-      value={value || ""}
-      onChange={(e) => onChange(Number(e.target.value))}
-      disabled={disabled}
-      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-    >
-      <option value="">{placeholder}</option>
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative">
+      <select
+        value={value || ""}
+        onChange={(e) => onChange(Number(e.target.value))}
+        disabled={disabled}
+        className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+        style={{ paddingRight: '3rem' }}
+      >
+        <option value="" className="bg-gray-900">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value} className="bg-gray-900">
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {/* Custom dropdown arrow */}
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      {/* Display selected option description if available */}
+      {selectedOption?.description && (
+        <div className="mt-2 text-sm text-gray-400">{selectedOption.description}</div>
+      )}
+    </div>
   );
 };
 
@@ -1452,7 +1467,7 @@ export default function ComprehensiveAssessmentPage() {
                           standout_strength_1: e.target.value,
                         }))
                       }
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
                     >
                       <option value="">Select your primary strength</option>
                       {[
@@ -1489,7 +1504,7 @@ export default function ComprehensiveAssessmentPage() {
                           standout_strength_2: e.target.value,
                         }))
                       }
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
                     >
                       <option value="">Select your second strength</option>
                       {[

@@ -122,7 +122,12 @@ export default function AdminDashboard() {
           )
         `)
 
-      if (userError) throw userError
+      if (userError) {
+        console.error('Error fetching user data:', userError)
+        throw userError
+      }
+
+      console.log('Fetched user data:', userData)
 
       // Note: We can't get last sign in data without admin API access
       // You would need to set up a server endpoint or use Supabase edge functions for this
@@ -184,6 +189,13 @@ export default function AdminDashboard() {
         tier90Count,
         newUsersThisWeek,
         assessmentsThisWeek
+      })
+
+      console.log('Dashboard stats:', {
+        totalUsers,
+        completedAssessments,
+        processedUsersLength: processedUsers.length,
+        rawDataLength: userData?.length
       })
 
       setLoading(false)
@@ -287,6 +299,27 @@ export default function AdminDashboard() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* No Data Message */}
+        {stats.totalUsers === 0 && (
+          <div className="mb-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+            <div className="flex items-start">
+              <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">No User Data Found</h3>
+                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <p>The dashboard is working, but there's no user data to display. This could be because:</p>
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>No users have registered yet</li>
+                    <li>Row Level Security (RLS) policies might be blocking data access</li>
+                    <li>Database tables might be empty</li>
+                  </ul>
+                  <p className="mt-3">Check the browser console for detailed logs, or run the test queries in <code className="bg-yellow-100 dark:bg-yellow-800 px-1 rounded">test_admin_data.sql</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Users */}

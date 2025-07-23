@@ -647,11 +647,11 @@ export default function DashboardPage() {
               <div className="text-center mb-6">
                 {/* Show actual strength names prominently */}
                 <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/30 px-4 py-2 rounded-lg">
+                  <div className="bg-[#1e293b] border border-orange-500/50 px-5 py-3 rounded-xl">
                     <p className="text-xl font-bold text-orange-400">{stats.standoutStrength1}</p>
                   </div>
                   <span className="text-2xl text-gray-500">+</span>
-                  <div className="bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/30 px-4 py-2 rounded-lg">
+                  <div className="bg-[#1e293b] border border-orange-500/50 px-5 py-3 rounded-xl">
                     <p className="text-xl font-bold text-orange-400">{stats.standoutStrength2}</p>
                   </div>
                 </div>

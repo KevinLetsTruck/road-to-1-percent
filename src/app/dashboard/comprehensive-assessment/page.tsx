@@ -1157,7 +1157,7 @@ export default function ComprehensiveAssessmentPage() {
       }
 
       router.push(
-        `/dashboard?message=Assessment completed successfully! Your SPI score is ${totalScore}% (${tier} tier)`
+        `/dashboard?message=Assessment completed successfully!`
       );
     } catch (error: unknown) {
       setError((error as Error).message);

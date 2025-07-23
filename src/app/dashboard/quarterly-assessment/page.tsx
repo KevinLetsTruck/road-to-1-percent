@@ -278,11 +278,11 @@ export default function QuarterlyAssessmentPage() {
 
         if (progressError) throw progressError
 
-        router.push('/dashboard?message=Quarterly assessment completed successfully! Your score is ' + totalScore + '/100.')
+        router.push('/dashboard?message=Quarterly assessment completed successfully!')
       } else {
         // Demo mode - just show success message
-        alert(`Demo Mode: Assessment completed! Your score is ${totalScore}/100.\n\nTo save your data permanently, please set up Supabase by creating a .env.local file with your Supabase credentials.`)
-        router.push('/dashboard?message=Demo: Quarterly assessment completed! Your score is ' + totalScore + '/100. (Data not saved - Supabase not configured)')
+        alert(`Demo Mode: Assessment completed!\n\nTo save your data permanently, please set up Supabase by creating a .env.local file with your Supabase credentials.`)
+        router.push('/dashboard?message=Demo: Quarterly assessment completed! (Data not saved - Supabase not configured)')
       }
     } catch (error: unknown) {
       setError((error as Error).message)

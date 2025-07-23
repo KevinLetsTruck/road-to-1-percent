@@ -1324,7 +1324,7 @@ export default function ComprehensiveAssessmentPage() {
       {/* Floating Header */}
       <div className="fixed top-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center py-6">
             <button
               onClick={() => router.push("/dashboard")}
               className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-xl border border-gray-700 hover:border-gray-600"
@@ -1356,7 +1356,7 @@ export default function ComprehensiveAssessmentPage() {
         </div>
       </div>
 
-      <main className="pt-20 pb-8">
+      <main className="pt-24 pb-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl p-8">
             <div className="mb-8">
@@ -1715,9 +1715,96 @@ export default function ComprehensiveAssessmentPage() {
                         </div>
                       )}
                       <div className="space-y-2">
-                        {question.options.map((option) =>
-                          renderOption(option, question)
-                        )}
+                        {question.options.map((option) => {
+                          const isCalculatorOption = option.value === -1;
+                          const isSelected =
+                            formData[
+                              question.id as keyof ComprehensiveAssessmentData
+                            ] === option.value;
+
+                          // Check if we have a calculated value for this calculator
+                          const hasCalculatedValue =
+                            (question.id === "net_worth" &&
+                              calculatorResults.netWorth !== null) ||
+                            (question.id === "monthly_savings" &&
+                              calculatorResults.monthlySavings !== null);
+
+                          // Get the display label for calculator options
+                          let displayLabel = option.label;
+                          if (isCalculatorOption && hasCalculatedValue) {
+                            if (question.id === "net_worth") {
+                              displayLabel = `${option.label} (Calculated: $${calculatorResults.netWorth?.toLocaleString()})`;
+                            } else if (question.id === "monthly_savings") {
+                              displayLabel = `${option.label} (Calculated: $${calculatorResults.monthlySavings?.toLocaleString()}/month)`;
+                            }
+                          }
+
+                          return (
+                            <label
+                              key={option.value}
+                              className={`flex items-start p-3 border rounded-xl cursor-pointer transition-all ${
+                                isCalculatorOption
+                                  ? hasCalculatedValue
+                                    ? "border-green-600 bg-green-900/20 hover:bg-green-900/30"
+                                    : "border-indigo-600 bg-indigo-900/20 hover:bg-indigo-900/30"
+                                  : "border-gray-600 bg-gray-700 hover:bg-gray-600"
+                              } ${isSelected ? "ring-2 ring-orange-500" : ""}`}
+                              onClick={() => {
+                                if (isCalculatorOption) {
+                                  handleOptionClick(
+                                    question.id as keyof ComprehensiveAssessmentData,
+                                    option.value
+                                  );
+                                }
+                              }}
+                            >
+                              <input
+                                type="radio"
+                                name={question.id}
+                                value={option.value}
+                                checked={isSelected}
+                                onChange={() =>
+                                  isCalculatorOption
+                                    ? handleOptionClick(
+                                        question.id as keyof ComprehensiveAssessmentData,
+                                        option.value
+                                      )
+                                    : handleInputChange(
+                                        question.id as keyof ComprehensiveAssessmentData,
+                                        option.value
+                                      )
+                                }
+                                className="mt-1 mr-3"
+                              />
+                              <div>
+                                <div
+                                  className={`font-medium ${
+                                    isCalculatorOption
+                                      ? hasCalculatedValue
+                                        ? "text-green-100"
+                                        : "text-indigo-100"
+                                      : "text-gray-100"
+                                  }`}
+                                >
+                                  {displayLabel}
+                                </div>
+                                {option.description && (
+                                  <div
+                                    className={`text-sm ${
+                                      isCalculatorOption
+                                        ? hasCalculatedValue
+                                          ? "text-green-300"
+                                          : "text-indigo-300"
+                                        : "text-gray-400"
+                                    }`}
+                                  >
+                                    {option.description}
+                                  </div>
+                                )}
+                              </div>
+                            </label>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
@@ -1904,27 +1991,10 @@ export default function ComprehensiveAssessmentPage() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
-                    <p className="text-red-800">{error}</p>
-                  </div>
+                <div className="mb-6 bg-red-900/20 border border-red-800 text-red-400 px-4 py-3 rounded-xl">
+                  {error}
                 </div>
               )}
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submitting
-                    ? "Processing..."
-                    : hasExistingData
-                      ? "Update Assessment"
-                      : "Complete Assessment"}
-                </button>
-              </div>
             </form>
           </div>
         </div>

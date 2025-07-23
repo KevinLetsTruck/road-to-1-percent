@@ -61,6 +61,21 @@ export default function DashboardPage() {
   const [userProgress, setUserProgress] = useState<any>(null);
   const router = useRouter();
   const supabase = createClient();
+  const [showSPIDetails, setShowSPIDetails] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check for success message in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const message = urlParams.get("message");
+    if (message) {
+      setSuccessMessage(decodeURIComponent(message));
+      // Clear the URL parameter after showing
+      window.history.replaceState({}, "", "/dashboard");
+      // Auto-hide message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    }
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -398,6 +413,22 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 bg-green-900/20 border border-green-500 rounded-lg p-4 animate-fade-in">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <CheckCircle className="h-5 w-5 text-green-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-green-400">
+                  {successMessage}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Success Probability Section */}
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
           {/* Success Probability Graphic */}

@@ -18,6 +18,7 @@ import {
   ChevronRight,
   UserCheck,
   UserX,
+  ArrowLeft,
   Gauge
 } from 'lucide-react'
 
@@ -286,13 +287,22 @@ export default function AdminDashboard() {
                   Monitor user progress and system metrics
                 </p>
               </div>
-              <button
-                onClick={exportToCSV}
-                className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Dashboard
+                </button>
+                <button
+                  onClick={exportToCSV}
+                  className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </button>
+              </div>
             </div>
           </div>
         </div>

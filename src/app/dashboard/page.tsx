@@ -69,7 +69,12 @@ export default function DashboardPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get("message");
     if (message) {
-      setSuccessMessage(decodeURIComponent(message));
+      try {
+        setSuccessMessage(decodeURIComponent(message));
+      } catch (e) {
+        // If decoding fails, use the raw message
+        setSuccessMessage(message);
+      }
       // Clear the URL parameter after showing
       window.history.replaceState({}, "", "/dashboard");
       // Auto-hide message after 5 seconds

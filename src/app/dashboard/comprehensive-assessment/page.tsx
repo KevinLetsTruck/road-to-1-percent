@@ -45,75 +45,21 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   placeholder = "Select an option",
   disabled = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const selectedOption = options.find((opt) => opt.value === value);
-
+  // Match the Standout dropdown style using native select
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between p-4 bg-gray-700 border border-gray-600 rounded-xl text-left transition-all
-          ${isOpen ? "ring-2 ring-orange-500 border-orange-500" : ""}
-          ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-600 cursor-pointer"}
-        `}
-        disabled={disabled}
-      >
-        <div className="flex-1">
-          {selectedOption ? (
-            <div>
-              <div className="font-medium text-gray-100">{selectedOption.label}</div>
-              {selectedOption.description && (
-                <div className="text-sm text-gray-400 mt-1">{selectedOption.description}</div>
-              )}
-            </div>
-          ) : (
-            <div className="text-gray-400">{placeholder}</div>
-          )}
-        </div>
-        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-gray-800 border border-gray-600 rounded-xl shadow-xl max-h-96 overflow-y-auto">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value);
-                setIsOpen(false);
-              }}
-              className={`w-full text-left p-4 transition-colors
-                ${option.value === value 
-                  ? "bg-orange-900/30 border-l-4 border-orange-500" 
-                  : "hover:bg-gray-700"
-                }
-              `}
-            >
-              <div className="font-medium text-gray-100">{option.label}</div>
-              {option.description && (
-                <div className="text-sm text-gray-400 mt-1">{option.description}</div>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    <select
+      value={value || ""}
+      onChange={(e) => onChange(Number(e.target.value))}
+      disabled={disabled}
+      className="w-full p-3 border border-purple-700 bg-gray-800 text-gray-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
   );
 };
 

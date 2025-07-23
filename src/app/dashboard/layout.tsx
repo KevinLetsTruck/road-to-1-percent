@@ -34,12 +34,12 @@ export default function DashboardLayout({
 
   return (
     <>
-      {/* Admin Button - Fixed at top for all dashboard pages */}
+      {/* Admin Button - Fixed at bottom-right to avoid header conflicts */}
       {isAdmin && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={() => router.push("/admin/dashboard")}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-purple-700 hover:to-purple-800 transition-all hover:shadow-lg flex items-center gap-2"
+            className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-purple-700 hover:to-purple-800 transition-all hover:shadow-lg flex items-center gap-2 shadow-xl"
           >
             <ShieldCheck className="w-4 h-4" />
             Admin Dashboard

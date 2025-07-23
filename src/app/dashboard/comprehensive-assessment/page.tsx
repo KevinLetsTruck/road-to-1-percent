@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -18,11 +18,104 @@ import {
   X,
   Calculator,
   Save,
+  ChevronDown,
 } from "lucide-react";
 import { calculateStandoutScore } from "@/lib/standoutScoring";
 import CalculatorModal from "@/components/CalculatorModal";
 import NetWorthCalculator from "@/components/calculators/NetWorthCalculator";
 import MonthlySavingsCalculator from "@/components/calculators/MonthlySavingsCalculator";
+
+// Custom Dropdown Component
+interface CustomDropdownProps {
+  options: Array<{
+    value: number;
+    label: string;
+    description?: string;
+  }>;
+  value: number;
+  onChange: (value: number) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+
+const CustomDropdown: React.FC<CustomDropdownProps> = ({
+  options,
+  value,
+  onChange,
+  placeholder = "Select an option",
+  disabled = false,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        className={`w-full flex items-center justify-between p-4 bg-gray-700 border border-gray-600 rounded-xl text-left transition-all
+          ${isOpen ? "ring-2 ring-orange-500 border-orange-500" : ""}
+          ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-600 cursor-pointer"}
+        `}
+        disabled={disabled}
+      >
+        <div className="flex-1">
+          {selectedOption ? (
+            <div>
+              <div className="font-medium text-gray-100">{selectedOption.label}</div>
+              {selectedOption.description && (
+                <div className="text-sm text-gray-400 mt-1">{selectedOption.description}</div>
+              )}
+            </div>
+          ) : (
+            <div className="text-gray-400">{placeholder}</div>
+          )}
+        </div>
+        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-2 bg-gray-800 border border-gray-600 rounded-xl shadow-xl max-h-96 overflow-y-auto">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left p-4 transition-colors
+                ${option.value === value 
+                  ? "bg-orange-900/30 border-l-4 border-orange-500" 
+                  : "hover:bg-gray-700"
+                }
+              `}
+            >
+              <div className="font-medium text-gray-100">{option.label}</div>
+              {option.description && (
+                <div className="text-sm text-gray-400 mt-1">{option.description}</div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 type CurrentSituation =
   | "Employee Driver"
@@ -760,8 +853,7 @@ const getAssessmentQuestions = (
   {
     id: "professional_network",
     dimension: "Support Systems",
-    question:
-      "How strong is your professional network in the trucking industry?",
+    question: "How strong is your professional network in the trucking industry?",
     options: [
       { value: 0, label: "No professional contacts", description: "Isolated" },
       {
@@ -1204,91 +1296,7 @@ export default function ComprehensiveAssessmentPage() {
     handleInputChange(field, value);
   };
 
-  // Helper function to render option with special styling for calculators
-  const renderOption = (option: any, question: any) => {
-    const isCalculatorOption = option.value === -1;
-    const isSelected =
-      formData[question.id as keyof ComprehensiveAssessmentData] ===
-      option.value;
 
-    // Check if we have a calculated value for this calculator
-    const hasCalculatedValue =
-      (question.id === "net_worth" && calculatorResults.netWorth !== null) ||
-      (question.id === "monthly_savings" &&
-        calculatorResults.monthlySavings !== null);
-
-    // Get the display label for calculator options
-    let displayLabel = option.label;
-    if (isCalculatorOption && hasCalculatedValue) {
-      if (question.id === "net_worth") {
-        displayLabel = `${option.label} (Calculated: $${calculatorResults.netWorth?.toLocaleString()})`;
-      } else if (question.id === "monthly_savings") {
-        displayLabel = `${option.label} (Calculated: $${calculatorResults.monthlySavings?.toLocaleString()}/month)`;
-      }
-    }
-
-    return (
-      <label
-        key={option.value}
-        className={`flex items-start p-3 border rounded-xl cursor-pointer transition-all ${
-          isCalculatorOption
-            ? hasCalculatedValue
-              ? "border-green-600 bg-green-900/20 hover:bg-green-900/30"
-              : "border-indigo-600 bg-indigo-900/20 hover:bg-indigo-900/30"
-            : "border-gray-700 bg-gray-800 hover:bg-gray-700"
-        } ${isSelected ? "ring-2 ring-orange-500" : ""}`}
-        onClick={() => {
-          if (isCalculatorOption && isSelected) {
-            // If calculator option is already selected, still open the calculator
-            handleOptionClick(
-              question.id as keyof ComprehensiveAssessmentData,
-              option.value
-            );
-          }
-        }}
-      >
-        <input
-          type="radio"
-          name={question.id}
-          value={option.value}
-          checked={isSelected}
-          onChange={() =>
-            handleOptionClick(
-              question.id as keyof ComprehensiveAssessmentData,
-              option.value
-            )
-          }
-          className="mt-1 mr-3"
-        />
-        <div>
-          <div
-            className={`font-medium ${
-              isCalculatorOption
-                ? hasCalculatedValue
-                  ? "text-green-100"
-                  : "text-indigo-100"
-                : "text-gray-100"
-            }`}
-          >
-            {displayLabel}
-          </div>
-          {option.description && (
-            <div
-              className={`text-sm ${
-                isCalculatorOption
-                  ? hasCalculatedValue
-                    ? "text-green-300"
-                    : "text-indigo-300"
-                  : "text-gray-400"
-              }`}
-            >
-              {option.description}
-            </div>
-          )}
-        </div>
-      </label>
-    );
-  };
 
   const handleSituationChange = (situation: CurrentSituation) => {
     setFormData((prev) => ({ ...prev, current_situation: situation }));
@@ -1585,32 +1593,23 @@ export default function ComprehensiveAssessmentPage() {
                       <h4 className="text-lg font-semibold text-green-200 mb-3">
                         How many trucks do you own?
                       </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {[2, 3, 4, 5, 6, 7, 8, 9, 10, "10+"].map((size) => (
-                          <label
-                            key={size}
-                            className={`flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                              formData.fleet_size === size
-                                ? "border-green-500 bg-green-900/30 shadow-md"
-                                : "border-gray-700 hover:border-green-600 hover:bg-green-900/20"
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name="fleet_size"
-                              value={size}
-                              checked={formData.fleet_size === size}
-                              onChange={() =>
-                                handleFleetSizeChange(size as number)
-                              }
-                              className="mr-2 w-4 h-4 text-green-600"
-                            />
-                            <span className="font-medium text-gray-100">
-                              {size} {size === 1 ? "Truck" : "Trucks"}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
+                      <CustomDropdown
+                        options={[
+                          { value: 2, label: "2 Trucks" },
+                          { value: 3, label: "3 Trucks" },
+                          { value: 4, label: "4 Trucks" },
+                          { value: 5, label: "5 Trucks" },
+                          { value: 6, label: "6 Trucks" },
+                          { value: 7, label: "7 Trucks" },
+                          { value: 8, label: "8 Trucks" },
+                          { value: 9, label: "9 Trucks" },
+                          { value: 10, label: "10 Trucks" },
+                          { value: 11, label: "10+ Trucks" }
+                        ]}
+                        value={typeof formData.fleet_size === 'number' ? formData.fleet_size : parseInt(formData.fleet_size as string, 10) || 0}
+                        onChange={(value) => handleFleetSizeChange(Number(value))}
+                        placeholder="Select fleet size"
+                      />
                     </div>
                   )}
 
@@ -1704,8 +1703,7 @@ export default function ComprehensiveAssessmentPage() {
                         question.id === "monthly_savings") && (
                         <div className="mb-3 p-3 bg-blue-900/20 border border-blue-700 rounded-xl">
                           <p className="text-sm text-blue-200">
-                            <strong>💡 Tip:</strong> You can either use the
-                            calculator for a precise calculation or select a
+                            <strong>💡 Tip:</strong> Use the calculator below for a precise calculation or select a
                             range if you already know your{" "}
                             {question.id === "net_worth"
                               ? "net worth"
@@ -1714,98 +1712,69 @@ export default function ComprehensiveAssessmentPage() {
                           </p>
                         </div>
                       )}
-                      <div className="space-y-2">
-                        {question.options.map((option) => {
-                          const isCalculatorOption = option.value === -1;
-                          const isSelected =
-                            formData[
-                              question.id as keyof ComprehensiveAssessmentData
-                            ] === option.value;
-
-                          // Check if we have a calculated value for this calculator
-                          const hasCalculatedValue =
-                            (question.id === "net_worth" &&
-                              calculatorResults.netWorth !== null) ||
-                            (question.id === "monthly_savings" &&
-                              calculatorResults.monthlySavings !== null);
-
-                          // Get the display label for calculator options
-                          let displayLabel = option.label;
-                          if (isCalculatorOption && hasCalculatedValue) {
-                            if (question.id === "net_worth") {
-                              displayLabel = `${option.label} (Calculated: $${calculatorResults.netWorth?.toLocaleString()})`;
-                            } else if (question.id === "monthly_savings") {
-                              displayLabel = `${option.label} (Calculated: $${calculatorResults.monthlySavings?.toLocaleString()}/month)`;
-                            }
-                          }
-
-                          return (
-                            <label
-                              key={option.value}
-                              className={`flex items-start p-3 border rounded-xl cursor-pointer transition-all ${
-                                isCalculatorOption
-                                  ? hasCalculatedValue
-                                    ? "border-green-600 bg-green-900/20 hover:bg-green-900/30"
-                                    : "border-indigo-600 bg-indigo-900/20 hover:bg-indigo-900/30"
-                                  : "border-gray-600 bg-gray-700 hover:bg-gray-600"
-                              } ${isSelected ? "ring-2 ring-orange-500" : ""}`}
+                      
+                      {/* Show calculated value if available */}
+                      {((question.id === "net_worth" && calculatorResults.netWorth !== undefined) ||
+                        (question.id === "monthly_savings" && calculatorResults.monthlySavings !== undefined)) && (
+                        <div className="mb-4 p-4 bg-green-900/30 border border-green-600 rounded-xl">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-green-300 mb-1">Calculated Value:</p>
+                              <p className="text-xl font-bold text-green-100">
+                                {question.id === "net_worth"
+                                  ? `$${calculatorResults.netWorth?.toLocaleString()}`
+                                  : `$${calculatorResults.monthlySavings?.toLocaleString()}/month`}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
                               onClick={() => {
-                                if (isCalculatorOption) {
-                                  handleOptionClick(
-                                    question.id as keyof ComprehensiveAssessmentData,
-                                    option.value
-                                  );
+                                if (question.id === "net_worth") {
+                                  setCalculatorResults(prev => ({ ...prev, netWorth: undefined }));
+                                  handleInputChange(question.id as keyof ComprehensiveAssessmentData, 0);
+                                } else {
+                                  setCalculatorResults(prev => ({ ...prev, monthlySavings: undefined }));
+                                  handleInputChange(question.id as keyof ComprehensiveAssessmentData, 0);
                                 }
                               }}
+                              className="text-sm text-green-400 hover:text-green-300 underline"
                             >
-                              <input
-                                type="radio"
-                                name={question.id}
-                                value={option.value}
-                                checked={isSelected}
-                                onChange={() =>
-                                  isCalculatorOption
-                                    ? handleOptionClick(
-                                        question.id as keyof ComprehensiveAssessmentData,
-                                        option.value
-                                      )
-                                    : handleInputChange(
-                                        question.id as keyof ComprehensiveAssessmentData,
-                                        option.value
-                                      )
-                                }
-                                className="mt-1 mr-3"
-                              />
-                              <div>
-                                <div
-                                  className={`font-medium ${
-                                    isCalculatorOption
-                                      ? hasCalculatedValue
-                                        ? "text-green-100"
-                                        : "text-indigo-100"
-                                      : "text-gray-100"
-                                  }`}
-                                >
-                                  {displayLabel}
-                                </div>
-                                {option.description && (
-                                  <div
-                                    className={`text-sm ${
-                                      isCalculatorOption
-                                        ? hasCalculatedValue
-                                          ? "text-green-300"
-                                          : "text-indigo-300"
-                                        : "text-gray-400"
-                                    }`}
-                                  >
-                                    {option.description}
-                                  </div>
-                                )}
-                              </div>
-                            </label>
-                          );
-                        })}
-                      </div>
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Calculator Button */}
+                      {(question.id === "net_worth" || question.id === "monthly_savings") && (
+                        <div className="mb-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (question.id === "net_worth") {
+                                setShowNetWorthCalculator(true);
+                                setShowSavingsCalculator(false);
+                              } else {
+                                setShowSavingsCalculator(true);
+                                setShowNetWorthCalculator(false);
+                              }
+                            }}
+                            className="w-full flex items-center justify-center gap-3 p-4 bg-indigo-900/30 hover:bg-indigo-900/50 border border-indigo-600 text-indigo-100 rounded-xl transition-all"
+                          >
+                            <Calculator className="w-5 h-5" />
+                            <span className="font-medium">
+                              Open {question.id === "net_worth" ? "Net Worth" : "Monthly Savings"} Calculator
+                            </span>
+                          </button>
+                        </div>
+                      )}
+                      
+                      <CustomDropdown
+                        options={question.options.filter(option => option.value !== -1)}
+                        value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
+                        onChange={(value) => handleInputChange(question.id as keyof ComprehensiveAssessmentData, value)}
+                        placeholder="Select an option"
+                      />
                     </div>
                   ))}
               </div>
@@ -1830,42 +1799,12 @@ export default function ComprehensiveAssessmentPage() {
                       <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
-                      <div className="space-y-2">
-                        {question.options.map((option) => (
-                          <label
-                            key={option.value}
-                            className="flex items-start p-3 border border-gray-600 bg-gray-700 rounded-xl hover:bg-gray-600 cursor-pointer"
-                          >
-                            <input
-                              type="radio"
-                              name={question.id}
-                              value={option.value}
-                              checked={
-                                formData[
-                                  question.id as keyof ComprehensiveAssessmentData
-                                ] === option.value
-                              }
-                              onChange={() =>
-                                handleInputChange(
-                                  question.id as keyof ComprehensiveAssessmentData,
-                                  option.value
-                                )
-                              }
-                              className="mt-1 mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-100">
-                                {option.label}
-                              </div>
-                              {option.description && (
-                                <div className="text-sm text-gray-400">
-                                  {option.description}
-                                </div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
+                      <CustomDropdown
+                        options={question.options}
+                        value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
+                        onChange={(value) => handleInputChange(question.id as keyof ComprehensiveAssessmentData, value)}
+                        placeholder="Select an option"
+                      />
                     </div>
                   ))}
               </div>
@@ -1890,42 +1829,12 @@ export default function ComprehensiveAssessmentPage() {
                       <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
-                      <div className="space-y-2">
-                        {question.options.map((option) => (
-                          <label
-                            key={option.value}
-                            className="flex items-start p-3 border border-gray-600 bg-gray-700 rounded-xl hover:bg-gray-600 cursor-pointer"
-                          >
-                            <input
-                              type="radio"
-                              name={question.id}
-                              value={option.value}
-                              checked={
-                                formData[
-                                  question.id as keyof ComprehensiveAssessmentData
-                                ] === option.value
-                              }
-                              onChange={() =>
-                                handleInputChange(
-                                  question.id as keyof ComprehensiveAssessmentData,
-                                  option.value
-                                )
-                              }
-                              className="mt-1 mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-100">
-                                {option.label}
-                              </div>
-                              {option.description && (
-                                <div className="text-sm text-gray-400">
-                                  {option.description}
-                                </div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
+                      <CustomDropdown
+                        options={question.options}
+                        value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
+                        onChange={(value) => handleInputChange(question.id as keyof ComprehensiveAssessmentData, value)}
+                        placeholder="Select an option"
+                      />
                     </div>
                   ))}
               </div>
@@ -1950,42 +1859,12 @@ export default function ComprehensiveAssessmentPage() {
                       <label className="block text-sm font-medium text-gray-100 mb-3">
                         {index + 1}. {question.question}
                       </label>
-                      <div className="space-y-2">
-                        {question.options.map((option) => (
-                          <label
-                            key={option.value}
-                            className="flex items-start p-3 border border-gray-600 bg-gray-700 rounded-xl hover:bg-gray-600 cursor-pointer"
-                          >
-                            <input
-                              type="radio"
-                              name={question.id}
-                              value={option.value}
-                              checked={
-                                formData[
-                                  question.id as keyof ComprehensiveAssessmentData
-                                ] === option.value
-                              }
-                              onChange={() =>
-                                handleInputChange(
-                                  question.id as keyof ComprehensiveAssessmentData,
-                                  option.value
-                                )
-                              }
-                              className="mt-1 mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-100">
-                                {option.label}
-                              </div>
-                              {option.description && (
-                                <div className="text-sm text-gray-400">
-                                  {option.description}
-                                </div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
+                      <CustomDropdown
+                        options={question.options}
+                        value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
+                        onChange={(value) => handleInputChange(question.id as keyof ComprehensiveAssessmentData, value)}
+                        placeholder="Select an option"
+                      />
                     </div>
                   ))}
               </div>
@@ -2018,15 +1897,15 @@ export default function ComprehensiveAssessmentPage() {
           onCalculate={(netWorth) => {
             setCalculatorResults((prev) => ({ ...prev, netWorth }));
             setShowNetWorthCalculator(false);
-            // Auto-select the appropriate range based on calculated value
+            // Automatically select the appropriate range based on calculated value
             let selectedValue = 0;
-            if (netWorth < -25000) selectedValue = 0;
-            else if (netWorth < -10000) selectedValue = 3;
-            else if (netWorth < 0) selectedValue = 6;
-            else if (netWorth < 10000) selectedValue = 10;
-            else if (netWorth < 50000) selectedValue = 12;
-            else selectedValue = 14;
-            setFormData((prev) => ({ ...prev, net_worth: selectedValue }));
+            if (netWorth >= 50000) selectedValue = 14;
+            else if (netWorth >= 10000) selectedValue = 12;
+            else if (netWorth >= 0) selectedValue = 10;
+            else if (netWorth >= -10000) selectedValue = 6;
+            else if (netWorth >= -25000) selectedValue = 3;
+            else selectedValue = 0;
+            handleInputChange("net_worth", selectedValue);
           }}
           onCancel={() => {
             setShowNetWorthCalculator(false);
@@ -2062,10 +1941,7 @@ export default function ComprehensiveAssessmentPage() {
             else if (monthlySavings < 1000) selectedValue = 7;
             else if (monthlySavings < 2000) selectedValue = 9;
             else selectedValue = 10.5;
-            setFormData((prev) => ({
-              ...prev,
-              monthly_savings: selectedValue,
-            }));
+            handleInputChange("monthly_savings", selectedValue);
           }}
           onCancel={() => {
             setShowSavingsCalculator(false);

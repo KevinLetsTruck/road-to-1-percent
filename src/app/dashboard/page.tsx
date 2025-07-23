@@ -268,7 +268,11 @@ export default function DashboardPage() {
   // Redirect to assessment if no assessments completed
   useEffect(() => {
     if (!loading && !authLoading && stats && !stats.hasCompletedAssessments) {
-      router.push("/dashboard/comprehensive-assessment");
+      // Small delay to show "Redirecting..." message
+      const timer = setTimeout(() => {
+        router.push("/dashboard/comprehensive-assessment");
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [loading, authLoading, stats, router]);
 
@@ -278,6 +282,18 @@ export default function DashboardPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
           <p className="mt-4 text-gray-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking if redirect is needed
+  if (stats && !stats.hasCompletedAssessments) {
+    return (
+      <div className="min-h-screen bg-navy-gradient flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Redirecting to assessment...</p>
         </div>
       </div>
     );

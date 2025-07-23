@@ -29,6 +29,8 @@ import {
   Shield,
   Users2,
   Check,
+  LogOut,
+  ShieldCheck,
 } from "lucide-react";
 import PDFDownloadButton from "@/components/PDFDownloadButton";
 
@@ -63,6 +65,7 @@ export default function DashboardPage() {
   const supabase = createClient();
   const [showSPIDetails, setShowSPIDetails] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Check for success message in URL parameters
@@ -93,6 +96,15 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+
+        // Check if user is admin
+        const { data: adminProfile } = await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", user.id)
+          .single();
+
+        setIsAdmin(adminProfile?.is_admin || false);
 
         // Fetch user profile for name
         const { data: profileData } = await supabase
@@ -286,6 +298,11 @@ export default function DashboardPage() {
     return "Early Stage - Significant development needed across multiple areas";
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   // Define dimension data with quick wins and long-term goals
   const dimensionsData: DimensionData[] = [
     {
@@ -400,7 +417,14 @@ export default function DashboardPage() {
                 {user?.email || "Entrepreneur"}
               </p>
             </div>
-            <div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleSignOut}
+                className="border-2 border-gray-600 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-gray-500 hover:text-white transition-all flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
               <button
                 onClick={() =>
                   router.push("/dashboard/comprehensive-assessment")

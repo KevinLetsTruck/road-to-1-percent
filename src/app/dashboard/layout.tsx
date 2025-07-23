@@ -35,6 +35,7 @@ export default function DashboardLayout({
   return (
     <>
       {/* Admin Button - Fixed at top for all dashboard pages */}
+      {/* Temporarily hidden
       {isAdmin && (
         <div className="fixed top-4 right-4 z-50">
           <button
@@ -46,6 +47,7 @@ export default function DashboardLayout({
           </button>
         </div>
       )}
+      */}
       {children}
     </>
   );

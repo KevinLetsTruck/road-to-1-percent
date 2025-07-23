@@ -479,6 +479,58 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Standout Strengths Reminder */}
+        {stats?.hasCompletedAssessments && (!stats?.standoutStrength1 || !stats?.standoutStrength2) && (
+          <div className="mb-8 p-6 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-800 rounded-xl">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-purple-400" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-purple-100 mb-2">
+                  Complete Your Standout Assessment
+                </h3>
+                <p className="text-purple-200 mb-4">
+                  You haven't selected your standout strengths yet. These strengths provide valuable insights 
+                  and can add up to 20 bonus points to your SPI score.
+                </p>
+                <div className="space-y-3">
+                  <p className="text-sm text-purple-300">
+                    <strong>What to do:</strong>
+                  </p>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-purple-200">
+                    <li>
+                      Take the free assessment at{" "}
+                      <a
+                        href="https://www.marcusbuckingham.com/the-standout-assessment"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-400 hover:text-purple-300 underline"
+                      >
+                        StandOut Assessment
+                      </a>
+                    </li>
+                    <li>Complete the 15-minute questionnaire</li>
+                    <li>Get your top 2 strengths from the report</li>
+                    <li>Return here to update your profile</li>
+                  </ol>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => router.push("/dashboard/comprehensive-assessment")}
+                    className="inline-flex items-center px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-all"
+                  >
+                    Update Your Strengths
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Success Probability Section */}
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
           {/* Success Probability Graphic */}

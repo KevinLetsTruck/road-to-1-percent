@@ -206,12 +206,9 @@ function ComprehensiveAssessmentResultsContent() {
     // Check if this is a combination
     if (combo.includes(' + ')) {
       const combinationKey = combo.trim();
-      console.log('Looking for combination:', combinationKey);
-      console.log('Available combinations:', Object.keys(strengthCombinationInsights).slice(0, 5));
       const dynamicInsights = strengthCombinationInsights[combinationKey];
       
       if (dynamicInsights) {
-        console.log('Found dynamic insights for:', combinationKey);
         // Parse the combination to get individual strengths
         const [first, second] = combo.split(' + ').map(s => s.trim());
         
@@ -239,9 +236,6 @@ function ComprehensiveAssessmentResultsContent() {
           leverageTips: dynamicInsights.leverageTips,
           successProfile: `Your ${combo} combination positions you to leverage both strengths for exceptional results.`
         };
-      } else {
-        console.log('No dynamic insights found for:', combinationKey);
-        console.log('Checking if strengths exist separately:', combo.split(' + '));
       }
     }
     
@@ -964,9 +958,6 @@ function ComprehensiveAssessmentResultsContent() {
             </div>
 
             {(() => {
-              console.log('Strength1:', strength1);
-              console.log('Strength2:', strength2);
-              console.log('ActualStrengthCombo:', actualStrengthCombo);
               const insights = getStrengthInsights(actualStrengthCombo);
               return (
                 <>

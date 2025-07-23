@@ -1445,7 +1445,7 @@ export default function ComprehensiveAssessmentPage() {
                     <li>
                       Take the free assessment at:{" "}
                       <a
-                        href="https://www.marcusbuckingham.com/the-standout-assessment"
+                        href="https://www.tmbc.com/standout-assessment/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-purple-400 hover:text-purple-300 underline"

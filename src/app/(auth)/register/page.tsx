@@ -87,8 +87,8 @@ export default function RegisterPage() {
           // Continue even if progress creation fails
         }
 
-        // Redirect directly to dashboard
-        router.push("/dashboard");
+        // Redirect directly to comprehensive assessment
+        router.push("/dashboard/comprehensive-assessment");
       } else {
         throw new Error("Failed to sign in after registration");
       }

@@ -34,7 +34,9 @@ import {
   Check,
   LogOut,
   ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
+import Link from "next/link";
 import PDFDownloadButton from "@/components/PDFDownloadButton";
 
 interface DashboardStats {
@@ -45,6 +47,7 @@ interface DashboardStats {
   lastAssessmentDate: string | null;
   standoutStrength1: string | null;
   standoutStrength2: string | null;
+  hasCompletedAssessments: boolean;
 }
 
 interface DimensionData {
@@ -201,37 +204,45 @@ export default function DashboardPage() {
           // Total possible score: 100 points (80 base + 20 standout)
           const totalScore = baseScore + standoutBonus;
 
+          // Check if user has completed any assessments
+          const hasCompletedAssessments = progressData.financial_foundation_completed ||
+            progressData.market_intelligence_completed ||
+            progressData.risk_management_completed ||
+            progressData.support_systems_completed;
+
           // Calculate success probability with progressive scaling
           let successProbability = 0;
 
-          if (totalScore >= 90) {
-            // 90-100 -> 85-95%
-            successProbability = 85 + (totalScore - 90);
-          } else if (totalScore >= 80) {
-            // 80-89 -> 75-84%
-            successProbability = 75 + (totalScore - 80) * 0.9;
-          } else if (totalScore >= 70) {
-            // 70-79 -> 65-74%
-            successProbability = 65 + (totalScore - 70) * 0.9;
-          } else if (totalScore >= 60) {
-            // 60-69 -> 55-64%
-            successProbability = 55 + (totalScore - 60) * 0.9;
-          } else if (totalScore >= 50) {
-            // 50-59 -> 45-54%
-            successProbability = 45 + (totalScore - 50) * 0.9;
-          } else if (totalScore >= 40) {
-            // 40-49 -> 35-44%
-            successProbability = 35 + (totalScore - 40) * 0.9;
-          } else if (totalScore >= 30) {
-            // 30-39 -> 25-34%
-            successProbability = 25 + (totalScore - 30) * 0.9;
-          } else {
-            // Below 30 -> 15-24%
-            successProbability = 15 + totalScore * 0.33;
-          }
+          if (hasCompletedAssessments) {
+            if (totalScore >= 90) {
+              // 90-100 -> 85-95%
+              successProbability = 85 + (totalScore - 90);
+            } else if (totalScore >= 80) {
+              // 80-89 -> 75-84%
+              successProbability = 75 + (totalScore - 80) * 0.9;
+            } else if (totalScore >= 70) {
+              // 70-79 -> 65-74%
+              successProbability = 65 + (totalScore - 70) * 0.9;
+            } else if (totalScore >= 60) {
+              // 60-69 -> 55-64%
+              successProbability = 55 + (totalScore - 60) * 0.9;
+            } else if (totalScore >= 50) {
+              // 50-59 -> 45-54%
+              successProbability = 45 + (totalScore - 50) * 0.9;
+            } else if (totalScore >= 40) {
+              // 40-49 -> 35-44%
+              successProbability = 35 + (totalScore - 40) * 0.9;
+            } else if (totalScore >= 30) {
+              // 30-39 -> 25-34%
+              successProbability = 25 + (totalScore - 30) * 0.9;
+            } else {
+              // Below 30 -> 15-24%
+              successProbability = 15 + totalScore * 0.33;
+            }
 
-          // Round and cap at 95%
-          successProbability = Math.min(Math.round(successProbability), 95);
+            // Round and cap at 95%
+            successProbability = Math.min(Math.round(successProbability), 95);
+          }
 
           setStats({
             successProbability,
@@ -241,6 +252,7 @@ export default function DashboardPage() {
             lastAssessmentDate: assessmentData?.assessment_date || null,
             standoutStrength1: assessmentData?.standout_strength_1 || null,
             standoutStrength2: assessmentData?.standout_strength_2 || null,
+            hasCompletedAssessments,
           });
         }
       } catch (error) {
@@ -471,30 +483,52 @@ export default function DashboardPage() {
                 </h2>
 
                 {/* Large Percentage Display */}
-                <div className="mb-3">
-                  <span
-                    className="text-6xl font-bold"
-                    style={{ color: "#ff6b35" }}
-                  >
-                    {stats?.successProbability || 30}%
-                  </span>
-                </div>
+                {stats?.hasCompletedAssessments ? (
+                  <>
+                    <div className="mb-3">
+                      <span
+                        className="text-6xl font-bold"
+                        style={{ color: "#ff6b35" }}
+                      >
+                        {stats?.successProbability || 0}%
+                      </span>
+                    </div>
 
-                {/* Probability Range */}
-                <div className="mb-3">
-                  <span
-                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-white"
-                    style={{ backgroundColor: "#ff6b35" }}
-                  >
-                    {getProbabilityRange(stats?.successProbability || 30)}{" "}
-                    Probability Range
-                  </span>
-                </div>
+                    {/* Probability Range */}
+                    <div className="mb-3">
+                      <span
+                        className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-white"
+                        style={{ backgroundColor: "#ff6b35" }}
+                      >
+                        {getProbabilityRange(stats?.successProbability || 0)}{" "}
+                        Probability Range
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-2xl font-semibold text-gray-100 mb-2">
+                      Take Your First Assessment
+                    </p>
+                    <p className="text-gray-400 mb-6">
+                      Complete the comprehensive assessment to calculate your Success Probability Index
+                    </p>
+                    <Link
+                      href="/dashboard/comprehensive-assessment"
+                      className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all"
+                    >
+                      Start Assessment
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
+                  </div>
+                )}
 
                 {/* Description */}
-                <p className="text-gray-400 text-sm mb-6">
-                  {getProbabilityDescription(stats?.successProbability || 30)}
-                </p>
+                {stats?.hasCompletedAssessments && (
+                  <p className="text-gray-400 text-sm mb-6">
+                    {getProbabilityDescription(stats?.successProbability || 0)}
+                  </p>
+                )}
 
                 {/* Progress Bar */}
                 <div className="mt-4">

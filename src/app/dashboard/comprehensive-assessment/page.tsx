@@ -51,8 +51,15 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   return (
     <div className="relative">
       <select
-        value={value || ""}
-        onChange={(e) => onChange(Number(e.target.value))}
+        value={value !== null && value !== undefined ? value : ""}
+        onChange={(e) => {
+          const val = e.target.value;
+          if (val === "") {
+            // If empty string (placeholder selected), don't call onChange
+            return;
+          }
+          onChange(Number(val));
+        }}
         disabled={disabled}
         className="w-full px-4 py-4 bg-gray-900/50 hover:bg-gray-900/70 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
         style={{ paddingRight: '3rem' }}

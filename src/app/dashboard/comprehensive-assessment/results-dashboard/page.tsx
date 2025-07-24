@@ -17,8 +17,12 @@ function TruckDashboardResultsContent() {
   const { signOut } = useAuth()
   
   const handleSignOut = async () => {
-    await signOut()
-    router.push('/login')
+    try {
+      await signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   useEffect(() => {

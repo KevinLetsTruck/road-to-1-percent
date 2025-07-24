@@ -50,8 +50,16 @@ export default function InsightsPage() {
   }, [router, supabase])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Logout error:', error)
+      } else {
+        router.push('/login')
+      }
+    } catch (err) {
+      console.error('Unexpected error during logout:', err)
+    }
   }
 
   if (loading) {

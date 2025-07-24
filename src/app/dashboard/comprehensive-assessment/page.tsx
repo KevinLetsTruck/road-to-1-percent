@@ -922,25 +922,25 @@ export default function ComprehensiveAssessmentPage() {
     load_sources: [],
     standout_strength_1: "",
     standout_strength_2: "",
-    net_worth: 0,
-    monthly_savings: 0,
-    emergency_fund_months: 0,
-    debt_to_income_ratio: 0,
-    business_capital: 0,
-    credit_score: 0,
-    rate_understanding: 0,
-    cost_analysis: 0,
-    customer_knowledge: 0,
-    industry_trends: 0,
-    strategic_planning: 0,
+    net_worth: null as any,
+    monthly_savings: null as any,
+    emergency_fund_months: null as any,
+    debt_to_income_ratio: null as any,
+    business_capital: null as any,
+    credit_score: null as any,
+    rate_understanding: null as any,
+    cost_analysis: null as any,
+    customer_knowledge: null as any,
+    industry_trends: null as any,
+    strategic_planning: null as any,
 
-    contingency_planning: 0,
-    business_continuity: 0,
-    risk_assessment: 0,
-    family_alignment: 0,
-    professional_network: 0,
-    mentorship: 0,
-    industry_reputation: 0,
+    contingency_planning: null as any,
+    business_continuity: null as any,
+    risk_assessment: null as any,
+    family_alignment: null as any,
+    professional_network: null as any,
+    mentorship: null as any,
+    industry_reputation: null as any,
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -986,26 +986,25 @@ export default function ComprehensiveAssessmentPage() {
             load_sources: existingAssessment.load_sources || [],
             standout_strength_1: existingAssessment.standout_strength_1 || "",
             standout_strength_2: existingAssessment.standout_strength_2 || "",
-            net_worth: existingAssessment.net_worth || 0,
-            monthly_savings: existingAssessment.monthly_savings || 0,
-            emergency_fund_months:
-              existingAssessment.emergency_fund_months || 0,
-            debt_to_income_ratio: existingAssessment.debt_to_income_ratio || 0,
-            business_capital: existingAssessment.business_capital || 0,
-            credit_score: existingAssessment.credit_score || 0,
-            rate_understanding: existingAssessment.rate_understanding || 0,
-            cost_analysis: existingAssessment.cost_analysis || 0,
-            customer_knowledge: existingAssessment.customer_knowledge || 0,
-            industry_trends: existingAssessment.industry_trends || 0,
-            strategic_planning: existingAssessment.strategic_planning || 0,
+            net_worth: existingAssessment.net_worth !== null && existingAssessment.net_worth !== undefined ? existingAssessment.net_worth : null,
+            monthly_savings: existingAssessment.monthly_savings !== null && existingAssessment.monthly_savings !== undefined ? existingAssessment.monthly_savings : null,
+            emergency_fund_months: existingAssessment.emergency_fund_months !== null && existingAssessment.emergency_fund_months !== undefined ? existingAssessment.emergency_fund_months : null,
+            debt_to_income_ratio: existingAssessment.debt_to_income_ratio !== null && existingAssessment.debt_to_income_ratio !== undefined ? existingAssessment.debt_to_income_ratio : null,
+            business_capital: existingAssessment.business_capital !== null && existingAssessment.business_capital !== undefined ? existingAssessment.business_capital : null,
+            credit_score: existingAssessment.credit_score !== null && existingAssessment.credit_score !== undefined ? existingAssessment.credit_score : null,
+            rate_understanding: existingAssessment.rate_understanding !== null && existingAssessment.rate_understanding !== undefined ? existingAssessment.rate_understanding : null,
+            cost_analysis: existingAssessment.cost_analysis !== null && existingAssessment.cost_analysis !== undefined ? existingAssessment.cost_analysis : null,
+            customer_knowledge: existingAssessment.customer_knowledge !== null && existingAssessment.customer_knowledge !== undefined ? existingAssessment.customer_knowledge : null,
+            industry_trends: existingAssessment.industry_trends !== null && existingAssessment.industry_trends !== undefined ? existingAssessment.industry_trends : null,
+            strategic_planning: existingAssessment.strategic_planning !== null && existingAssessment.strategic_planning !== undefined ? existingAssessment.strategic_planning : null,
 
-            contingency_planning: existingAssessment.contingency_planning || 0,
-            business_continuity: existingAssessment.business_continuity || 0,
-            risk_assessment: existingAssessment.risk_assessment || 0,
-            family_alignment: existingAssessment.family_alignment || 0,
-            professional_network: existingAssessment.professional_network || 0,
-            mentorship: existingAssessment.mentorship || 0,
-            industry_reputation: existingAssessment.industry_reputation || 0,
+            contingency_planning: existingAssessment.contingency_planning !== null && existingAssessment.contingency_planning !== undefined ? existingAssessment.contingency_planning : null,
+            business_continuity: existingAssessment.business_continuity !== null && existingAssessment.business_continuity !== undefined ? existingAssessment.business_continuity : null,
+            risk_assessment: existingAssessment.risk_assessment !== null && existingAssessment.risk_assessment !== undefined ? existingAssessment.risk_assessment : null,
+            family_alignment: existingAssessment.family_alignment !== null && existingAssessment.family_alignment !== undefined ? existingAssessment.family_alignment : null,
+            professional_network: existingAssessment.professional_network !== null && existingAssessment.professional_network !== undefined ? existingAssessment.professional_network : null,
+            mentorship: existingAssessment.mentorship !== null && existingAssessment.mentorship !== undefined ? existingAssessment.mentorship : null,
+            industry_reputation: existingAssessment.industry_reputation !== null && existingAssessment.industry_reputation !== undefined ? existingAssessment.industry_reputation : null,
           });
           setHasExistingData(true);
         }
@@ -1031,7 +1030,10 @@ export default function ComprehensiveAssessmentPage() {
       const value = formData[
         question.id as keyof ComprehensiveAssessmentData
       ] as number;
-      totalScore += value;
+      // Skip null/undefined values
+      if (value !== null && value !== undefined) {
+        totalScore += value;
+      }
     });
 
     return Math.round(totalScore);
@@ -1090,6 +1092,24 @@ export default function ComprehensiveAssessmentPage() {
 
     try {
       if (!user) throw new Error("User not authenticated");
+      
+      // Validate that all fields are selected
+      const requiredFields = [
+        'net_worth', 'monthly_savings', 'emergency_fund_months', 'debt_to_income_ratio',
+        'business_capital', 'credit_score', 'rate_understanding', 'cost_analysis',
+        'customer_knowledge', 'industry_trends', 'strategic_planning', 
+        'contingency_planning', 'business_continuity', 'risk_assessment',
+        'family_alignment', 'professional_network', 'mentorship', 'industry_reputation'
+      ];
+      
+      for (const field of requiredFields) {
+        if (formData[field as keyof ComprehensiveAssessmentData] === null || 
+            formData[field as keyof ComprehensiveAssessmentData] === undefined) {
+          setError(`Please select an option for all questions before submitting.`);
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const totalScore = calculateTotalSPIScore();
       const tier = getSPITier(totalScore);

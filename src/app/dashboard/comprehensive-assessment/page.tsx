@@ -107,8 +107,6 @@ interface ComprehensiveAssessmentData {
   net_worth: number | null;
   monthly_savings: number | null;
   emergency_fund_months: number | null;
-  debt_to_income_ratio: number | null;
-  business_capital: number | null;
   credit_score: number | null;
 
   // Market Intelligence (20 points)
@@ -925,8 +923,6 @@ export default function ComprehensiveAssessmentPage() {
     net_worth: null,
     monthly_savings: null,
     emergency_fund_months: null,
-    debt_to_income_ratio: null,
-    business_capital: null,
     credit_score: null,
     rate_understanding: null,
     cost_analysis: null,
@@ -989,8 +985,6 @@ export default function ComprehensiveAssessmentPage() {
             net_worth: existingAssessment.net_worth !== null && existingAssessment.net_worth !== undefined ? existingAssessment.net_worth : null,
             monthly_savings: existingAssessment.monthly_savings !== null && existingAssessment.monthly_savings !== undefined ? existingAssessment.monthly_savings : null,
             emergency_fund_months: existingAssessment.emergency_fund_months !== null && existingAssessment.emergency_fund_months !== undefined ? existingAssessment.emergency_fund_months : null,
-            debt_to_income_ratio: existingAssessment.debt_to_income_ratio !== null && existingAssessment.debt_to_income_ratio !== undefined ? existingAssessment.debt_to_income_ratio : null,
-            business_capital: existingAssessment.business_capital !== null && existingAssessment.business_capital !== undefined ? existingAssessment.business_capital : null,
             credit_score: existingAssessment.credit_score !== null && existingAssessment.credit_score !== undefined ? existingAssessment.credit_score : null,
             rate_understanding: existingAssessment.rate_understanding !== null && existingAssessment.rate_understanding !== undefined ? existingAssessment.rate_understanding : null,
             cost_analysis: existingAssessment.cost_analysis !== null && existingAssessment.cost_analysis !== undefined ? existingAssessment.cost_analysis : null,
@@ -1093,14 +1087,9 @@ export default function ComprehensiveAssessmentPage() {
     try {
       if (!user) throw new Error("User not authenticated");
       
-      // Validate that all fields are selected
-      const requiredFields = [
-        'net_worth', 'monthly_savings', 'emergency_fund_months', 'debt_to_income_ratio',
-        'business_capital', 'credit_score', 'rate_understanding', 'cost_analysis',
-        'customer_knowledge', 'industry_trends', 'strategic_planning', 
-        'contingency_planning', 'business_continuity', 'risk_assessment',
-        'family_alignment', 'professional_network', 'mentorship', 'industry_reputation'
-      ];
+      // Validate that all fields are selected - only check for questions that actually exist in the assessment
+      const assessmentQuestions = getAssessmentQuestions(formData.current_situation);
+      const requiredFields = assessmentQuestions.map(q => q.id);
       
       const missingFields: string[] = [];
       
@@ -1344,18 +1333,7 @@ export default function ComprehensiveAssessmentPage() {
               </span>
             </div>
 
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-xl font-medium hover:from-orange-600 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Save className="w-4 h-4" />
-              {submitting
-                ? "Processing..."
-                : hasExistingData
-                  ? "Update Assessment"
-                  : "Complete Assessment"}
-            </button>
+
           </div>
         </div>
       </div>

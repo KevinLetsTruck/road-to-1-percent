@@ -32,7 +32,7 @@ interface CustomDropdownProps {
     label: string;
     description?: string;
   }>;
-  value: number;
+  value: number | null;
   onChange: (value: number) => void;
   placeholder?: string;
   disabled?: boolean;
@@ -104,32 +104,32 @@ interface ComprehensiveAssessmentData {
   standout_strength_2: string;
 
   // Financial Foundation (35 points)
-  net_worth: number;
-  monthly_savings: number;
-  emergency_fund_months: number;
-  debt_to_income_ratio: number;
-  business_capital: number;
-  credit_score: number;
+  net_worth: number | null;
+  monthly_savings: number | null;
+  emergency_fund_months: number | null;
+  debt_to_income_ratio: number | null;
+  business_capital: number | null;
+  credit_score: number | null;
 
   // Market Intelligence (20 points)
-  rate_understanding: number;
-  cost_analysis: number;
-  customer_knowledge: number;
-  industry_trends: number;
-  strategic_planning: number;
+  rate_understanding: number | null;
+  cost_analysis: number | null;
+  customer_knowledge: number | null;
+  industry_trends: number | null;
+  strategic_planning: number | null;
 
   // Personal Strengths (20 points)
 
   // Risk Management (15 points)
-  contingency_planning: number;
-  business_continuity: number;
-  risk_assessment: number;
+  contingency_planning: number | null;
+  business_continuity: number | null;
+  risk_assessment: number | null;
 
   // Support Systems (10 points)
-  family_alignment: number;
-  professional_network: number;
-  mentorship: number;
-  industry_reputation: number;
+  family_alignment: number | null;
+  professional_network: number | null;
+  mentorship: number | null;
+  industry_reputation: number | null;
 }
 
 interface AssessmentQuestion {
@@ -922,25 +922,25 @@ export default function ComprehensiveAssessmentPage() {
     load_sources: [],
     standout_strength_1: "",
     standout_strength_2: "",
-    net_worth: null as any,
-    monthly_savings: null as any,
-    emergency_fund_months: null as any,
-    debt_to_income_ratio: null as any,
-    business_capital: null as any,
-    credit_score: null as any,
-    rate_understanding: null as any,
-    cost_analysis: null as any,
-    customer_knowledge: null as any,
-    industry_trends: null as any,
-    strategic_planning: null as any,
+    net_worth: null,
+    monthly_savings: null,
+    emergency_fund_months: null,
+    debt_to_income_ratio: null,
+    business_capital: null,
+    credit_score: null,
+    rate_understanding: null,
+    cost_analysis: null,
+    customer_knowledge: null,
+    industry_trends: null,
+    strategic_planning: null,
 
-    contingency_planning: null as any,
-    business_continuity: null as any,
-    risk_assessment: null as any,
-    family_alignment: null as any,
-    professional_network: null as any,
-    mentorship: null as any,
-    industry_reputation: null as any,
+    contingency_planning: null,
+    business_continuity: null,
+    risk_assessment: null,
+    family_alignment: null,
+    professional_network: null,
+    mentorship: null,
+    industry_reputation: null,
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -1029,7 +1029,7 @@ export default function ComprehensiveAssessmentPage() {
     dimensionQuestions.forEach((question) => {
       const value = formData[
         question.id as keyof ComprehensiveAssessmentData
-      ] as number;
+      ] as number | null;
       // Skip null/undefined values
       if (value !== null && value !== undefined) {
         totalScore += value;
@@ -1102,13 +1102,21 @@ export default function ComprehensiveAssessmentPage() {
         'family_alignment', 'professional_network', 'mentorship', 'industry_reputation'
       ];
       
+      const missingFields: string[] = [];
+      
       for (const field of requiredFields) {
-        if (formData[field as keyof ComprehensiveAssessmentData] === null || 
-            formData[field as keyof ComprehensiveAssessmentData] === undefined) {
-          setError(`Please select an option for all questions before submitting.`);
-          setSubmitting(false);
-          return;
+        const value = formData[field as keyof ComprehensiveAssessmentData];
+        if (value === null || value === undefined) {
+          // Convert field name to a more readable format
+          const readableField = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          missingFields.push(readableField);
         }
+      }
+      
+      if (missingFields.length > 0) {
+        setError(`Please select an option for the following questions: ${missingFields.join(', ')}`);
+        setSubmitting(false);
+        return;
       }
 
       const totalScore = calculateTotalSPIScore();
@@ -1679,6 +1687,48 @@ export default function ComprehensiveAssessmentPage() {
               </div>
             </div>
 
+            {/* Progress Indicator */}
+            <div className="mb-8 p-6 bg-gray-800 rounded-xl border border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-100 mb-4">Assessment Progress</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {['Financial Foundation', 'Market Intelligence', 'Risk Management', 'Support Systems'].map((dimension) => {
+                  const questions = getAssessmentQuestions(formData.current_situation).filter(q => q.dimension === dimension);
+                  const answeredQuestions = questions.filter(q => {
+                    const value = formData[q.id as keyof ComprehensiveAssessmentData];
+                    return value !== null && value !== undefined;
+                  }).length;
+                  const progress = questions.length > 0 ? (answeredQuestions / questions.length) * 100 : 0;
+                  
+                  return (
+                    <div key={dimension} className="bg-gray-700 rounded-lg p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-200">{dimension}</span>
+                        <span className="text-xs text-gray-400">{answeredQuestions}/{questions.length}</span>
+                      </div>
+                      <div className="w-full bg-gray-600 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            progress === 100 ? 'bg-green-500' : progress > 50 ? 'bg-yellow-500' : 'bg-red-500'
+                          }`}
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 text-sm text-gray-400">
+                {(() => {
+                  const totalQuestions = getAssessmentQuestions(formData.current_situation).length;
+                  const totalAnswered = getAssessmentQuestions(formData.current_situation).filter(q => {
+                    const value = formData[q.id as keyof ComprehensiveAssessmentData];
+                    return value !== null && value !== undefined;
+                  }).length;
+                  return `${totalAnswered} of ${totalQuestions} questions answered`;
+                })()}
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Financial Foundation Section */}
               <div>
@@ -1695,11 +1745,30 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
+                      className={`mb-6 p-4 border rounded-xl transition-all duration-200 ${
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== undefined
+                          ? 'border-green-500 bg-gray-800'
+                          : 'border-gray-700 bg-gray-800'
+                      }`}
                     >
-                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
-                        {index + 1}. {question.question}
-                      </label>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-gray-100" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
+                          {index + 1}. {question.question}
+                        </label>
+                        {formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                         formData[question.id as keyof ComprehensiveAssessmentData] !== undefined ? (
+                          <div className="flex items-center text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Answered</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-400">
+                            <AlertCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Required</span>
+                          </div>
+                        )}
+                      </div>
                       {/* Add helpful instructions for calculator questions */}
                       {(question.id === "net_worth" ||
                         question.id === "monthly_savings") && (
@@ -1796,11 +1865,30 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
+                      className={`mb-6 p-4 border rounded-xl transition-all duration-200 ${
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== undefined
+                          ? 'border-green-500 bg-gray-800'
+                          : 'border-gray-700 bg-gray-800'
+                      }`}
                     >
-                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
-                        {index + 1}. {question.question}
-                      </label>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-gray-100" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
+                          {index + 1}. {question.question}
+                        </label>
+                        {formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                         formData[question.id as keyof ComprehensiveAssessmentData] !== undefined ? (
+                          <div className="flex items-center text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Answered</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-400">
+                            <AlertCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Required</span>
+                          </div>
+                        )}
+                      </div>
                       <CustomDropdown
                         options={question.options}
                         value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
@@ -1826,11 +1914,30 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
+                      className={`mb-6 p-4 border rounded-xl transition-all duration-200 ${
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== undefined
+                          ? 'border-green-500 bg-gray-800'
+                          : 'border-gray-700 bg-gray-800'
+                      }`}
                     >
-                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
-                        {index + 1}. {question.question}
-                      </label>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-gray-100" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
+                          {index + 1}. {question.question}
+                        </label>
+                        {formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                         formData[question.id as keyof ComprehensiveAssessmentData] !== undefined ? (
+                          <div className="flex items-center text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Answered</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-400">
+                            <AlertCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Required</span>
+                          </div>
+                        )}
+                      </div>
                       <CustomDropdown
                         options={question.options}
                         value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
@@ -1856,11 +1963,30 @@ export default function ComprehensiveAssessmentPage() {
                   .map((question, index) => (
                     <div
                       key={question.id}
-                      className="mb-6 p-4 border border-gray-700 bg-gray-800 rounded-xl"
+                      className={`mb-6 p-4 border rounded-xl transition-all duration-200 ${
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                        formData[question.id as keyof ComprehensiveAssessmentData] !== undefined
+                          ? 'border-green-500 bg-gray-800'
+                          : 'border-gray-700 bg-gray-800'
+                      }`}
                     >
-                      <label className="block text-gray-100 mb-3" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
-                        {index + 1}. {question.question}
-                      </label>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-gray-100" style={{ fontSize: '1.25rem', fontWeight: 500 }}>
+                          {index + 1}. {question.question}
+                        </label>
+                        {formData[question.id as keyof ComprehensiveAssessmentData] !== null && 
+                         formData[question.id as keyof ComprehensiveAssessmentData] !== undefined ? (
+                          <div className="flex items-center text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Answered</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-400">
+                            <AlertCircle className="w-5 h-5 mr-1" />
+                            <span className="text-sm">Required</span>
+                          </div>
+                        )}
+                      </div>
                       <CustomDropdown
                         options={question.options}
                         value={formData[question.id as keyof ComprehensiveAssessmentData] as number}
@@ -1869,6 +1995,72 @@ export default function ComprehensiveAssessmentPage() {
                       />
                     </div>
                   ))}
+              </div>
+
+              {/* Submit Button with Progress */}
+              <div className="mt-8 p-6 bg-gray-800 rounded-xl border border-gray-700">
+                {(() => {
+                  const totalQuestions = getAssessmentQuestions(formData.current_situation).length;
+                  const totalAnswered = getAssessmentQuestions(formData.current_situation).filter(q => {
+                    const value = formData[q.id as keyof ComprehensiveAssessmentData];
+                    return value !== null && value !== undefined;
+                  }).length;
+                  const isComplete = totalAnswered === totalQuestions;
+                  
+                  return (
+                    <div className="text-center">
+                      <div className="mb-4">
+                        <p className="text-gray-300 mb-2">
+                          {isComplete ? (
+                            <span className="text-green-400 font-semibold">✅ All questions answered!</span>
+                          ) : (
+                            <span className="text-yellow-400 font-semibold">
+                              ⚠️ {totalQuestions - totalAnswered} question{totalQuestions - totalAnswered !== 1 ? 's' : ''} remaining
+                            </span>
+                          )}
+                        </p>
+                        <div className="w-full bg-gray-700 rounded-full h-3">
+                          <div 
+                            className={`h-3 rounded-full transition-all duration-500 ${
+                              isComplete ? 'bg-green-500' : 'bg-yellow-500'
+                            }`}
+                            style={{ width: `${(totalAnswered / totalQuestions) * 100}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-sm text-gray-400 mt-2">
+                          {totalAnswered} of {totalQuestions} questions completed
+                        </p>
+                      </div>
+                      
+                      <button
+                        type="submit"
+                        disabled={submitting || !isComplete}
+                        className={`w-full px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center ${
+                          isComplete && !submitting
+                            ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
+                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {submitting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                            Submitting Assessment...
+                          </>
+                        ) : isComplete ? (
+                          <>
+                            <CheckCircle className="w-5 h-5 mr-2" />
+                            Submit Comprehensive Assessment
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle className="w-5 h-5 mr-2" />
+                            Complete All Questions to Submit
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
 
               {error && (

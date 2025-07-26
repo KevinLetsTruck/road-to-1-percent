@@ -62,27 +62,33 @@ USING (
 );
 
 -- 4. Keep existing INSERT and UPDATE policies for users
-CREATE POLICY IF NOT EXISTS "Users can update own profile" 
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+CREATE POLICY "Users can update own profile" 
 ON profiles FOR UPDATE 
 USING (auth.uid() = id);
 
-CREATE POLICY IF NOT EXISTS "Users can insert own profile" 
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+CREATE POLICY "Users can insert own profile" 
 ON profiles FOR INSERT 
 WITH CHECK (auth.uid() = id);
 
-CREATE POLICY IF NOT EXISTS "Users can update own progress" 
+DROP POLICY IF EXISTS "Users can update own progress" ON user_progress;
+CREATE POLICY "Users can update own progress" 
 ON user_progress FOR UPDATE 
 USING (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can insert own progress" 
+DROP POLICY IF EXISTS "Users can insert own progress" ON user_progress;
+CREATE POLICY "Users can insert own progress" 
 ON user_progress FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can insert own assessments" 
+DROP POLICY IF EXISTS "Users can insert own assessments" ON comprehensive_assessments;
+CREATE POLICY "Users can insert own assessments" 
 ON comprehensive_assessments FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can update own assessments" 
+DROP POLICY IF EXISTS "Users can update own assessments" ON comprehensive_assessments;
+CREATE POLICY "Users can update own assessments" 
 ON comprehensive_assessments FOR UPDATE 
 USING (auth.uid() = user_id);
 

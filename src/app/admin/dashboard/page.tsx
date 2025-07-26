@@ -119,7 +119,9 @@ export default function AdminDashboard() {
           comprehensive_assessments (
             assessment_date,
             standout_strength_1,
-            standout_strength_2
+            standout_strength_2,
+            total_spi_score,
+            tier
           )
         `)
 
@@ -136,6 +138,7 @@ export default function AdminDashboard() {
       // Process user data
       const processedUsers: UserMetrics[] = userData?.map(user => {
         const progress = user.user_progress?.[0]
+        // Get the most recent assessment (they should be ordered by date desc)
         const assessment = user.comprehensive_assessments?.[0]
 
         return {
@@ -143,8 +146,8 @@ export default function AdminDashboard() {
           email: user.email,
           created_at: user.created_at,
           last_sign_in_at: '', // Would need admin API for this
-          spi_score: progress?.spi_score || 0,
-          current_tier: progress?.current_tier || '90%',
+          spi_score: assessment?.total_spi_score || progress?.spi_score || 0,
+          current_tier: assessment?.tier || progress?.current_tier || '90%',
           financial_foundation_score: progress?.financial_foundation_score || 0,
           market_intelligence_score: progress?.market_intelligence_score || 0,
           risk_management_score: progress?.risk_management_score || 0,

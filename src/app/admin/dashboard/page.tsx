@@ -101,45 +101,59 @@ export default function AdminDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      // Get all users with their assessment data
+      console.log('Loading dashboard data...')
+      
+      // First, try to get basic user data without joins
       const { data: userData, error: userError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          email,
-          created_at,
-          user_progress (
-            spi_score,
-            current_tier,
-            financial_foundation_score,
-            market_intelligence_score,
-            risk_management_score,
-            support_systems_score
-          ),
-          comprehensive_assessments (
-            assessment_date,
-            standout_strength_1,
-            standout_strength_2,
-            total_spi_score,
-            tier
-          )
-        `)
+        .select('id, email, created_at')
 
       if (userError) {
-        console.error('Error fetching user data:', userError)
+        console.error('Error fetching basic user data:', userError)
         throw userError
       }
+
+      console.log('Basic user data fetched:', userData?.length, 'users')
+
+      // Then try to get user progress data
+      const { data: progressData, error: progressError } = await supabase
+        .from('user_progress')
+        .select('*')
+
+      if (progressError) {
+        console.error('Error fetching progress data:', progressError)
+        // Don't throw, just log the error
+      }
+
+      console.log('Progress data fetched:', progressData?.length, 'records')
+
+      // Try to get comprehensive assessments data
+      const { data: assessmentData, error: assessmentError } = await supabase
+        .from('comprehensive_assessments')
+        .select('*')
+
+      if (assessmentError) {
+        console.error('Error fetching assessment data:', assessmentError)
+        // Don't throw, just log the error
+      }
+
+      console.log('Assessment data fetched:', assessmentData?.length, 'records')
 
       console.log('Fetched user data:', userData)
 
       // Note: We can't get last sign in data without admin API access
       // You would need to set up a server endpoint or use Supabase edge functions for this
 
-      // Process user data
+      // Process user data by combining separate queries
       const processedUsers: UserMetrics[] = userData?.map(user => {
-        const progress = user.user_progress?.[0]
-        // Get the most recent assessment (they should be ordered by date desc)
-        const assessment = user.comprehensive_assessments?.[0]
+        // Find matching progress data
+        const progress = progressData?.find(p => p.user_id === user.id)
+        
+        // Find matching assessment data (most recent)
+        const userAssessments = assessmentData?.filter(a => a.user_id === user.id) || []
+        const assessment = userAssessments.sort((a, b) => 
+          new Date(b.assessment_date || 0).getTime() - new Date(a.assessment_date || 0).getTime()
+        )[0]
 
         return {
           id: user.id,
@@ -205,6 +219,19 @@ export default function AdminDashboard() {
       setLoading(false)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
+      // Set empty data instead of failing completely
+      setUsers([])
+      setFilteredUsers([])
+      setStats({
+        totalUsers: 0,
+        completedAssessments: 0,
+        averageSPIScore: 0,
+        tier1Count: 0,
+        tier9Count: 0,
+        tier90Count: 0,
+        newUsersThisWeek: 0,
+        assessmentsThisWeek: 0
+      })
       setLoading(false)
     }
   }

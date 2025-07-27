@@ -21,7 +21,8 @@ import {
   ArrowLeft,
   Gauge,
   LogOut,
-  Trash2
+  Trash2,
+  TestTube
 } from 'lucide-react'
 
 interface UserMetrics {
@@ -38,6 +39,7 @@ interface UserMetrics {
   assessment_date: string
   standout_strength_1: string
   standout_strength_2: string
+  is_test_user?: boolean
 }
 
 interface DashboardStats {
@@ -119,7 +121,7 @@ export default function AdminDashboard() {
       // First, try to get basic user data without joins
       const { data: userData, error: userError } = await supabase
         .from('profiles')
-        .select('id, email, created_at')
+        .select('id, email, created_at, is_test_user')
 
       if (userError) {
         console.error('Error fetching basic user data:', userError)
@@ -181,33 +183,35 @@ export default function AdminDashboard() {
           support_systems_score: progress?.support_systems_score || 0,
           assessment_date: assessment?.assessment_date || '',
           standout_strength_1: assessment?.standout_strength_1 || '',
-          standout_strength_2: assessment?.standout_strength_2 || ''
+          standout_strength_2: assessment?.standout_strength_2 || '',
+          is_test_user: user.is_test_user || false
         }
       }) || []
 
       setUsers(processedUsers)
       setFilteredUsers(processedUsers)
 
-      // Calculate stats
-      const totalUsers = processedUsers.length
-      const completedAssessments = processedUsers.filter(u => u.spi_score > 0).length
+      // Calculate stats (excluding test users)
+      const realUsers = processedUsers.filter(u => !u.is_test_user)
+      const totalUsers = realUsers.length
+      const completedAssessments = realUsers.filter(u => u.spi_score > 0).length
       const averageSPIScore = completedAssessments > 0 
-        ? Math.round(processedUsers.reduce((sum, u) => sum + u.spi_score, 0) / completedAssessments)
+        ? Math.round(realUsers.reduce((sum, u) => sum + u.spi_score, 0) / completedAssessments)
         : 0
 
-      const tier1Count = processedUsers.filter(u => u.current_tier === '1%').length
-      const tier9Count = processedUsers.filter(u => u.current_tier === '9%').length
-      const tier90Count = processedUsers.filter(u => u.current_tier === '90%').length
+      const tier1Count = realUsers.filter(u => u.current_tier === '1%').length
+      const tier9Count = realUsers.filter(u => u.current_tier === '9%').length
+      const tier90Count = realUsers.filter(u => u.current_tier === '90%').length
 
       // Calculate weekly stats
       const oneWeekAgo = new Date()
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-      const newUsersThisWeek = processedUsers.filter(u => 
+      const newUsersThisWeek = realUsers.filter(u => 
         new Date(u.created_at) > oneWeekAgo
       ).length
 
-      const assessmentsThisWeek = processedUsers.filter(u => 
+      const assessmentsThisWeek = realUsers.filter(u => 
         u.assessment_date && new Date(u.assessment_date) > oneWeekAgo
       ).length
 
@@ -332,6 +336,32 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error deleting user:', error)
       alert(`Failed to delete user: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  const toggleTestUser = async (userId: string, isTestUser: boolean) => {
+    try {
+      console.log('Toggling test user status:', userId, isTestUser)
+      const response = await fetch('/api/admin/toggle-test-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, isTestUser }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update user status')
+      }
+
+      // Show success message
+      alert(data.message || `User ${isTestUser ? 'excluded from' : 'included in'} statistics`)
+      
+      // Reload data to update statistics
+      await loadDashboardData()
+    } catch (error) {
+      console.error('Error toggling test user:', error)
+      alert(`Failed to update user: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -629,8 +659,16 @@ export default function AdminDashboard() {
                   <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {user.email}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {user.email}
+                          </span>
+                          {user.is_test_user && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                              <TestTube className="h-3 w-3 mr-1" />
+                              Test User
+                            </span>
+                          )}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           Joined {new Date(user.created_at).toLocaleDateString()}
@@ -710,17 +748,31 @@ export default function AdminDashboard() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => {
-                          const confirmed = window.confirm(`Are you sure you want to delete user ${user.email}? This action cannot be undone.`);
-                          if (confirmed) {
-                            deleteUser(user.id);
-                          }
-                        }}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleTestUser(user.id, !user.is_test_user)}
+                          className={`${
+                            user.is_test_user 
+                              ? 'text-amber-600 hover:text-amber-900 dark:text-amber-400' 
+                              : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
+                          } transition-colors`}
+                          title={user.is_test_user ? 'Include in statistics' : 'Exclude from statistics'}
+                        >
+                          <TestTube className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            const confirmed = window.confirm(`Are you sure you want to delete user ${user.email}? This action cannot be undone.`);
+                            if (confirmed) {
+                              deleteUser(user.id);
+                            }
+                          }}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400"
+                          title="Delete user permanently"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -730,10 +782,18 @@ export default function AdminDashboard() {
 
           {/* Table Footer */}
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              Showing <span className="font-medium">{filteredUsers.length}</span> of{' '}
-              <span className="font-medium">{users.length}</span> users
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Showing <span className="font-medium">{filteredUsers.length}</span> of{' '}
+                <span className="font-medium">{users.length}</span> users
+              </p>
+              {users.filter(u => u.is_test_user).length > 0 && (
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  <TestTube className="inline h-4 w-4 mr-1" />
+                  {users.filter(u => u.is_test_user).length} test users excluded from statistics
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </main>

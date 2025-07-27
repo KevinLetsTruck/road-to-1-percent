@@ -388,15 +388,21 @@ export default function DashboardPage() {
   };
 
   const handleSignOut = async () => {
+    console.log("Logout button clicked");
     try {
+      console.log("Attempting to sign out...");
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Logout error:", error);
+        alert(`Logout failed: ${error.message}`);
       } else {
-        router.push("/login");
+        console.log("Logout successful, redirecting to login...");
+        // Use window.location for a hard redirect to ensure session is cleared
+        window.location.href = "/login";
       }
     } catch (err) {
       console.error("Unexpected error during logout:", err);
+      alert(`Unexpected error: ${err}`);
     }
   };
 
@@ -464,11 +470,42 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-4">
               <button
+                onClick={() => {
+                  console.log("Test button clicked!");
+                  alert("Test button works!");
+                }}
+                className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700"
+              >
+                Test Click
+              </button>
+              <button
                 onClick={handleSignOut}
                 className="border-2 border-gray-600 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-gray-500 hover:text-white transition-all flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
                 Logout
+              </button>
+              <button
+                onClick={async () => {
+                  console.log("Direct logout clicked!");
+                  alert("Direct logout clicked - check console");
+                  try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) {
+                      console.error("Direct logout error:", error);
+                      alert(`Error: ${error.message}`);
+                    } else {
+                      console.log("Direct logout success!");
+                      window.location.href = "/login";
+                    }
+                  } catch (err) {
+                    console.error("Direct logout exception:", err);
+                    alert(`Exception: ${err}`);
+                  }
+                }}
+                className="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-700"
+              >
+                Direct Logout
               </button>
               <button
                 onClick={() =>

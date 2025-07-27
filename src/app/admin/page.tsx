@@ -46,7 +46,7 @@ interface AdminStats {
 }
 
 export default function AdminDashboard() {
-  const { user: currentUser } = useAuth()
+  const { user: currentUser, loading: authLoading } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [userProgress, setUserProgress] = useState<UserProgress[]>([])
   const [stats, setStats] = useState<AdminStats | null>(null)
@@ -58,28 +58,48 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const checkAdminAccess = async () => {
+      // Wait for auth to load
+      if (authLoading) {
+        console.log('Admin check - Auth still loading...')
+        return
+      }
+      
+      console.log('Admin check - currentUser:', currentUser)
+      
       if (!currentUser) {
+        console.log('Admin check - No user, redirecting to login')
         router.push('/login')
         return
       }
 
-      // Check if user is admin (you can customize this logic)
-      const { data: userData } = await supabase
+      // Check if user is admin
+      console.log('Admin check - Checking admin status for user:', currentUser.id)
+      const { data: userData, error } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('*')  // Select all fields to see what we get
         .eq('id', currentUser.id)
         .single()
 
-      if (!userData || !userData.is_admin) {
+      console.log('Admin check - Full query result:', JSON.stringify({ userData, error }, null, 2))
+
+      if (error) {
+        console.error('Admin check - Query error:', error)
         router.push('/dashboard')
         return
       }
 
+      if (!userData || userData.is_admin !== true) {
+        console.log('Admin check - Not admin, is_admin value:', userData?.is_admin)
+        router.push('/dashboard')
+        return
+      }
+
+      console.log('Admin check - User is admin, loading data')
       loadAdminData()
     }
 
     checkAdminAccess()
-  }, [currentUser, router, supabase])
+  }, [currentUser, authLoading, router, supabase])
 
   const loadAdminData = async () => {
     try {
@@ -93,6 +113,11 @@ export default function AdminDashboard() {
       const { data: progressData } = await supabase
         .from('user_progress')
         .select('*')
+
+      console.log('Admin data loaded:', {
+        users: usersData,
+        userProgress: progressData
+      })
 
       if (usersData) setUsers(usersData)
       if (progressData) setUserProgress(progressData)
@@ -110,20 +135,30 @@ export default function AdminDashboard() {
     const now = new Date()
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
+    // Debug: Log what we're calculating
+    console.log('Calculating stats from:', {
+      usersCount: users.length,
+      progressCount: progress.length,
+      progressData: progress
+    })
+
     const stats: AdminStats = {
       totalUsers: users.length,
       activeUsers: users.filter(u => new Date(u.updated_at || u.created_at) > thirtyDaysAgo).length,
       completedAssessments: progress.reduce((sum, p) => {
-        return sum + [
+        // Count total assessments completed across all users
+        const userCompletedCount = [
           p.financial_foundation_completed,
           p.market_intelligence_completed,
           p.personal_strengths_completed,
           p.risk_management_completed,
           p.support_systems_completed
         ].filter(Boolean).length
+        console.log(`User ${p.user_id} completed ${userCompletedCount} assessments`)
+        return sum + userCompletedCount
       }, 0),
       averageSPI: progress.length > 0 ? 
-        Math.round(progress.reduce((sum, p) => sum + (p.financial_foundation_score || 0), 0) / progress.length) : 0,
+        Math.round(progress.reduce((sum, p) => sum + (p.spi_score || 0), 0) / progress.length) : 0,
       tierDistribution: {
         '90%': progress.filter(p => p.current_tier === '90%').length,
         '9%': progress.filter(p => p.current_tier === '9%').length,
@@ -139,6 +174,7 @@ export default function AdminDashboard() {
       }
     }
 
+    console.log('Calculated stats:', stats)
     setStats(stats)
   }
 

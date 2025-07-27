@@ -19,7 +19,9 @@ import {
   UserCheck,
   UserX,
   ArrowLeft,
-  Gauge
+  Gauge,
+  LogOut,
+  Trash2
 } from 'lucide-react'
 
 interface UserMetrics {
@@ -76,25 +78,36 @@ export default function AdminDashboard() {
   }, [])
 
   const checkAdminAccess = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    console.log('Admin Dashboard - Checking access...')
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    console.log('Admin Dashboard - User:', user)
+    console.log('Admin Dashboard - User error:', userError)
     
     if (!user) {
+      console.log('Admin Dashboard - No user, redirecting to login')
       router.push('/login')
       return
     }
 
     // Check if user is admin from database
-    const { data: profile } = await supabase
+    console.log('Admin Dashboard - Checking admin status for user:', user.id)
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('is_admin')
+      .select('*') // Select all fields to see what we get
       .eq('id', user.id)
       .single()
     
+    console.log('Admin Dashboard - Profile data:', profile)
+    console.log('Admin Dashboard - Profile error:', profileError)
+    
     if (!profile?.is_admin) {
+      console.log('Admin Dashboard - Not admin, redirecting. is_admin:', profile?.is_admin)
       router.push('/dashboard')
       return
     }
 
+    console.log('Admin Dashboard - User is admin, loading data')
     setIsAdmin(true)
     await loadDashboardData()
   }
@@ -292,6 +305,36 @@ export default function AdminDashboard() {
     a.click()
   }
 
+  const deleteUser = async (userId: string) => {
+    try {
+      console.log('Deleting user:', userId)
+      
+      // Call the API endpoint to delete the user
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete user')
+      }
+
+      // Show success message
+      alert('User deleted successfully')
+      
+      // Reload the dashboard data
+      await loadDashboardData()
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      alert(`Failed to delete user: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -324,6 +367,21 @@ export default function AdminDashboard() {
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
+                </button>
+                <button
+                  onClick={async () => {
+                    console.log("Admin logout clicked");
+                    try {
+                      await supabase.auth.signOut();
+                      window.location.href = '/login';
+                    } catch (error) {
+                      console.error('Logout error:', error);
+                    }
+                  }}
+                  className="flex items-center px-4 py-2 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
                 </button>
                 <button
                   onClick={exportToCSV}
@@ -561,6 +619,9 @@ export default function AdminDashboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Assessment Date
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -647,6 +708,19 @@ export default function AdminDashboard() {
                           Not completed
                         </div>
                       )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => {
+                          const confirmed = window.confirm(`Are you sure you want to delete user ${user.email}? This action cannot be undone.`);
+                          if (confirmed) {
+                            deleteUser(user.id);
+                          }
+                        }}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </td>
                   </tr>
                 ))}

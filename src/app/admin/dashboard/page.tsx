@@ -71,6 +71,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'score' | 'date' | 'email'>('score')
   const [filterTier, setFilterTier] = useState<'all' | '1%' | '9%' | '90%'>('all')
+  const [showTestUsers, setShowTestUsers] = useState(false)
   
   const router = useRouter()
   const supabase = createClient()
@@ -257,6 +258,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     let filtered = [...users]
 
+    // Apply test user filter
+    if (!showTestUsers) {
+      filtered = filtered.filter(user => !user.is_test_user)
+    }
+
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(user => 
@@ -284,7 +290,7 @@ export default function AdminDashboard() {
     })
 
     setFilteredUsers(filtered)
-  }, [searchTerm, sortBy, filterTier, users])
+  }, [searchTerm, sortBy, filterTier, users, showTestUsers])
 
   const exportToCSV = () => {
     const headers = ['Email', 'SPI Score', 'Tier', 'Financial', 'Market Intel', 'Risk Mgmt', 'Support', 'Strengths', 'Assessment Date']
@@ -622,6 +628,20 @@ export default function AdminDashboard() {
                   <option value="date">Sort by Date</option>
                   <option value="email">Sort by Email</option>
                 </select>
+
+                {/* Test User Toggle */}
+                <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={showTestUsers}
+                    onChange={(e) => setShowTestUsers(e.target.checked)}
+                    className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                    <TestTube className="h-4 w-4" />
+                    Show Test Users
+                  </span>
+                </label>
               </div>
             </div>
           </div>
@@ -785,12 +805,12 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 Showing <span className="font-medium">{filteredUsers.length}</span> of{' '}
-                <span className="font-medium">{users.length}</span> users
+                <span className="font-medium">{showTestUsers ? users.length : users.filter(u => !u.is_test_user).length}</span> {showTestUsers ? 'total' : 'real'} users
               </p>
               {users.filter(u => u.is_test_user).length > 0 && (
                 <p className="text-sm text-amber-600 dark:text-amber-400">
                   <TestTube className="inline h-4 w-4 mr-1" />
-                  {users.filter(u => u.is_test_user).length} test users excluded from statistics
+                  {users.filter(u => u.is_test_user).length} test users {showTestUsers ? 'included' : 'excluded from statistics'}
                 </p>
               )}
             </div>

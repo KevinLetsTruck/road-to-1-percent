@@ -399,11 +399,29 @@ export default function AdminDashboard() {
               </div>
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => router.push('/admin/view-assessment')}
+                  onClick={() => {
+                    console.log('View Assessments button clicked');
+                    console.log('Router object:', router);
+                    try {
+                      router.push('/admin/view-assessment');
+                    } catch (error) {
+                      console.error('Router error:', error);
+                      window.location.href = '/admin/view-assessment';
+                    }
+                  }}
                   className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   View Assessments
+                </button>
+                <button
+                  onClick={() => {
+                    console.log('Test button clicked');
+                    alert('Test button works!');
+                  }}
+                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Test Button
                 </button>
                 <button
                   onClick={() => router.push('/dashboard')}

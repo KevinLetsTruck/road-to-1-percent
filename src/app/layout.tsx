@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +23,14 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL('https://spiassessment.com'),
+  manifest: '/manifest.json',
+  themeColor: '#4f46e5',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SPI Assessment',
+  },
   openGraph: {
     title: "Road to 1% - Transform Your Driving Career",
     description: "Join the Road to 1% program and unlock your full potential as a professional driver.",
@@ -62,6 +71,27 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="SPI Assessment" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    });
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={`${inter.variable} antialiased`}
@@ -69,6 +99,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             {children}
+            <PWAInstallPrompt />
           </ThemeProvider>
         </AuthProvider>
       </body>

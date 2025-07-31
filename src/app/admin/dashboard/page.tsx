@@ -22,7 +22,8 @@ import {
   Gauge,
   LogOut,
   Trash2,
-  TestTube
+  TestTube,
+  FileText
 } from 'lucide-react'
 
 interface UserMetrics {
@@ -397,6 +398,13 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <div className="flex items-center gap-4">
+                <button
+                  onClick={() => router.push('/admin/view-assessment')}
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Assessments
+                </button>
                 <button
                   onClick={() => router.push('/dashboard')}
                   className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

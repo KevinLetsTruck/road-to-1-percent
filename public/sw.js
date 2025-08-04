@@ -3,10 +3,7 @@ const CACHE_NAME = 'spi-assessment-v1';
 const urlsToCache = [
   '/',
   '/dashboard',
-  '/assessments',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/manifest.json'
 ];
 
 // Install event - cache resources

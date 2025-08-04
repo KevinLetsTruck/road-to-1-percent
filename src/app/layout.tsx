@@ -24,8 +24,6 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL('https://spiassessment.com'),
   manifest: '/manifest.json',
-  themeColor: '#4f46e5',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -60,6 +58,14 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#4f46e5',
 };
 
 export default function RootLayout({

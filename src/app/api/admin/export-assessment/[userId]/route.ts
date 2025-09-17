@@ -238,25 +238,79 @@ export async function POST(
         : "N/A",
     });
 
-    // Test: Return a simple text response instead of PDF to isolate the issue
-    console.log("Bypassing PDF generation for testing...");
+    // Generate PDF with minimal, reliable structure
+    console.log("Starting minimal PDF generation...");
     
-    return new NextResponse(
-      `Test Assessment Report
-      
-User: ${data.profile?.first_name || 'N/A'} ${data.profile?.last_name || 'N/A'}
-Email: ${data.profile?.email || 'N/A'}
-SPI Score: ${data.progress?.spi_score || 'Not Available'}
+    try {
+      // Create the most basic PDF possible
+      const MinimalPDF = createElement(
+        Document,
+        {},
+        createElement(
+          Page,
+          { size: "A4", style: { padding: 30, fontFamily: "Helvetica" } },
+          createElement(
+            Text,
+            { style: { fontSize: 20, marginBottom: 20, color: "#000" } },
+            "SPI Assessment Report"
+          ),
+          createElement(
+            Text,
+            { style: { fontSize: 12, marginBottom: 10, color: "#000" } },
+            `Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}`
+          ),
+          createElement(
+            Text,
+            { style: { fontSize: 12, marginBottom: 10, color: "#000" } },
+            `Email: ${data.profile?.email || "N/A"}`
+          ),
+          createElement(
+            Text,
+            { style: { fontSize: 12, marginBottom: 10, color: "#000" } },
+            `SPI Score: ${data.progress?.spi_score || "Not Available"}`
+          ),
+          createElement(
+            Text,
+            { style: { fontSize: 10, marginTop: 30, color: "#666" } },
+            `Generated: ${new Date().toLocaleDateString()}`
+          )
+        )
+      );
 
-Generated on: ${new Date().toLocaleDateString()}
-      `,
-      {
+      console.log("Generating PDF buffer...");
+      const pdfBuffer = await pdf(MinimalPDF).toBuffer();
+      console.log("PDF generated successfully");
+
+      return new NextResponse(pdfBuffer as unknown as BodyInit, {
         headers: {
-          "Content-Type": "text/plain",
-          "Content-Disposition": `attachment; filename="test-assessment-${data.profile?.first_name || 'user'}.txt"`,
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="spi-assessment-${data.profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.pdf"`,
         },
-      }
-    );
+      });
+    } catch (pdfError) {
+      console.error("PDF generation failed:", pdfError);
+      const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
+      
+      // Fallback to text file if PDF fails
+      return new NextResponse(
+        `SPI Assessment Report (PDF Generation Failed)
+        
+Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}
+Email: ${data.profile?.email || "N/A"}
+SPI Score: ${data.progress?.spi_score || "Not Available"}
+
+Generated: ${new Date().toLocaleDateString()}
+
+Error: ${errorMessage}
+        `,
+        {
+          headers: {
+            "Content-Type": "text/plain",
+            "Content-Disposition": `attachment; filename="spi-assessment-error-${data.profile?.first_name || "user"}.txt"`,
+          },
+        }
+      );
+    }
   } catch (error) {
     console.error("Error generating PDF:", error);
     return NextResponse.json(

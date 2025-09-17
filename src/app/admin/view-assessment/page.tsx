@@ -74,23 +74,63 @@ export default function ViewAssessment() {
   const exportUserPdf = async (userId: string) => {
     try {
       setExportingPdf(true);
+      
+      // Get assessment data from API
       const response = await fetch(`/api/admin/export-assessment/${userId}`, {
         method: "POST",
       });
-
+      
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = `assessment-${selectedUser?.email || userId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          // Import jsPDF dynamically
+          const { default: jsPDF } = await import('jspdf');
+          
+          // Create new PDF document
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          // Add content to PDF
+          const { profile, progress } = result.data;
+          
+          // Header
+          pdf.setFontSize(20);
+          pdf.setTextColor(30, 58, 138); // Blue color
+          pdf.text('Success Probability Index (SPI)', 20, 30);
+          
+          pdf.setFontSize(14);
+          pdf.setTextColor(107, 114, 128); // Gray color
+          pdf.text('Assessment Report', 20, 45);
+          
+          // Client Information
+          pdf.setFontSize(16);
+          pdf.setTextColor(30, 58, 138);
+          pdf.text('Client Information', 20, 70);
+          
+          pdf.setFontSize(12);
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(`Name: ${profile?.first_name || 'N/A'} ${profile?.last_name || 'N/A'}`, 20, 85);
+          pdf.text(`Email: ${profile?.email || 'N/A'}`, 20, 95);
+          pdf.text(`SPI Score: ${progress?.spi_score || 'Not Available'}`, 20, 105);
+          
+          if (progress?.current_tier) {
+            pdf.text(`Current Tier: ${progress.current_tier}`, 20, 115);
+          }
+          
+          // Footer
+          pdf.setFontSize(10);
+          pdf.setTextColor(107, 114, 128);
+          pdf.text(`Generated on ${new Date().toLocaleDateString()} | Road to 1% Program`, 20, 280);
+          pdf.text('This report is confidential and intended for authorized personnel only.', 20, 290);
+          
+          // Download the PDF
+          const fileName = `spi-assessment-${profile?.first_name || 'user'}-${new Date().toISOString().split('T')[0]}.pdf`;
+          pdf.save(fileName);
+        } else {
+          throw new Error('Invalid response data');
+        }
       } else {
-        console.error("Failed to export PDF");
+        console.error("Failed to get assessment data");
         alert("Failed to export PDF. Please try again.");
       }
     } catch (error) {

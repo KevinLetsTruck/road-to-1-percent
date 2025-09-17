@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import puppeteer from "puppeteer";
 
 // Generate HTML content for the assessment report
 function generateAssessmentHTML(data: any): string {
@@ -161,68 +160,19 @@ export async function POST(
         : "N/A",
     });
 
-    // Generate PDF using Puppeteer (more reliable than @react-pdf/renderer)
-    console.log("Generating PDF assessment report...");
+    // Return assessment data for client-side PDF generation
+    console.log("Returning assessment data for client-side PDF generation...");
 
-    try {
-      const htmlContent = generateAssessmentHTML(data);
-      console.log("HTML content generated, converting to PDF...");
-
-      // Launch Puppeteer browser
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-      
-      const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-      
-      // Generate PDF
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: {
-          top: '20px',
-          right: '20px',
-          bottom: '20px',
-          left: '20px'
-        }
-      });
-      
-      await browser.close();
-      console.log("PDF generated successfully");
-
-      return new NextResponse(pdfBuffer, {
-        headers: {
-          "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="spi-assessment-${data.profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.pdf"`,
-        },
-      });
-    } catch (pdfError) {
-      console.error("PDF generation failed:", pdfError);
-      const errorMessage =
-        pdfError instanceof Error ? pdfError.message : String(pdfError);
-
-      // Fallback to text file if PDF fails
-      return new NextResponse(
-        `SPI Assessment Report (PDF Generation Failed)
-        
-Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}
-Email: ${data.profile?.email || "N/A"}
-SPI Score: ${data.progress?.spi_score || "Not Available"}
-
-Generated: ${new Date().toLocaleDateString()}
-
-Error: ${errorMessage}
-        `,
-        {
-          headers: {
-            "Content-Type": "text/plain",
-            "Content-Disposition": `attachment; filename="spi-assessment-error-${data.profile?.first_name || "user"}.txt"`,
-          },
-        }
-      );
-    }
+    return NextResponse.json({
+      success: true,
+      data: {
+        profile: data.profile,
+        progress: data.progress,
+        spiAssessment: data.spiAssessment,
+        comprehensiveAssessment: data.comprehensiveAssessment,
+        htmlContent: generateAssessmentHTML(data)
+      }
+    });
   } catch (error) {
     console.error("Error generating assessment report:", error);
     return NextResponse.json(

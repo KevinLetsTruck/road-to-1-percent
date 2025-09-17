@@ -462,44 +462,54 @@ export async function POST(
   try {
     const supabase = await createClient();
 
-    // Fetch all assessment data
-    const [profileResult, progressResult, spiResult, comprehensiveResult] =
-      await Promise.all([
-        supabase.from("profiles").select("*").eq("id", params.userId).single(),
-        supabase
-          .from("user_progress")
-          .select("*")
-          .eq("user_id", params.userId)
-          .single(),
-        supabase
-          .from("spi_assessments")
-          .select("*")
-          .eq("user_id", params.userId)
-          .order("assessment_date", { ascending: false })
-          .limit(1)
-          .single(),
-        supabase
-          .from("comprehensive_assessments")
-          .select("*")
-          .eq("user_id", params.userId)
-          .order("assessment_date", { ascending: false })
-          .limit(1)
-          .single(),
-      ]);
+    // Fetch profile first (required)
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", params.userId)
+      .single();
 
-    const data = {
-      profile: profileResult.data,
-      progress: progressResult.data,
-      spiAssessment: spiResult.data,
-      comprehensiveAssessment: comprehensiveResult.data,
-    };
-
-    if (!data.profile) {
+    if (profileError || !profile) {
+      console.error("Profile error:", profileError);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Fetch optional assessment data (don't fail if missing)
+    const { data: progress } = await supabase
+      .from("user_progress")
+      .select("*")
+      .eq("user_id", params.userId)
+      .maybeSingle();
+
+    const { data: spiAssessment } = await supabase
+      .from("spi_assessments")
+      .select("*")
+      .eq("user_id", params.userId)
+      .order("assessment_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { data: comprehensiveAssessment } = await supabase
+      .from("comprehensive_assessments")
+      .select("*")
+      .eq("user_id", params.userId)
+      .order("assessment_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const data = {
+      profile,
+      progress,
+      spiAssessment,
+      comprehensiveAssessment,
+    };
+
+    console.log("PDF data:", JSON.stringify(data, null, 2));
+
     // Generate PDF
+    console.log("Starting PDF generation...");
     const pdfBuffer = await pdf(AssessmentReport({ data })).toBuffer();
+    console.log("PDF generated successfully, buffer size:", pdfBuffer.length);
 
     // Return PDF as response
     return new NextResponse(pdfBuffer as unknown as BodyInit, {

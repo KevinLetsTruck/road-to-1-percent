@@ -21,21 +21,12 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get user progress
-    const { data: progress, error: progressError } = await supabase
+    // Get user progress (optional)
+    const { data: progress } = await supabase
       .from("user_progress")
       .select("*")
       .eq("user_id", params.userId)
-      .single();
-
-    if (progressError) {
-      return NextResponse.json({
-        profile,
-        progress: null,
-        spiAssessment: null,
-        comprehensiveAssessment: null,
-      });
-    }
+      .maybeSingle();
 
     // Get SPI assessment data if available
     const { data: spiAssessment } = await supabase
@@ -44,7 +35,7 @@ export async function GET(
       .eq("user_id", params.userId)
       .order("assessment_date", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Get comprehensive assessment data if available
     const { data: comprehensiveAssessment } = await supabase
@@ -53,7 +44,7 @@ export async function GET(
       .eq("user_id", params.userId)
       .order("assessment_date", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     return NextResponse.json({
       profile,

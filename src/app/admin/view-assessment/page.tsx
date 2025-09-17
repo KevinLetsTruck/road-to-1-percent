@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { 
-  Search, 
-  User, 
-  FileText, 
-  TrendingUp, 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import {
+  Search,
+  User,
+  FileText,
+  TrendingUp,
   Award,
   ArrowLeft,
   Calendar,
@@ -17,123 +17,135 @@ import {
   BarChart3,
   CheckCircle,
   XCircle,
-  AlertCircle
-} from 'lucide-react'
+  AlertCircle,
+} from "lucide-react";
 
 interface UserAssessment {
-  id: string
-  email: string
-  first_name: string
-  last_name: string
-  created_at: string
-  is_test_user: boolean
-  assessment_date: string
-  total_spi_score: number
-  tier: string
-  standout_strength_1: string
-  standout_strength_2: string
-  spi_score: number
-  current_tier: string
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  is_test_user: boolean;
+  assessment_date: string;
+  total_spi_score: number;
+  tier: string;
+  standout_strength_1: string;
+  standout_strength_2: string;
+  spi_score: number;
+  current_tier: string;
 }
 
 export default function ViewAssessment() {
-  const [users, setUsers] = useState<UserAssessment[]>([])
-  const [selectedUser, setSelectedUser] = useState<UserAssessment | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const router = useRouter()
-  const supabase = createClient()
+  const [users, setUsers] = useState<UserAssessment[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserAssessment | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    loadUsers()
-  }, [])
+    loadUsers();
+  }, []);
 
   const loadUsers = async () => {
     try {
-      setLoading(true)
-      
+      setLoading(true);
+
       // Get all users first
       const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('id, email, first_name, last_name, created_at, is_test_user')
-        .order('created_at', { ascending: false })
+        .from("profiles")
+        .select("id, email, first_name, last_name, created_at, is_test_user")
+        .order("created_at", { ascending: false });
 
-      if (userError) throw userError
+      if (userError) throw userError;
 
       // Get user progress data separately
       const { data: progressData } = await supabase
-        .from('user_progress')
-        .select('user_id, spi_score, current_tier')
+        .from("user_progress")
+        .select("user_id, spi_score, current_tier");
 
-      // Get comprehensive assessments data separately  
+      // Get comprehensive assessments data separately
       const { data: assessmentData } = await supabase
-        .from('comprehensive_assessments')
-        .select('user_id, assessment_date, total_spi_score, tier, standout_strength_1, standout_strength_2')
-        .order('assessment_date', { ascending: false })
+        .from("comprehensive_assessments")
+        .select(
+          "user_id, assessment_date, total_spi_score, tier, standout_strength_1, standout_strength_2"
+        )
+        .order("assessment_date", { ascending: false });
 
-      // Process the data to combine everything
-      const processedUsers = userData?.map(user => {
-        const progress = progressData?.find(p => p.user_id === user.id) || {}
-        const assessment = assessmentData?.find(a => a.user_id === user.id) || {}
-        
-        return {
-          id: user.id,
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          created_at: user.created_at,
-          is_test_user: user.is_test_user,
-          assessment_date: assessment.assessment_date,
-          total_spi_score: assessment.total_spi_score,
-          tier: assessment.tier,
-          standout_strength_1: assessment.standout_strength_1,
-          standout_strength_2: assessment.standout_strength_2,
-          spi_score: progress.spi_score || 0,
-          current_tier: progress.current_tier
-        }
-      }) || []
+        // Process the data to combine everything
+        const processedUsers =
+          userData?.map((user) => {
+            const progress =
+              progressData?.find((p) => p.user_id === user.id) || {};
+            const assessment =
+              assessmentData?.find((a) => a.user_id === user.id) || {};
 
-      setUsers(processedUsers)
+            return {
+              id: user.id,
+              email: user.email,
+              first_name: user.first_name,
+              last_name: user.last_name,
+              created_at: user.created_at,
+              is_test_user: user.is_test_user,
+              assessment_date: (assessment as any)?.assessment_date,
+              total_spi_score: (assessment as any)?.total_spi_score,
+              tier: (assessment as any)?.tier,
+              standout_strength_1: (assessment as any)?.standout_strength_1,
+              standout_strength_2: (assessment as any)?.standout_strength_2,
+              spi_score: (progress as any)?.spi_score || 0,
+              current_tier: (progress as any)?.current_tier,
+            };
+          }) || [];
+
+      setUsers(processedUsers);
     } catch (err) {
-      console.error('Error loading users:', err)
-      setError('Failed to load users')
+      console.error("Error loading users:", err);
+      setError("Failed to load users");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredUsers = users.filter(
+    (user) =>
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case '1%': return 'text-green-600 bg-green-100 dark:bg-green-900/20'
-      case '9%': return 'text-blue-600 bg-blue-100 dark:bg-blue-900/20'
-      case '90%': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/20'
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20'
+      case "1%":
+        return "text-green-600 bg-green-100 dark:bg-green-900/20";
+      case "9%":
+        return "text-blue-600 bg-blue-100 dark:bg-blue-900/20";
+      case "90%":
+        return "text-orange-600 bg-orange-100 dark:bg-orange-900/20";
+      default:
+        return "text-gray-600 bg-gray-100 dark:bg-gray-900/20";
     }
-  }
+  };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-blue-600'
-    if (score >= 40) return 'text-orange-600'
-    return 'text-red-600'
-  }
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-blue-600";
+    if (score >= 40) return "text-orange-600";
+    return "text-red-600";
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading users...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading users...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -142,7 +154,7 @@ export default function ViewAssessment() {
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-600 mx-auto" />
           <p className="mt-4 text-red-600">{error}</p>
-          <button 
+          <button
             onClick={loadUsers}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
@@ -150,7 +162,7 @@ export default function ViewAssessment() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -159,7 +171,7 @@ export default function ViewAssessment() {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => router.push('/admin/dashboard')}
+            onClick={() => router.push("/admin/dashboard")}
             className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -189,14 +201,16 @@ export default function ViewAssessment() {
                   />
                 </div>
               </div>
-              
+
               <div className="max-h-96 overflow-y-auto">
                 {filteredUsers.map((user) => (
                   <div
                     key={user.id}
                     onClick={() => setSelectedUser(user)}
                     className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                      selectedUser?.id === user.id ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700' : ''
+                      selectedUser?.id === user.id
+                        ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
+                        : ""
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -218,7 +232,9 @@ export default function ViewAssessment() {
                         {user.spi_score > 0 && (
                           <div className="flex items-center mt-2">
                             <TrendingUp className="h-3 w-3 text-gray-400 mr-1" />
-                            <span className={`text-xs font-medium ${getScoreColor(user.spi_score)}`}>
+                            <span
+                              className={`text-xs font-medium ${getScoreColor(user.spi_score)}`}
+                            >
                               SPI: {user.spi_score}
                             </span>
                           </div>
@@ -246,7 +262,9 @@ export default function ViewAssessment() {
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                         {selectedUser.first_name} {selectedUser.last_name}
                       </h2>
-                      <p className="text-gray-600 dark:text-gray-400">{selectedUser.email}</p>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {selectedUser.email}
+                      </p>
                     </div>
                     {selectedUser.is_test_user && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
@@ -271,10 +289,14 @@ export default function ViewAssessment() {
                             </p>
                           </div>
                           <div className="text-right">
-                            <div className={`text-3xl font-bold ${getScoreColor(selectedUser.spi_score)}`}>
+                            <div
+                              className={`text-3xl font-bold ${getScoreColor(selectedUser.spi_score)}`}
+                            >
                               {selectedUser.spi_score}
                             </div>
-                            <div className={`text-sm font-medium ${getTierColor(selectedUser.current_tier)} px-2 py-1 rounded`}>
+                            <div
+                              className={`text-sm font-medium ${getTierColor(selectedUser.current_tier)} px-2 py-1 rounded`}
+                            >
                               {selectedUser.current_tier} Tier
                             </div>
                           </div>
@@ -287,19 +309,27 @@ export default function ViewAssessment() {
                           <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                             <div className="flex items-center mb-3">
                               <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                              <h4 className="font-medium text-gray-900 dark:text-white">Assessment Date</h4>
+                              <h4 className="font-medium text-gray-900 dark:text-white">
+                                Assessment Date
+                              </h4>
                             </div>
                             <p className="text-gray-600 dark:text-gray-400">
-                              {new Date(selectedUser.assessment_date).toLocaleDateString()}
+                              {new Date(
+                                selectedUser.assessment_date
+                              ).toLocaleDateString()}
                             </p>
                           </div>
 
                           <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                             <div className="flex items-center mb-3">
                               <Target className="h-5 w-5 text-gray-400 mr-2" />
-                              <h4 className="font-medium text-gray-900 dark:text-white">Assessment Tier</h4>
+                              <h4 className="font-medium text-gray-900 dark:text-white">
+                                Assessment Tier
+                              </h4>
                             </div>
-                            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getTierColor(selectedUser.tier)}`}>
+                            <div
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getTierColor(selectedUser.tier)}`}
+                            >
                               {selectedUser.tier}
                             </div>
                           </div>
@@ -307,23 +337,30 @@ export default function ViewAssessment() {
                       )}
 
                       {/* Standout Strengths */}
-                      {(selectedUser.standout_strength_1 || selectedUser.standout_strength_2) && (
+                      {(selectedUser.standout_strength_1 ||
+                        selectedUser.standout_strength_2) && (
                         <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                           <div className="flex items-center mb-3">
                             <Award className="h-5 w-5 text-gray-400 mr-2" />
-                            <h4 className="font-medium text-gray-900 dark:text-white">Standout Strengths</h4>
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              Standout Strengths
+                            </h4>
                           </div>
                           <div className="space-y-2">
                             {selectedUser.standout_strength_1 && (
                               <div className="flex items-center">
                                 <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                                <span className="text-gray-700 dark:text-gray-300">{selectedUser.standout_strength_1}</span>
+                                <span className="text-gray-700 dark:text-gray-300">
+                                  {selectedUser.standout_strength_1}
+                                </span>
                               </div>
                             )}
                             {selectedUser.standout_strength_2 && (
                               <div className="flex items-center">
                                 <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                                <span className="text-gray-700 dark:text-gray-300">{selectedUser.standout_strength_2}</span>
+                                <span className="text-gray-700 dark:text-gray-300">
+                                  {selectedUser.standout_strength_2}
+                                </span>
                               </div>
                             )}
                           </div>
@@ -334,19 +371,29 @@ export default function ViewAssessment() {
                       <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                         <div className="flex items-center mb-3">
                           <User className="h-5 w-5 text-gray-400 mr-2" />
-                          <h4 className="font-medium text-gray-900 dark:text-white">User Information</h4>
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            User Information
+                          </h4>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-500 dark:text-gray-400">Member since:</span>
+                            <span className="text-gray-500 dark:text-gray-400">
+                              Member since:
+                            </span>
                             <p className="text-gray-900 dark:text-white">
-                              {new Date(selectedUser.created_at).toLocaleDateString()}
+                              {new Date(
+                                selectedUser.created_at
+                              ).toLocaleDateString()}
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-500 dark:text-gray-400">Account type:</span>
+                            <span className="text-gray-500 dark:text-gray-400">
+                              Account type:
+                            </span>
                             <p className="text-gray-900 dark:text-white">
-                              {selectedUser.is_test_user ? 'Test Account' : 'Regular Account'}
+                              {selectedUser.is_test_user
+                                ? "Test Account"
+                                : "Regular Account"}
                             </p>
                           </div>
                         </div>
@@ -373,7 +420,8 @@ export default function ViewAssessment() {
                     Select a User
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    Choose a user from the list to view their complete assessment results.
+                    Choose a user from the list to view their complete
+                    assessment results.
                   </p>
                 </div>
               </div>
@@ -382,5 +430,5 @@ export default function ViewAssessment() {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

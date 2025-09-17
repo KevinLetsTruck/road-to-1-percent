@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import puppeteer from "puppeteer";
 
 // Generate HTML content for the assessment report
 function generateAssessmentHTML(data: any): string {
@@ -71,19 +72,23 @@ function generateAssessmentHTML(data: any): string {
     <div class="section">
         <h2 class="section-title">Client Information</h2>
         <div class="info-item">
-            <span class="label">Name:</span> ${data.profile?.first_name || 'N/A'} ${data.profile?.last_name || 'N/A'}
+            <span class="label">Name:</span> ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}
         </div>
         <div class="info-item">
-            <span class="label">Email:</span> ${data.profile?.email || 'N/A'}
+            <span class="label">Email:</span> ${data.profile?.email || "N/A"}
         </div>
         <div class="info-item">
-            <span class="label">SPI Score:</span> ${data.progress?.spi_score || 'Not Available'}
+            <span class="label">SPI Score:</span> ${data.progress?.spi_score || "Not Available"}
         </div>
-        ${data.progress?.current_tier ? `
+        ${
+          data.progress?.current_tier
+            ? `
         <div class="info-item">
             <span class="label">Current Tier:</span> ${data.progress.current_tier}
         </div>
-        ` : ''}
+        `
+            : ""
+        }
     </div>
     
     <div class="footer">
@@ -156,26 +161,51 @@ export async function POST(
         : "N/A",
     });
 
-    // Generate HTML report (more reliable than PDF)
-    console.log("Generating HTML assessment report...");
-    
+    // Generate PDF using Puppeteer (more reliable than @react-pdf/renderer)
+    console.log("Generating PDF assessment report...");
+
     try {
       const htmlContent = generateAssessmentHTML(data);
-      console.log("HTML report generated successfully");
+      console.log("HTML content generated, converting to PDF...");
 
-      return new NextResponse(htmlContent, {
+      // Launch Puppeteer browser
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
+      
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      
+      // Generate PDF
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px'
+        }
+      });
+      
+      await browser.close();
+      console.log("PDF generated successfully");
+
+      return new NextResponse(pdfBuffer, {
         headers: {
-          "Content-Type": "text/html",
-          "Content-Disposition": `attachment; filename="spi-assessment-${data.profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.html"`,
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="spi-assessment-${data.profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.pdf"`,
         },
       });
-    } catch (htmlError) {
-      console.error("HTML generation failed:", htmlError);
-      const errorMessage = htmlError instanceof Error ? htmlError.message : String(htmlError);
-      
-      // Fallback to text file if HTML fails
+    } catch (pdfError) {
+      console.error("PDF generation failed:", pdfError);
+      const errorMessage =
+        pdfError instanceof Error ? pdfError.message : String(pdfError);
+
+      // Fallback to text file if PDF fails
       return new NextResponse(
-        `SPI Assessment Report (HTML Generation Failed)
+        `SPI Assessment Report (PDF Generation Failed)
         
 Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}
 Email: ${data.profile?.email || "N/A"}

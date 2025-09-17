@@ -135,11 +135,7 @@ const AssessmentReport = ({ data }: { data: any }) =>
           { style: styles.title },
           "Success Probability Index (SPI)"
         ),
-        createElement(
-          Text,
-          { style: styles.subtitle },
-          "Assessment Report"
-        )
+        createElement(Text, { style: styles.subtitle }, "Assessment Report")
       ),
 
       // Basic Client Information
@@ -154,17 +150,17 @@ const AssessmentReport = ({ data }: { data: any }) =>
         createElement(
           Text,
           { style: styles.value },
-          `Name: ${data.profile?.first_name || 'N/A'} ${data.profile?.last_name || 'N/A'}`
+          `Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}`
         ),
         createElement(
           Text,
           { style: styles.value },
-          `Email: ${data.profile?.email || 'N/A'}`
+          `Email: ${data.profile?.email || "N/A"}`
         ),
         createElement(
           Text,
           { style: styles.value },
-          `SPI Score: ${data.progress?.spi_score || 'Not Available'}`
+          `SPI Score: ${data.progress?.spi_score || "Not Available"}`
         )
       ),
 
@@ -237,7 +233,9 @@ export async function POST(
       hasProgress: !!data.progress,
       hasSpiAssessment: !!data.spiAssessment,
       hasComprehensiveAssessment: !!data.comprehensiveAssessment,
-      profileName: data.profile ? `${data.profile.first_name} ${data.profile.last_name}` : 'N/A'
+      profileName: data.profile
+        ? `${data.profile.first_name} ${data.profile.last_name}`
+        : "N/A",
     });
 
     // Generate PDF with error handling
@@ -250,7 +248,8 @@ export async function POST(
       console.log("PDF generated successfully");
     } catch (pdfError) {
       console.error("PDF generation error:", pdfError);
-      throw new Error(`PDF generation failed: ${pdfError.message}`);
+      const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
+      throw new Error(`PDF generation failed: ${errorMessage}`);
     }
 
     // Return PDF as response

@@ -501,8 +501,8 @@ export async function POST(
     // Generate PDF
     const pdfBuffer = await pdf(AssessmentReport({ data })).toBuffer();
 
-    // Return PDF as response
-    return new NextResponse(pdfBuffer, {
+    // Return PDF as response  
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="spi-assessment-${data.profile.first_name}-${data.profile.last_name}-${new Date().toISOString().split("T")[0]}.pdf"`,

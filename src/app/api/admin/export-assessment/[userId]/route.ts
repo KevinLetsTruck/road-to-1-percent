@@ -509,7 +509,7 @@ export async function POST(
     // Generate PDF
     console.log("Starting PDF generation...");
     const pdfBuffer = await pdf(AssessmentReport({ data })).toBuffer();
-    console.log("PDF generated successfully, buffer size:", pdfBuffer.length);
+    console.log("PDF generated successfully");
 
     // Return PDF as response
     return new NextResponse(pdfBuffer as unknown as BodyInit, {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 import {
   Document,
   Page,
@@ -460,7 +460,7 @@ export async function POST(
 ) {
   const params = await context.params;
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Fetch all assessment data
     const [profileResult, progressResult, spiResult, comprehensiveResult] =

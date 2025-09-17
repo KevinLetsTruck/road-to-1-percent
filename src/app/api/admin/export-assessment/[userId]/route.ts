@@ -238,27 +238,25 @@ export async function POST(
         : "N/A",
     });
 
-    // Generate PDF with error handling
-    console.log("Starting PDF generation...");
-    let pdfBuffer;
-    try {
-      const pdfDocument = AssessmentReport({ data });
-      console.log("PDF document created, generating buffer...");
-      pdfBuffer = await pdf(pdfDocument).toBuffer();
-      console.log("PDF generated successfully");
-    } catch (pdfError) {
-      console.error("PDF generation error:", pdfError);
-      const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
-      throw new Error(`PDF generation failed: ${errorMessage}`);
-    }
+    // Test: Return a simple text response instead of PDF to isolate the issue
+    console.log("Bypassing PDF generation for testing...");
+    
+    return new NextResponse(
+      `Test Assessment Report
+      
+User: ${data.profile?.first_name || 'N/A'} ${data.profile?.last_name || 'N/A'}
+Email: ${data.profile?.email || 'N/A'}
+SPI Score: ${data.progress?.spi_score || 'Not Available'}
 
-    // Return PDF as response
-    return new NextResponse(pdfBuffer as unknown as BodyInit, {
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="spi-assessment-${data.profile.first_name}-${data.profile.last_name}-${new Date().toISOString().split("T")[0]}.pdf"`,
-      },
-    });
+Generated on: ${new Date().toLocaleDateString()}
+      `,
+      {
+        headers: {
+          "Content-Type": "text/plain",
+          "Content-Disposition": `attachment; filename="test-assessment-${data.profile?.first_name || 'user'}.txt"`,
+        },
+      }
+    );
   } catch (error) {
     console.error("Error generating PDF:", error);
     return NextResponse.json(

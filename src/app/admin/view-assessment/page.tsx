@@ -18,6 +18,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Download,
+  Eye,
 } from "lucide-react";
 
 interface UserAssessment {
@@ -39,6 +41,9 @@ interface UserAssessment {
 export default function ViewAssessment() {
   const [users, setUsers] = useState<UserAssessment[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserAssessment | null>(null);
+  const [selectedUserDetails, setSelectedUserDetails] = useState<any>(null);
+  const [loadingUserDetails, setLoadingUserDetails] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,6 +53,53 @@ export default function ViewAssessment() {
   useEffect(() => {
     loadUsers();
   }, []);
+
+  const fetchUserDetails = async (userId: string) => {
+    try {
+      setLoadingUserDetails(true);
+      const response = await fetch(`/api/admin/user-assessment/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedUserDetails(data);
+      } else {
+        console.error('Failed to fetch user details');
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    } finally {
+      setLoadingUserDetails(false);
+    }
+  };
+
+  const exportUserPdf = async (userId: string) => {
+    try {
+      setExportingPdf(true);
+      const response = await fetch(`/api/admin/export-assessment/${userId}`, {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `assessment-${selectedUser?.email || userId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        console.error('Failed to export PDF');
+        alert('Failed to export PDF. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('Error exporting PDF. Please try again.');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
 
   const loadUsers = async () => {
     try {
@@ -74,30 +126,30 @@ export default function ViewAssessment() {
         )
         .order("assessment_date", { ascending: false });
 
-        // Process the data to combine everything
-        const processedUsers =
-          userData?.map((user) => {
-            const progress =
-              progressData?.find((p) => p.user_id === user.id) || {};
-            const assessment =
-              assessmentData?.find((a) => a.user_id === user.id) || {};
+      // Process the data to combine everything
+      const processedUsers =
+        userData?.map((user) => {
+          const progress =
+            progressData?.find((p) => p.user_id === user.id) || {};
+          const assessment =
+            assessmentData?.find((a) => a.user_id === user.id) || {};
 
-            return {
-              id: user.id,
-              email: user.email,
-              first_name: user.first_name,
-              last_name: user.last_name,
-              created_at: user.created_at,
-              is_test_user: user.is_test_user,
-              assessment_date: (assessment as any)?.assessment_date,
-              total_spi_score: (assessment as any)?.total_spi_score,
-              tier: (assessment as any)?.tier,
-              standout_strength_1: (assessment as any)?.standout_strength_1,
-              standout_strength_2: (assessment as any)?.standout_strength_2,
-              spi_score: (progress as any)?.spi_score || 0,
-              current_tier: (progress as any)?.current_tier,
-            };
-          }) || [];
+          return {
+            id: user.id,
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            created_at: user.created_at,
+            is_test_user: user.is_test_user,
+            assessment_date: (assessment as any)?.assessment_date,
+            total_spi_score: (assessment as any)?.total_spi_score,
+            tier: (assessment as any)?.tier,
+            standout_strength_1: (assessment as any)?.standout_strength_1,
+            standout_strength_2: (assessment as any)?.standout_strength_2,
+            spi_score: (progress as any)?.spi_score || 0,
+            current_tier: (progress as any)?.current_tier,
+          };
+        }) || [];
 
       setUsers(processedUsers);
     } catch (err) {
@@ -206,7 +258,10 @@ export default function ViewAssessment() {
                 {filteredUsers.map((user) => (
                   <div
                     key={user.id}
-                    onClick={() => setSelectedUser(user)}
+                    onClick={() => {
+                      setSelectedUser(user);
+                      fetchUserDetails(user.id);
+                    }}
                     className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                       selectedUser?.id === user.id
                         ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
@@ -266,11 +321,32 @@ export default function ViewAssessment() {
                         {selectedUser.email}
                       </p>
                     </div>
-                    {selectedUser.is_test_user && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
-                        Test User
-                      </span>
-                    )}
+                    <div className="flex items-center space-x-3">
+                      {selectedUser.spi_score > 0 && (
+                        <button
+                          onClick={() => exportUserPdf(selectedUser.id)}
+                          disabled={exportingPdf}
+                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {exportingPdf ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Exporting...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-4 w-4 mr-2" />
+                              Export PDF
+                            </>
+                          )}
+                        </button>
+                      )}
+                      {selectedUser.is_test_user && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                          Test User
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -365,6 +441,108 @@ export default function ViewAssessment() {
                             )}
                           </div>
                         </div>
+                      )}
+
+                      {/* Detailed Assessment Data */}
+                      {loadingUserDetails ? (
+                        <div className="text-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                          <p className="mt-2 text-gray-600 dark:text-gray-400">Loading detailed assessment...</p>
+                        </div>
+                      ) : selectedUserDetails && (
+                        <>
+                          {/* Assessment Completion Status */}
+                          {selectedUserDetails.spiAssessment && (
+                            <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                              <div className="flex items-center mb-3">
+                                <CheckCircle className="h-5 w-5 text-gray-400 mr-2" />
+                                <h4 className="font-medium text-gray-900 dark:text-white">Assessment Completion Status</h4>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                                {[
+                                  { key: 'financial_foundation_completed', label: 'Financial Foundation' },
+                                  { key: 'market_intelligence_completed', label: 'Market Intelligence' },
+                                  { key: 'personal_strengths_completed', label: 'Personal Strengths' },
+                                  { key: 'risk_management_completed', label: 'Risk Management' },
+                                  { key: 'support_systems_completed', label: 'Support Systems' }
+                                ].map(({ key, label }) => (
+                                  <div key={key} className="flex items-center">
+                                    {selectedUserDetails.spiAssessment[key] ? (
+                                      <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                                    ) : (
+                                      <XCircle className="h-4 w-4 text-gray-400 mr-2" />
+                                    )}
+                                    <span className={selectedUserDetails.spiAssessment[key] ? 'text-green-700 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}>
+                                      {label}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* StandOut Assessment */}
+                          {selectedUserDetails.comprehensiveAssessment?.standout_strength_1 && (
+                            <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                              <div className="flex items-center mb-3">
+                                <Award className="h-5 w-5 text-gray-400 mr-2" />
+                                <h4 className="font-medium text-gray-900 dark:text-white">StandOut Assessment</h4>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center">
+                                  <span className="text-gray-500 dark:text-gray-400 w-24">Primary:</span>
+                                  <span className="text-gray-900 dark:text-white font-medium">
+                                    {selectedUserDetails.comprehensiveAssessment.standout_strength_1}
+                                  </span>
+                                </div>
+                                {selectedUserDetails.comprehensiveAssessment.standout_strength_2 && (
+                                  <div className="flex items-center">
+                                    <span className="text-gray-500 dark:text-gray-400 w-24">Secondary:</span>
+                                    <span className="text-gray-900 dark:text-white font-medium">
+                                      {selectedUserDetails.comprehensiveAssessment.standout_strength_2}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Financial Assessment */}
+                          {selectedUserDetails.comprehensiveAssessment && (
+                            <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                              <div className="flex items-center mb-3">
+                                <Target className="h-5 w-5 text-gray-400 mr-2" />
+                                <h4 className="font-medium text-gray-900 dark:text-white">Financial Assessment</h4>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="text-gray-500 dark:text-gray-400">Net Worth:</span>
+                                  <p className="text-gray-900 dark:text-white font-medium">
+                                    ${selectedUserDetails.comprehensiveAssessment.net_worth?.toLocaleString() || 'Not provided'}
+                                  </p>
+                                </div>
+                                <div>
+                                  <span className="text-gray-500 dark:text-gray-400">Monthly Income:</span>
+                                  <p className="text-gray-900 dark:text-white font-medium">
+                                    ${selectedUserDetails.comprehensiveAssessment.monthly_income?.toLocaleString() || 'Not provided'}
+                                  </p>
+                                </div>
+                                <div>
+                                  <span className="text-gray-500 dark:text-gray-400">Monthly Expenses:</span>
+                                  <p className="text-gray-900 dark:text-white font-medium">
+                                    ${selectedUserDetails.comprehensiveAssessment.monthly_expenses?.toLocaleString() || 'Not provided'}
+                                  </p>
+                                </div>
+                                <div>
+                                  <span className="text-gray-500 dark:text-gray-400">Emergency Fund:</span>
+                                  <p className="text-gray-900 dark:text-white font-medium">
+                                    ${selectedUserDetails.comprehensiveAssessment.emergency_fund?.toLocaleString() || 'Not provided'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* User Info */}

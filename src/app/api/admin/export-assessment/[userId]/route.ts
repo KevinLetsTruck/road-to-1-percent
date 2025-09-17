@@ -1,183 +1,101 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  pdf,
-} from "@react-pdf/renderer";
-import { createElement } from "react";
 
-// PDF Styles
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    backgroundColor: "#FFFFFF",
-    padding: 30,
-    fontFamily: "Helvetica",
-  },
-  header: {
-    marginBottom: 20,
-    paddingBottom: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: "#1e3a8a",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1e3a8a",
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginBottom: 10,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1e3a8a",
-    marginBottom: 10,
-    paddingBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-  },
-  infoGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  infoItem: {
-    flex: 1,
-    marginRight: 10,
-  },
-  label: {
-    fontSize: 10,
-    color: "#6b7280",
-    marginBottom: 2,
-  },
-  value: {
-    fontSize: 12,
-    color: "#111827",
-    fontWeight: "bold",
-  },
-  scoreContainer: {
-    backgroundColor: "#f3f4f6",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  scoreTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#1e3a8a",
-    marginBottom: 5,
-  },
-  scoreValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#1e3a8a",
-  },
-  assessmentGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  assessmentItem: {
-    width: "48%",
-    backgroundColor: "#f9fafb",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  assessmentTitle: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: "#374151",
-    marginBottom: 3,
-  },
-  assessmentStatus: {
-    fontSize: 10,
-    color: "#6b7280",
-  },
-  footer: {
-    marginTop: 30,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 10,
-    color: "#6b7280",
-  },
-});
+// Generate HTML content for the assessment report
+function generateAssessmentHTML(data: any): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SPI Assessment Report</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            color: #333;
+            line-height: 1.6;
+        }
+        .header { 
+            text-align: center; 
+            border-bottom: 2px solid #1e3a8a; 
+            padding-bottom: 20px; 
+            margin-bottom: 30px; 
+        }
+        .title { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #1e3a8a; 
+            margin: 0; 
+        }
+        .subtitle { 
+            font-size: 16px; 
+            color: #6b7280; 
+            margin: 10px 0 0 0; 
+        }
+        .section { 
+            margin-bottom: 25px; 
+        }
+        .section-title { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #1e3a8a; 
+            border-bottom: 1px solid #e5e7eb; 
+            padding-bottom: 5px; 
+            margin-bottom: 15px; 
+        }
+        .info-item { 
+            margin-bottom: 10px; 
+            font-size: 14px; 
+        }
+        .label { 
+            font-weight: bold; 
+            color: #374151; 
+        }
+        .footer { 
+            margin-top: 40px; 
+            padding-top: 20px; 
+            border-top: 1px solid #e5e7eb; 
+            text-align: center; 
+            font-size: 12px; 
+            color: #6b7280; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Success Probability Index (SPI)</h1>
+        <p class="subtitle">Assessment Report</p>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Client Information</h2>
+        <div class="info-item">
+            <span class="label">Name:</span> ${data.profile?.first_name || 'N/A'} ${data.profile?.last_name || 'N/A'}
+        </div>
+        <div class="info-item">
+            <span class="label">Email:</span> ${data.profile?.email || 'N/A'}
+        </div>
+        <div class="info-item">
+            <span class="label">SPI Score:</span> ${data.progress?.spi_score || 'Not Available'}
+        </div>
+        ${data.progress?.current_tier ? `
+        <div class="info-item">
+            <span class="label">Current Tier:</span> ${data.progress.current_tier}
+        </div>
+        ` : ''}
+    </div>
+    
+    <div class="footer">
+        Generated on ${new Date().toLocaleDateString()} | Road to 1% Program<br>
+        This report is confidential and intended for authorized personnel only.
+    </div>
+</body>
+</html>
+  `.trim();
+}
 
-// Simplified PDF Document Component for testing
-const AssessmentReport = ({ data }: { data: any }) =>
-  createElement(
-    Document,
-    {},
-    createElement(
-      Page,
-      { size: "A4", style: styles.page },
-      // Header
-      createElement(
-        View,
-        { style: styles.header },
-        createElement(
-          Text,
-          { style: styles.title },
-          "Success Probability Index (SPI)"
-        ),
-        createElement(Text, { style: styles.subtitle }, "Assessment Report")
-      ),
-
-      // Basic Client Information
-      createElement(
-        View,
-        { style: styles.section },
-        createElement(
-          Text,
-          { style: styles.sectionTitle },
-          "Client Information"
-        ),
-        createElement(
-          Text,
-          { style: styles.value },
-          `Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}`
-        ),
-        createElement(
-          Text,
-          { style: styles.value },
-          `Email: ${data.profile?.email || "N/A"}`
-        ),
-        createElement(
-          Text,
-          { style: styles.value },
-          `SPI Score: ${data.progress?.spi_score || "Not Available"}`
-        )
-      ),
-
-      // Footer
-      createElement(
-        View,
-        { style: styles.footer },
-        createElement(
-          Text,
-          { style: styles.footerText },
-          `Generated on ${new Date().toLocaleDateString()}`
-        )
-      )
-    )
-  );
-
-// POST /api/admin/export-assessment/[userId] - Export assessment as PDF
+// POST /api/admin/export-assessment/[userId] - Export assessment as HTML
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ userId: string }> }
@@ -228,7 +146,7 @@ export async function POST(
       comprehensiveAssessment,
     };
 
-    console.log("PDF data:", {
+    console.log("Assessment data:", {
       hasProfile: !!data.profile,
       hasProgress: !!data.progress,
       hasSpiAssessment: !!data.spiAssessment,
@@ -238,62 +156,26 @@ export async function POST(
         : "N/A",
     });
 
-    // Generate PDF with minimal, reliable structure
-    console.log("Starting minimal PDF generation...");
+    // Generate HTML report (more reliable than PDF)
+    console.log("Generating HTML assessment report...");
     
     try {
-      // Create the most basic PDF possible
-      const MinimalPDF = createElement(
-        Document,
-        {},
-        createElement(
-          Page,
-          { size: "A4", style: { padding: 30, fontFamily: "Helvetica" } },
-          createElement(
-            Text,
-            { style: { fontSize: 20, marginBottom: 20, color: "#000" } },
-            "SPI Assessment Report"
-          ),
-          createElement(
-            Text,
-            { style: { fontSize: 12, marginBottom: 10, color: "#000" } },
-            `Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}`
-          ),
-          createElement(
-            Text,
-            { style: { fontSize: 12, marginBottom: 10, color: "#000" } },
-            `Email: ${data.profile?.email || "N/A"}`
-          ),
-          createElement(
-            Text,
-            { style: { fontSize: 12, marginBottom: 10, color: "#000" } },
-            `SPI Score: ${data.progress?.spi_score || "Not Available"}`
-          ),
-          createElement(
-            Text,
-            { style: { fontSize: 10, marginTop: 30, color: "#666" } },
-            `Generated: ${new Date().toLocaleDateString()}`
-          )
-        )
-      );
+      const htmlContent = generateAssessmentHTML(data);
+      console.log("HTML report generated successfully");
 
-      console.log("Generating PDF buffer...");
-      const pdfBuffer = await pdf(MinimalPDF).toBuffer();
-      console.log("PDF generated successfully");
-
-      return new NextResponse(pdfBuffer as unknown as BodyInit, {
+      return new NextResponse(htmlContent, {
         headers: {
-          "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="spi-assessment-${data.profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.pdf"`,
+          "Content-Type": "text/html",
+          "Content-Disposition": `attachment; filename="spi-assessment-${data.profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.html"`,
         },
       });
-    } catch (pdfError) {
-      console.error("PDF generation failed:", pdfError);
-      const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
+    } catch (htmlError) {
+      console.error("HTML generation failed:", htmlError);
+      const errorMessage = htmlError instanceof Error ? htmlError.message : String(htmlError);
       
-      // Fallback to text file if PDF fails
+      // Fallback to text file if HTML fails
       return new NextResponse(
-        `SPI Assessment Report (PDF Generation Failed)
+        `SPI Assessment Report (HTML Generation Failed)
         
 Name: ${data.profile?.first_name || "N/A"} ${data.profile?.last_name || "N/A"}
 Email: ${data.profile?.email || "N/A"}
@@ -312,9 +194,9 @@ Error: ${errorMessage}
       );
     }
   } catch (error) {
-    console.error("Error generating PDF:", error);
+    console.error("Error generating assessment report:", error);
     return NextResponse.json(
-      { error: "Failed to generate PDF" },
+      { error: "Failed to generate assessment report" },
       { status: 500 }
     );
   }

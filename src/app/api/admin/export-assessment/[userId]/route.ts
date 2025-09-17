@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// PDF Document Component using createElement to avoid JSX syntax issues
+// Simplified PDF Document Component for testing
 const AssessmentReport = ({ data }: { data: any }) =>
   createElement(
     Document,
@@ -138,12 +138,11 @@ const AssessmentReport = ({ data }: { data: any }) =>
         createElement(
           Text,
           { style: styles.subtitle },
-          "Owner-Operator Readiness Assessment Report"
-        ),
-        createElement(Text, { style: styles.subtitle }, "Road to 1% Program")
+          "Assessment Report"
+        )
       ),
 
-      // Client Information
+      // Basic Client Information
       createElement(
         View,
         { style: styles.section },
@@ -153,287 +152,21 @@ const AssessmentReport = ({ data }: { data: any }) =>
           "Client Information"
         ),
         createElement(
-          View,
-          { style: styles.infoGrid },
-          createElement(
-            View,
-            { style: styles.infoItem },
-            createElement(Text, { style: styles.label }, "Name"),
-            createElement(
-              Text,
-              { style: styles.value },
-              `${data.profile?.first_name} ${data.profile?.last_name}`
-            )
-          ),
-          createElement(
-            View,
-            { style: styles.infoItem },
-            createElement(Text, { style: styles.label }, "Email"),
-            createElement(Text, { style: styles.value }, data.profile?.email)
-          )
+          Text,
+          { style: styles.value },
+          `Name: ${data.profile?.first_name || 'N/A'} ${data.profile?.last_name || 'N/A'}`
         ),
-        createElement(
-          View,
-          { style: styles.infoGrid },
-          createElement(
-            View,
-            { style: styles.infoItem },
-            createElement(Text, { style: styles.label }, "Assessment Date"),
-            createElement(
-              Text,
-              { style: styles.value },
-              data.progress?.last_assessment_date
-                ? new Date(
-                    data.progress.last_assessment_date
-                  ).toLocaleDateString()
-                : "N/A"
-            )
-          ),
-          createElement(
-            View,
-            { style: styles.infoItem },
-            createElement(Text, { style: styles.label }, "Current Tier"),
-            createElement(
-              Text,
-              { style: styles.value },
-              data.progress?.current_tier || "Not Assigned"
-            )
-          )
-        )
-      ),
-
-      // Overall SPI Score
-      ...(data.progress?.spi_score
-        ? [
-            createElement(
-              View,
-              { style: styles.section },
-              createElement(
-                Text,
-                { style: styles.sectionTitle },
-                "Overall SPI Score"
-              ),
-              createElement(
-                View,
-                { style: styles.scoreContainer },
-                createElement(
-                  Text,
-                  { style: styles.scoreTitle },
-                  "Success Probability Index"
-                ),
-                createElement(
-                  Text,
-                  { style: styles.scoreValue },
-                  data.progress.spi_score.toString()
-                )
-              )
-            ),
-          ]
-        : []),
-
-      // Assessment Completion Status
-      createElement(
-        View,
-        { style: styles.section },
         createElement(
           Text,
-          { style: styles.sectionTitle },
-          "Assessment Completion Status"
+          { style: styles.value },
+          `Email: ${data.profile?.email || 'N/A'}`
         ),
         createElement(
-          View,
-          { style: styles.assessmentGrid },
-          [
-            "financial_foundation",
-            "market_intelligence",
-            "personal_strengths",
-            "risk_management",
-            "support_systems",
-          ].map((key, index) => {
-            const label = key
-              .split("_")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ");
-            const completed = data.progress?.[`${key}_completed`];
-            const score = data.progress?.[`${key}_score`];
-            return createElement(
-              View,
-              { key: index, style: styles.assessmentItem },
-              createElement(Text, { style: styles.assessmentTitle }, label),
-              createElement(
-                Text,
-                { style: styles.assessmentStatus },
-                `${completed ? "Completed" : "Not Completed"}${score ? ` - Score: ${score}` : ""}`
-              )
-            );
-          })
+          Text,
+          { style: styles.value },
+          `SPI Score: ${data.progress?.spi_score || 'Not Available'}`
         )
       ),
-
-      // StandOut Assessment
-      ...(data.progress?.standout_completed
-        ? [
-            createElement(
-              View,
-              { style: styles.section },
-              createElement(
-                Text,
-                { style: styles.sectionTitle },
-                "StandOut Assessment"
-              ),
-              createElement(
-                View,
-                { style: styles.infoGrid },
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(Text, { style: styles.label }, "Primary Role"),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    data.progress.standout_role_1 || "N/A"
-                  )
-                ),
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(
-                    Text,
-                    { style: styles.label },
-                    "Secondary Role"
-                  ),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    data.progress.standout_role_2 || "N/A"
-                  )
-                )
-              ),
-              createElement(
-                View,
-                { style: styles.infoGrid },
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(
-                    Text,
-                    { style: styles.label },
-                    "Strength Combination"
-                  ),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    data.progress.strength_combination || "N/A"
-                  )
-                ),
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(
-                    Text,
-                    { style: styles.label },
-                    "StandOut Score"
-                  ),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    data.progress.standout_score?.toString() || "N/A"
-                  )
-                )
-              )
-            ),
-          ]
-        : []),
-
-      // Financial Details
-      ...(data.spiAssessment
-        ? [
-            createElement(
-              View,
-              { style: styles.section },
-              createElement(
-                Text,
-                { style: styles.sectionTitle },
-                "Financial Assessment Details"
-              ),
-              createElement(
-                View,
-                { style: styles.infoGrid },
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(Text, { style: styles.label }, "Net Worth"),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    `$${(
-                      (data.spiAssessment.cash_checking || 0) +
-                      (data.spiAssessment.savings || 0) +
-                      (data.spiAssessment.investments || 0) +
-                      (data.spiAssessment.retirement || 0) +
-                      (data.spiAssessment.real_estate || 0) +
-                      (data.spiAssessment.vehicles || 0) +
-                      (data.spiAssessment.equipment || 0) +
-                      (data.spiAssessment.other_assets || 0) -
-                      (data.spiAssessment.credit_cards || 0) -
-                      (data.spiAssessment.auto_loans || 0) -
-                      (data.spiAssessment.mortgage || 0) -
-                      (data.spiAssessment.equipment_loans || 0) -
-                      (data.spiAssessment.personal_loans || 0) -
-                      (data.spiAssessment.other_debts || 0)
-                    ).toLocaleString()}`
-                  )
-                ),
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(
-                    Text,
-                    { style: styles.label },
-                    "Monthly Income"
-                  ),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    `$${data.spiAssessment.monthly_income?.toLocaleString() || "N/A"}`
-                  )
-                )
-              ),
-              createElement(
-                View,
-                { style: styles.infoGrid },
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(
-                    Text,
-                    { style: styles.label },
-                    "Monthly Expenses"
-                  ),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    `$${data.spiAssessment.monthly_expenses?.toLocaleString() || "N/A"}`
-                  )
-                ),
-                createElement(
-                  View,
-                  { style: styles.infoItem },
-                  createElement(
-                    Text,
-                    { style: styles.label },
-                    "Emergency Fund"
-                  ),
-                  createElement(
-                    Text,
-                    { style: styles.value },
-                    `${data.spiAssessment.emergency_fund_months || 0} months`
-                  )
-                )
-              )
-            ),
-          ]
-        : []),
 
       // Footer
       createElement(
@@ -442,12 +175,7 @@ const AssessmentReport = ({ data }: { data: any }) =>
         createElement(
           Text,
           { style: styles.footerText },
-          `Generated on ${new Date().toLocaleDateString()} | Road to 1% Program`
-        ),
-        createElement(
-          Text,
-          { style: styles.footerText },
-          "This report is confidential and intended for authorized personnel only."
+          `Generated on ${new Date().toLocaleDateString()}`
         )
       )
     )
@@ -504,12 +232,26 @@ export async function POST(
       comprehensiveAssessment,
     };
 
-    console.log("PDF data:", JSON.stringify(data, null, 2));
+    console.log("PDF data:", {
+      hasProfile: !!data.profile,
+      hasProgress: !!data.progress,
+      hasSpiAssessment: !!data.spiAssessment,
+      hasComprehensiveAssessment: !!data.comprehensiveAssessment,
+      profileName: data.profile ? `${data.profile.first_name} ${data.profile.last_name}` : 'N/A'
+    });
 
-    // Generate PDF
+    // Generate PDF with error handling
     console.log("Starting PDF generation...");
-    const pdfBuffer = await pdf(AssessmentReport({ data })).toBuffer();
-    console.log("PDF generated successfully");
+    let pdfBuffer;
+    try {
+      const pdfDocument = AssessmentReport({ data });
+      console.log("PDF document created, generating buffer...");
+      pdfBuffer = await pdf(pdfDocument).toBuffer();
+      console.log("PDF generated successfully");
+    } catch (pdfError) {
+      console.error("PDF generation error:", pdfError);
+      throw new Error(`PDF generation failed: ${pdfError.message}`);
+    }
 
     // Return PDF as response
     return new NextResponse(pdfBuffer as unknown as BodyInit, {

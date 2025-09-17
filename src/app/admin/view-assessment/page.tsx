@@ -74,60 +74,176 @@ export default function ViewAssessment() {
   const exportUserPdf = async (userId: string) => {
     try {
       setExportingPdf(true);
-      
+
       // Get assessment data from API
       const response = await fetch(`/api/admin/export-assessment/${userId}`, {
         method: "POST",
       });
-      
+
       if (response.ok) {
         const result = await response.json();
-        
+
         if (result.success && result.data) {
           // Import jsPDF dynamically
-          const { default: jsPDF } = await import('jspdf');
-          
+          const { default: jsPDF } = await import("jspdf");
+
           // Create new PDF document
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          
+          const pdf = new jsPDF("p", "mm", "a4");
+
           // Add content to PDF
-          const { profile, progress } = result.data;
-          
+          const { profile, progress, spiAssessment, comprehensiveAssessment } = result.data;
+          let yPosition = 30;
+
           // Header
           pdf.setFontSize(20);
           pdf.setTextColor(30, 58, 138); // Blue color
-          pdf.text('Success Probability Index (SPI)', 20, 30);
-          
+          pdf.text("Success Probability Index (SPI)", 20, yPosition);
+          yPosition += 15;
+
           pdf.setFontSize(14);
           pdf.setTextColor(107, 114, 128); // Gray color
-          pdf.text('Assessment Report', 20, 45);
-          
-          // Client Information
+          pdf.text("Owner-Operator Readiness Assessment Report", 20, yPosition);
+          yPosition += 20;
+
+          // Client Information Section
           pdf.setFontSize(16);
           pdf.setTextColor(30, 58, 138);
-          pdf.text('Client Information', 20, 70);
-          
+          pdf.text("Client Information", 20, yPosition);
+          yPosition += 10;
+
           pdf.setFontSize(12);
           pdf.setTextColor(0, 0, 0);
-          pdf.text(`Name: ${profile?.first_name || 'N/A'} ${profile?.last_name || 'N/A'}`, 20, 85);
-          pdf.text(`Email: ${profile?.email || 'N/A'}`, 20, 95);
-          pdf.text(`SPI Score: ${progress?.spi_score || 'Not Available'}`, 20, 105);
-          
-          if (progress?.current_tier) {
-            pdf.text(`Current Tier: ${progress.current_tier}`, 20, 115);
+          pdf.text(`Name: ${profile?.first_name || "N/A"} ${profile?.last_name || "N/A"}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Email: ${profile?.email || "N/A"}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Member Since: ${new Date(profile?.created_at || Date.now()).toLocaleDateString()}`, 20, yPosition);
+          yPosition += 15;
+
+          // Overall SPI Score Section
+          if (progress?.spi_score) {
+            pdf.setFontSize(16);
+            pdf.setTextColor(30, 58, 138);
+            pdf.text("Overall SPI Score", 20, yPosition);
+            yPosition += 10;
+
+            pdf.setFontSize(14);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`Success Probability Index: ${progress.spi_score}`, 20, yPosition);
+            yPosition += 8;
+            if (progress.current_tier) {
+              pdf.text(`Current Tier: ${progress.current_tier}`, 20, yPosition);
+              yPosition += 8;
+            }
+            if (progress.last_assessment_date) {
+              pdf.text(`Last Assessment: ${new Date(progress.last_assessment_date).toLocaleDateString()}`, 20, yPosition);
+              yPosition += 15;
+            } else {
+              yPosition += 10;
+            }
           }
-          
+
+          // Assessment Completion Status
+          if (progress) {
+            pdf.setFontSize(16);
+            pdf.setTextColor(30, 58, 138);
+            pdf.text("Assessment Completion Status", 20, yPosition);
+            yPosition += 10;
+
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            
+            const assessments = [
+              { key: 'financial_foundation_completed', label: 'Financial Foundation', score: progress.financial_foundation_score },
+              { key: 'market_intelligence_completed', label: 'Market Intelligence', score: progress.market_intelligence_score },
+              { key: 'personal_strengths_completed', label: 'Personal Strengths', score: progress.personal_strengths_score },
+              { key: 'risk_management_completed', label: 'Risk Management', score: progress.risk_management_score },
+              { key: 'support_systems_completed', label: 'Support Systems', score: progress.support_systems_score }
+            ];
+
+            assessments.forEach(assessment => {
+              const completed = progress[assessment.key];
+              const status = completed ? "✓ Completed" : "○ Not Completed";
+              const scoreText = assessment.score ? ` - Score: ${assessment.score}` : "";
+              pdf.text(`${assessment.label}: ${status}${scoreText}`, 20, yPosition);
+              yPosition += 8;
+            });
+            yPosition += 10;
+          }
+
+          // StandOut Assessment
+          if (progress?.standout_completed || comprehensiveAssessment?.standout_strength_1) {
+            pdf.setFontSize(16);
+            pdf.setTextColor(30, 58, 138);
+            pdf.text("StandOut Assessment", 20, yPosition);
+            yPosition += 10;
+
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            
+            if (comprehensiveAssessment?.standout_strength_1) {
+              pdf.text(`Primary Strength: ${comprehensiveAssessment.standout_strength_1}`, 20, yPosition);
+              yPosition += 8;
+            }
+            if (comprehensiveAssessment?.standout_strength_2) {
+              pdf.text(`Secondary Strength: ${comprehensiveAssessment.standout_strength_2}`, 20, yPosition);
+              yPosition += 8;
+            }
+            if (progress?.standout_score) {
+              pdf.text(`StandOut Score: ${progress.standout_score}`, 20, yPosition);
+              yPosition += 8;
+            }
+            yPosition += 10;
+          }
+
+          // Financial Assessment
+          if (spiAssessment || comprehensiveAssessment) {
+            pdf.setFontSize(16);
+            pdf.setTextColor(30, 58, 138);
+            pdf.text("Financial Assessment", 20, yPosition);
+            yPosition += 10;
+
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+
+            if (comprehensiveAssessment?.net_worth) {
+              pdf.text(`Net Worth: $${comprehensiveAssessment.net_worth.toLocaleString()}`, 20, yPosition);
+              yPosition += 8;
+            }
+            if (comprehensiveAssessment?.monthly_income) {
+              pdf.text(`Monthly Income: $${comprehensiveAssessment.monthly_income.toLocaleString()}`, 20, yPosition);
+              yPosition += 8;
+            }
+            if (comprehensiveAssessment?.monthly_expenses) {
+              pdf.text(`Monthly Expenses: $${comprehensiveAssessment.monthly_expenses.toLocaleString()}`, 20, yPosition);
+              yPosition += 8;
+            }
+            if (comprehensiveAssessment?.emergency_fund) {
+              pdf.text(`Emergency Fund: $${comprehensiveAssessment.emergency_fund.toLocaleString()}`, 20, yPosition);
+              yPosition += 8;
+            }
+            yPosition += 10;
+          }
+
           // Footer
           pdf.setFontSize(10);
           pdf.setTextColor(107, 114, 128);
-          pdf.text(`Generated on ${new Date().toLocaleDateString()} | Road to 1% Program`, 20, 280);
-          pdf.text('This report is confidential and intended for authorized personnel only.', 20, 290);
-          
+          pdf.text(
+            `Generated on ${new Date().toLocaleDateString()} | Road to 1% Program`,
+            20,
+            280
+          );
+          pdf.text(
+            "This report is confidential and intended for authorized personnel only.",
+            20,
+            290
+          );
+
           // Download the PDF
-          const fileName = `spi-assessment-${profile?.first_name || 'user'}-${new Date().toISOString().split('T')[0]}.pdf`;
+          const fileName = `spi-assessment-${profile?.first_name || "user"}-${new Date().toISOString().split("T")[0]}.pdf`;
           pdf.save(fileName);
         } else {
-          throw new Error('Invalid response data');
+          throw new Error("Invalid response data");
         }
       } else {
         console.error("Failed to get assessment data");

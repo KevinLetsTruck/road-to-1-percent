@@ -170,8 +170,8 @@ export async function POST(
         progress: data.progress,
         spiAssessment: data.spiAssessment,
         comprehensiveAssessment: data.comprehensiveAssessment,
-        htmlContent: generateAssessmentHTML(data)
-      }
+        htmlContent: generateAssessmentHTML(data),
+      },
     });
   } catch (error) {
     console.error("Error generating assessment report:", error);

@@ -17,7 +17,9 @@ import {
   AlertCircle,
   Shield,
   DollarSign,
-  Activity
+  Activity,
+  Download,
+  FileText
 } from 'lucide-react'
 import ShieldLogo from '@/components/ui/ShieldLogo'
 import { useAuth } from '@/contexts/AuthContext'
@@ -53,6 +55,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
+  const [selectedUserDetails, setSelectedUserDetails] = useState<any>(null)
+  const [loadingUserDetails, setLoadingUserDetails] = useState(false)
+  const [exportingPdf, setExportingPdf] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -207,6 +212,57 @@ export default function AdminDashboard() {
     if (percentage >= 80) return <CheckCircle className="h-4 w-4 text-green-600" />
     if (percentage >= 50) return <Clock className="h-4 w-4 text-yellow-600" />
     return <AlertCircle className="h-4 w-4 text-red-600" />
+  }
+
+  const fetchUserDetails = async (user: User) => {
+    setLoadingUserDetails(true)
+    setSelectedUser(user)
+    setShowUserModal(true)
+    
+    try {
+      const response = await fetch(`/api/admin/user-assessment/${user.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setSelectedUserDetails(data)
+      } else {
+        console.error('Failed to fetch user details')
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error)
+    } finally {
+      setLoadingUserDetails(false)
+    }
+  }
+
+  const exportUserPdf = async (userId: string, userName: string) => {
+    setExportingPdf(userId)
+    
+    try {
+      const response = await fetch(`/api/admin/export-assessment/${userId}`, {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = `spi-assessment-${userName}-${new Date().toISOString().split('T')[0]}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      } else {
+        console.error('Failed to export PDF')
+        alert('Failed to export PDF. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+      alert('Error exporting PDF. Please try again.')
+    } finally {
+      setExportingPdf(null)
+    }
   }
 
   if (loading) {
@@ -446,18 +502,30 @@ export default function AdminDashboard() {
                           {new Date(user.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => {
-                              setSelectedUser(user)
-                              setShowUserModal(true)
-                            }}
-                            className="text-[#1e3a8a] hover:text-[#1e40af] mr-3"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button className="text-gray-600 hover:text-gray-900">
-                            <Mail className="h-4 w-4" />
-                          </button>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => fetchUserDetails(user)}
+                              className="text-[#1e3a8a] hover:text-[#1e40af] p-1 rounded"
+                              title="View Details"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => exportUserPdf(user.id, `${user.first_name}-${user.last_name}`)}
+                              disabled={exportingPdf === user.id}
+                              className="text-green-600 hover:text-green-700 p-1 rounded disabled:opacity-50"
+                              title="Export PDF"
+                            >
+                              {exportingPdf === user.id ? (
+                                <div className="animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full"></div>
+                              ) : (
+                                <Download className="h-4 w-4" />
+                              )}
+                            </button>
+                            <button className="text-gray-600 hover:text-gray-900 p-1 rounded" title="Send Email">
+                              <Mail className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
@@ -469,38 +537,189 @@ export default function AdminDashboard() {
         </div>
       </main>
 
-      {/* User Detail Modal */}
+      {/* Enhanced User Detail Modal */}
       {showUserModal && selectedUser && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-10 mx-auto p-5 border max-w-4xl shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">User Details</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Email:</label>
-                  <p className="text-sm text-gray-900">{selectedUser.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Name:</label>
-                  <p className="text-sm text-gray-900">{selectedUser.first_name} {selectedUser.last_name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Joined:</label>
-                  <p className="text-sm text-gray-900">{new Date(selectedUser.created_at).toLocaleDateString()}</p>
-                </div>
-                {getUserProgress(selectedUser.id) && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Progress:</label>
-                    <p className="text-sm text-gray-900">
-                      {getCompletionPercentage(selectedUser)}% Complete
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="mt-6 flex justify-end space-x-3">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {selectedUser.first_name} {selectedUser.last_name} - Assessment Details
+                </h3>
                 <button
-                  onClick={() => setShowUserModal(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  onClick={() => exportUserPdf(selectedUser.id, `${selectedUser.first_name}-${selectedUser.last_name}`)}
+                  disabled={exportingPdf === selectedUser.id}
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                >
+                  {exportingPdf === selectedUser.id ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  Export PDF
+                </button>
+              </div>
+
+              {loadingUserDetails ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin h-8 w-8 border-2 border-[#1e3a8a] border-t-transparent rounded-full"></div>
+                  <span className="ml-3 text-gray-600">Loading assessment details...</span>
+                </div>
+              ) : selectedUserDetails ? (
+                <div className="space-y-6">
+                  {/* Basic Information */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Basic Information</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Email</label>
+                        <p className="text-sm text-gray-900">{selectedUser.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Joined</label>
+                        <p className="text-sm text-gray-900">{new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Current Tier</label>
+                        <p className="text-sm text-gray-900">{selectedUserDetails.progress?.current_tier || 'Not Assigned'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Overall Progress</label>
+                        <p className="text-sm text-gray-900">{getCompletionPercentage(selectedUser)}% Complete</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SPI Score */}
+                  {selectedUserDetails.progress?.spi_score && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="text-lg font-semibold text-[#1e3a8a] mb-3">SPI Score</h4>
+                      <div className="text-3xl font-bold text-[#1e3a8a]">
+                        {selectedUserDetails.progress.spi_score}
+                      </div>
+                      <p className="text-sm text-gray-600">Success Probability Index</p>
+                    </div>
+                  )}
+
+                  {/* Assessment Completion Status */}
+                  <div className="bg-white border rounded-lg p-4">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Assessment Completion Status</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {[
+                        { key: 'financial_foundation', label: 'Financial Foundation' },
+                        { key: 'market_intelligence', label: 'Market Intelligence' },
+                        { key: 'personal_strengths', label: 'Personal Strengths' },
+                        { key: 'risk_management', label: 'Risk Management' },
+                        { key: 'support_systems', label: 'Support Systems' }
+                      ].map(({ key, label }) => {
+                        const completed = selectedUserDetails.progress?.[`${key}_completed`]
+                        const score = selectedUserDetails.progress?.[`${key}_score`]
+                        return (
+                          <div key={key} className="bg-gray-50 p-3 rounded">
+                            <div className="flex items-center mb-2">
+                              {completed ? (
+                                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                              ) : (
+                                <Clock className="h-4 w-4 text-gray-400 mr-2" />
+                              )}
+                              <span className="text-sm font-medium">{label}</span>
+                            </div>
+                            <p className="text-xs text-gray-600">
+                              {completed ? 'Completed' : 'Not Completed'}
+                              {score && ` - Score: ${score}`}
+                            </p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* StandOut Assessment */}
+                  {selectedUserDetails.progress?.standout_completed && (
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <h4 className="text-lg font-semibold text-purple-900 mb-3">StandOut Assessment</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Primary Role</label>
+                          <p className="text-sm text-gray-900">{selectedUserDetails.progress.standout_role_1 || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Secondary Role</label>
+                          <p className="text-sm text-gray-900">{selectedUserDetails.progress.standout_role_2 || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Strength Combination</label>
+                          <p className="text-sm text-gray-900">{selectedUserDetails.progress.strength_combination || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">StandOut Score</label>
+                          <p className="text-sm text-gray-900">{selectedUserDetails.progress.standout_score || 'N/A'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Financial Details */}
+                  {selectedUserDetails.spiAssessment && (
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <h4 className="text-lg font-semibold text-green-900 mb-3">Financial Assessment</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Net Worth</label>
+                          <p className="text-sm text-gray-900">
+                            ${((selectedUserDetails.spiAssessment.cash_checking || 0) +
+                              (selectedUserDetails.spiAssessment.savings || 0) +
+                              (selectedUserDetails.spiAssessment.investments || 0) +
+                              (selectedUserDetails.spiAssessment.retirement || 0) +
+                              (selectedUserDetails.spiAssessment.real_estate || 0) +
+                              (selectedUserDetails.spiAssessment.vehicles || 0) +
+                              (selectedUserDetails.spiAssessment.equipment || 0) +
+                              (selectedUserDetails.spiAssessment.other_assets || 0) -
+                              (selectedUserDetails.spiAssessment.credit_cards || 0) -
+                              (selectedUserDetails.spiAssessment.auto_loans || 0) -
+                              (selectedUserDetails.spiAssessment.mortgage || 0) -
+                              (selectedUserDetails.spiAssessment.equipment_loans || 0) -
+                              (selectedUserDetails.spiAssessment.personal_loans || 0) -
+                              (selectedUserDetails.spiAssessment.other_debts || 0)).toLocaleString()}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Monthly Income</label>
+                          <p className="text-sm text-gray-900">
+                            ${selectedUserDetails.spiAssessment.monthly_income?.toLocaleString() || 'N/A'}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Monthly Expenses</label>
+                          <p className="text-sm text-gray-900">
+                            ${selectedUserDetails.spiAssessment.monthly_expenses?.toLocaleString() || 'N/A'}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-700">Emergency Fund</label>
+                          <p className="text-sm text-gray-900">
+                            {selectedUserDetails.spiAssessment.emergency_fund_months || 0} months
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No detailed assessment data available for this user.</p>
+                </div>
+              )}
+
+              <div className="mt-8 flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowUserModal(false)
+                    setSelectedUser(null)
+                    setSelectedUserDetails(null)
+                  }}
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
                 >
                   Close
                 </button>

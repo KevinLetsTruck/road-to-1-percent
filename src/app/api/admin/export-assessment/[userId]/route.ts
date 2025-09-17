@@ -501,7 +501,7 @@ export async function POST(
     // Generate PDF
     const pdfBuffer = await pdf(AssessmentReport({ data })).toBuffer();
 
-    // Return PDF as response  
+    // Return PDF as response
     return new NextResponse(pdfBuffer as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",

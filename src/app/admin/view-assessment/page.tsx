@@ -53,36 +53,29 @@ export default function ViewAssessment() {
     try {
       setLoading(true)
       
-      // Get all users with their assessment data
+      // Get all users first
       const { data: userData, error: userError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          email,
-          first_name,
-          last_name,
-          created_at,
-          is_test_user,
-          user_progress (
-            spi_score,
-            current_tier
-          ),
-          comprehensive_assessments (
-            assessment_date,
-            total_spi_score,
-            tier,
-            standout_strength_1,
-            standout_strength_2
-          )
-        `)
+        .select('id, email, first_name, last_name, created_at, is_test_user')
         .order('created_at', { ascending: false })
 
       if (userError) throw userError
 
-      // Process the data to flatten it
+      // Get user progress data separately
+      const { data: progressData } = await supabase
+        .from('user_progress')
+        .select('user_id, spi_score, current_tier')
+
+      // Get comprehensive assessments data separately  
+      const { data: assessmentData } = await supabase
+        .from('comprehensive_assessments')
+        .select('user_id, assessment_date, total_spi_score, tier, standout_strength_1, standout_strength_2')
+        .order('assessment_date', { ascending: false })
+
+      // Process the data to combine everything
       const processedUsers = userData?.map(user => {
-        const progress = user.user_progress?.[0] || {}
-        const assessment = user.comprehensive_assessments?.[0] || {}
+        const progress = progressData?.find(p => p.user_id === user.id) || {}
+        const assessment = assessmentData?.find(a => a.user_id === user.id) || {}
         
         return {
           id: user.id,
@@ -96,7 +89,7 @@ export default function ViewAssessment() {
           tier: assessment.tier,
           standout_strength_1: assessment.standout_strength_1,
           standout_strength_2: assessment.standout_strength_2,
-          spi_score: progress.spi_score,
+          spi_score: progress.spi_score || 0,
           current_tier: progress.current_tier
         }
       }) || []

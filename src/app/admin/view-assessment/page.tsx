@@ -552,7 +552,8 @@ export default function ViewAssessment() {
                           fetchUserDetails(userTyped.id);
                         }}
                         className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                          selectedUser?.id === (userTyped as any).id
+                          // @ts-expect-error - TypeScript inference issue with filtered array
+                          selectedUser?.id === userTyped.id
                             ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
                             : ""
                         }`}

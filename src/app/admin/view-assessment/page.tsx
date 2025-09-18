@@ -11,15 +11,10 @@ import {
   Award,
   ArrowLeft,
   Calendar,
-  Mail,
-  Shield,
   Target,
-  BarChart3,
   CheckCircle,
   XCircle,
   AlertCircle,
-  Download,
-  Eye,
   ExternalLink,
 } from "lucide-react";
 
@@ -44,11 +39,12 @@ export default function ViewAssessment() {
   const [selectedUser, setSelectedUser] = useState<UserAssessment | null>(null);
   const [selectedUserDetails, setSelectedUserDetails] = useState<any>(null);
   const [loadingUserDetails, setLoadingUserDetails] = useState(false);
-  const [exportingPdf, setExportingPdf] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [preselectedUserId, setPreselectedUserId] = useState<string | null>(null);
+  const [preselectedUserId, setPreselectedUserId] = useState<string | null>(
+    null
+  );
   const router = useRouter();
   const supabase = createClient();
 
@@ -56,11 +52,11 @@ export default function ViewAssessment() {
     // Check if a specific user was selected via URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const selectedUserId = urlParams.get("selectedUserId");
-    
+
     if (selectedUserId) {
       setPreselectedUserId(selectedUserId);
     }
-    
+
     loadUsers();
   }, []);
 
@@ -434,8 +430,8 @@ export default function ViewAssessment() {
     }
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
+  const filteredUsers: UserAssessment[] = users.filter(
+    (user: UserAssessment) =>
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -524,75 +520,77 @@ export default function ViewAssessment() {
           </div>
         </div>
 
-        <div className={`grid grid-cols-1 ${selectedUser ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
+        <div
+          className={`grid grid-cols-1 ${selectedUser ? "lg:grid-cols-1" : "lg:grid-cols-3"} gap-8`}
+        >
           {/* User List - Hide when user is selected from dashboard */}
           {!selectedUser && (
             <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  />
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <input
+                      type="text"
+                      placeholder="Search users..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="max-h-96 overflow-y-auto">
-                {filteredUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    onClick={() => {
-                      setSelectedUser(user);
-                      fetchUserDetails(user.id);
-                    }}
-                    className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                      selectedUser?.id === user.id
-                        ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
-                        : ""
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-gray-400" />
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {user.email}
+                <div className="max-h-96 overflow-y-auto">
+                  {filteredUsers.map((user: UserAssessment) => (
+                    <div
+                      key={user.id}
+                      onClick={() => {
+                        setSelectedUser(user);
+                        fetchUserDetails(user.id);
+                      }}
+                      className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                        selectedUser?.id === user.id
+                          ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
+                          : ""
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {user.email}
+                            </p>
+                            {user.is_test_user && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                                Test
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {user.first_name} {user.last_name}
                           </p>
-                          {user.is_test_user && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
-                              Test
-                            </span>
+                          {user.spi_score > 0 && (
+                            <div className="flex items-center mt-2">
+                              <TrendingUp className="h-3 w-3 text-gray-400 mr-1" />
+                              <span
+                                className={`text-xs font-medium ${getScoreColor(user.spi_score)}`}
+                              >
+                                SPI: {user.spi_score}
+                              </span>
+                            </div>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {user.first_name} {user.last_name}
-                        </p>
-                        {user.spi_score > 0 && (
-                          <div className="flex items-center mt-2">
-                            <TrendingUp className="h-3 w-3 text-gray-400 mr-1" />
-                            <span
-                              className={`text-xs font-medium ${getScoreColor(user.spi_score)}`}
-                            >
-                              SPI: {user.spi_score}
-                            </span>
-                          </div>
+                        {user.spi_score > 0 ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-gray-400" />
                         )}
                       </div>
-                      {user.spi_score > 0 ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-gray-400" />
-                      )}
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
             </div>
           )}
 

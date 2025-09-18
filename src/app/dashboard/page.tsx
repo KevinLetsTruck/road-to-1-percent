@@ -606,7 +606,7 @@ export default function DashboardPage() {
                   Admin Dashboard
                 </Link>
               )}
-              
+
               {/* Retake Assessment Button */}
               <button
                 onClick={() =>
@@ -617,7 +617,7 @@ export default function DashboardPage() {
                 <RefreshCw className="w-4 h-4" />
                 Retake Assessment
               </button>
-              
+
               {/* Logout Button */}
               <button
                 onClick={handleSignOut}

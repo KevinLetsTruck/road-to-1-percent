@@ -397,11 +397,11 @@ export default function AdminDashboard() {
                   Monitor user progress and system metrics
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                {/* Primary Actions */}
                 <button
                   onClick={() => {
                     console.log('View Assessments button clicked');
-                    console.log('Router object:', router);
                     try {
                       router.push('/admin/view-assessment');
                     } catch (error) {
@@ -409,20 +409,21 @@ export default function AdminDashboard() {
                       window.location.href = '/admin/view-assessment';
                     }
                   }}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   View Assessments
                 </button>
+                
                 <button
-                  onClick={() => {
-                    console.log('Test button clicked');
-                    alert('Test button works!');
-                  }}
-                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={exportToCSV}
+                  className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
                 >
-                  Test Button
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
                 </button>
+                
+                {/* Navigation Actions */}
                 <button
                   onClick={() => router.push('/dashboard')}
                   className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -430,6 +431,7 @@ export default function AdminDashboard() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </button>
+                
                 <button
                   onClick={async () => {
                     console.log("Admin logout clicked");
@@ -444,13 +446,6 @@ export default function AdminDashboard() {
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
-                </button>
-                <button
-                  onClick={exportToCSV}
-                  className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
                 </button>
               </div>
             </div>

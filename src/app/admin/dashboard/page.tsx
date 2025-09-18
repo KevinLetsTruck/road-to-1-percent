@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { 
-  Users, 
-  TrendingUp, 
-  Award, 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import {
+  Users,
+  TrendingUp,
+  Award,
   AlertCircle,
   BarChart3,
   Activity,
@@ -23,40 +23,40 @@ import {
   LogOut,
   Trash2,
   TestTube,
-  FileText
-} from 'lucide-react'
+  FileText,
+} from "lucide-react";
 
 interface UserMetrics {
-  id: string
-  email: string
-  created_at: string
-  last_sign_in_at: string
-  spi_score: number
-  current_tier: string
-  financial_foundation_score: number
-  market_intelligence_score: number
-  risk_management_score: number
-  support_systems_score: number
-  assessment_date: string
-  standout_strength_1: string
-  standout_strength_2: string
-  is_test_user?: boolean
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string;
+  spi_score: number;
+  current_tier: string;
+  financial_foundation_score: number;
+  market_intelligence_score: number;
+  risk_management_score: number;
+  support_systems_score: number;
+  assessment_date: string;
+  standout_strength_1: string;
+  standout_strength_2: string;
+  is_test_user?: boolean;
 }
 
 interface DashboardStats {
-  totalUsers: number
-  completedAssessments: number
-  averageSPIScore: number
-  tier1Count: number
-  tier9Count: number
-  tier90Count: number
-  newUsersThisWeek: number
-  assessmentsThisWeek: number
+  totalUsers: number;
+  completedAssessments: number;
+  averageSPIScore: number;
+  tier1Count: number;
+  tier9Count: number;
+  tier90Count: number;
+  newUsersThisWeek: number;
+  assessmentsThisWeek: number;
 }
 
 export default function AdminDashboard() {
-  const [loading, setLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     completedAssessments: 0,
@@ -65,157 +65,186 @@ export default function AdminDashboard() {
     tier9Count: 0,
     tier90Count: 0,
     newUsersThisWeek: 0,
-    assessmentsThisWeek: 0
-  })
-  const [users, setUsers] = useState<UserMetrics[]>([])
-  const [filteredUsers, setFilteredUsers] = useState<UserMetrics[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortBy, setSortBy] = useState<'score' | 'date' | 'email'>('score')
-  const [filterTier, setFilterTier] = useState<'all' | '1%' | '9%' | '90%'>('all')
-  const [showTestUsers, setShowTestUsers] = useState(false)
-  
-  const router = useRouter()
-  const supabase = createClient()
+    assessmentsThisWeek: 0,
+  });
+  const [users, setUsers] = useState<UserMetrics[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserMetrics[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"score" | "date" | "email">("score");
+  const [filterTier, setFilterTier] = useState<"all" | "1%" | "9%" | "90%">(
+    "all"
+  );
+  const [showTestUsers, setShowTestUsers] = useState(false);
+
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    checkAdminAccess()
-  }, [])
+    checkAdminAccess();
+  }, []);
 
   const checkAdminAccess = async () => {
-    console.log('Admin Dashboard - Checking access...')
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
-    console.log('Admin Dashboard - User:', user)
-    console.log('Admin Dashboard - User error:', userError)
-    
+    console.log("Admin Dashboard - Checking access...");
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    console.log("Admin Dashboard - User:", user);
+    console.log("Admin Dashboard - User error:", userError);
+
     if (!user) {
-      console.log('Admin Dashboard - No user, redirecting to login')
-      router.push('/login')
-      return
+      console.log("Admin Dashboard - No user, redirecting to login");
+      router.push("/login");
+      return;
     }
 
     // Check if user is admin from database
-    console.log('Admin Dashboard - Checking admin status for user:', user.id)
+    console.log("Admin Dashboard - Checking admin status for user:", user.id);
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*') // Select all fields to see what we get
-      .eq('id', user.id)
-      .single()
-    
-    console.log('Admin Dashboard - Profile data:', profile)
-    console.log('Admin Dashboard - Profile error:', profileError)
-    
+      .from("profiles")
+      .select("*") // Select all fields to see what we get
+      .eq("id", user.id)
+      .single();
+
+    console.log("Admin Dashboard - Profile data:", profile);
+    console.log("Admin Dashboard - Profile error:", profileError);
+
     if (!profile?.is_admin) {
-      console.log('Admin Dashboard - Not admin, redirecting. is_admin:', profile?.is_admin)
-      router.push('/dashboard')
-      return
+      console.log(
+        "Admin Dashboard - Not admin, redirecting. is_admin:",
+        profile?.is_admin
+      );
+      router.push("/dashboard");
+      return;
     }
 
-    console.log('Admin Dashboard - User is admin, loading data')
-    setIsAdmin(true)
-    await loadDashboardData()
-  }
+    console.log("Admin Dashboard - User is admin, loading data");
+    setIsAdmin(true);
+    await loadDashboardData();
+  };
 
   const loadDashboardData = async () => {
     try {
-      console.log('Loading dashboard data...')
-      
+      console.log("Loading dashboard data...");
+
       // First, try to get basic user data without joins
       const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('id, email, created_at, is_test_user')
+        .from("profiles")
+        .select("id, email, created_at, is_test_user");
 
       if (userError) {
-        console.error('Error fetching basic user data:', userError)
-        throw userError
+        console.error("Error fetching basic user data:", userError);
+        throw userError;
       }
 
-      console.log('Basic user data fetched:', userData?.length, 'users')
+      console.log("Basic user data fetched:", userData?.length, "users");
 
       // Then try to get user progress data
       const { data: progressData, error: progressError } = await supabase
-        .from('user_progress')
-        .select('*')
+        .from("user_progress")
+        .select("*");
 
       if (progressError) {
-        console.error('Error fetching progress data:', progressError)
+        console.error("Error fetching progress data:", progressError);
         // Don't throw, just log the error
       }
 
-      console.log('Progress data fetched:', progressData?.length, 'records')
+      console.log("Progress data fetched:", progressData?.length, "records");
 
       // Try to get comprehensive assessments data
       const { data: assessmentData, error: assessmentError } = await supabase
-        .from('comprehensive_assessments')
-        .select('*')
+        .from("comprehensive_assessments")
+        .select("*");
 
       if (assessmentError) {
-        console.error('Error fetching assessment data:', assessmentError)
+        console.error("Error fetching assessment data:", assessmentError);
         // Don't throw, just log the error
       }
 
-      console.log('Assessment data fetched:', assessmentData?.length, 'records')
+      console.log(
+        "Assessment data fetched:",
+        assessmentData?.length,
+        "records"
+      );
 
-      console.log('Fetched user data:', userData)
+      console.log("Fetched user data:", userData);
 
       // Note: We can't get last sign in data without admin API access
       // You would need to set up a server endpoint or use Supabase edge functions for this
 
       // Process user data by combining separate queries
-      const processedUsers: UserMetrics[] = userData?.map(user => {
-        // Find matching progress data
-        const progress = progressData?.find(p => p.user_id === user.id)
-        
-        // Find matching assessment data (most recent)
-        const userAssessments = assessmentData?.filter(a => a.user_id === user.id) || []
-        const assessment = userAssessments.sort((a, b) => 
-          new Date(b.assessment_date || 0).getTime() - new Date(a.assessment_date || 0).getTime()
-        )[0]
+      const processedUsers: UserMetrics[] =
+        userData?.map((user) => {
+          // Find matching progress data
+          const progress = progressData?.find((p) => p.user_id === user.id);
 
-        return {
-          id: user.id,
-          email: user.email,
-          created_at: user.created_at,
-          last_sign_in_at: '', // Would need admin API for this
-          spi_score: assessment?.total_spi_score || progress?.spi_score || 0,
-          current_tier: assessment?.tier || progress?.current_tier || '90%',
-          financial_foundation_score: progress?.financial_foundation_score || 0,
-          market_intelligence_score: progress?.market_intelligence_score || 0,
-          risk_management_score: progress?.risk_management_score || 0,
-          support_systems_score: progress?.support_systems_score || 0,
-          assessment_date: assessment?.assessment_date || '',
-          standout_strength_1: assessment?.standout_strength_1 || '',
-          standout_strength_2: assessment?.standout_strength_2 || '',
-          is_test_user: user.is_test_user || false
-        }
-      }) || []
+          // Find matching assessment data (most recent)
+          const userAssessments =
+            assessmentData?.filter((a) => a.user_id === user.id) || [];
+          const assessment = userAssessments.sort(
+            (a, b) =>
+              new Date(b.assessment_date || 0).getTime() -
+              new Date(a.assessment_date || 0).getTime()
+          )[0];
 
-      setUsers(processedUsers)
-      setFilteredUsers(processedUsers)
+          return {
+            id: user.id,
+            email: user.email,
+            created_at: user.created_at,
+            last_sign_in_at: "", // Would need admin API for this
+            spi_score: assessment?.total_spi_score || progress?.spi_score || 0,
+            current_tier: assessment?.tier || progress?.current_tier || "90%",
+            financial_foundation_score:
+              progress?.financial_foundation_score || 0,
+            market_intelligence_score: progress?.market_intelligence_score || 0,
+            risk_management_score: progress?.risk_management_score || 0,
+            support_systems_score: progress?.support_systems_score || 0,
+            assessment_date: assessment?.assessment_date || "",
+            standout_strength_1: assessment?.standout_strength_1 || "",
+            standout_strength_2: assessment?.standout_strength_2 || "",
+            is_test_user: user.is_test_user || false,
+          };
+        }) || [];
+
+      setUsers(processedUsers);
+      setFilteredUsers(processedUsers);
 
       // Calculate stats (excluding test users)
-      const realUsers = processedUsers.filter(u => !u.is_test_user)
-      const totalUsers = realUsers.length
-      const completedAssessments = realUsers.filter(u => u.spi_score > 0).length
-      const averageSPIScore = completedAssessments > 0 
-        ? Math.round(realUsers.reduce((sum, u) => sum + u.spi_score, 0) / completedAssessments)
-        : 0
+      const realUsers = processedUsers.filter((u) => !u.is_test_user);
+      const totalUsers = realUsers.length;
+      const completedAssessments = realUsers.filter(
+        (u) => u.spi_score > 0
+      ).length;
+      const averageSPIScore =
+        completedAssessments > 0
+          ? Math.round(
+              realUsers.reduce((sum, u) => sum + u.spi_score, 0) /
+                completedAssessments
+            )
+          : 0;
 
-      const tier1Count = realUsers.filter(u => u.current_tier === '1%').length
-      const tier9Count = realUsers.filter(u => u.current_tier === '9%').length
-      const tier90Count = realUsers.filter(u => u.current_tier === '90%').length
+      const tier1Count = realUsers.filter(
+        (u) => u.current_tier === "1%"
+      ).length;
+      const tier9Count = realUsers.filter(
+        (u) => u.current_tier === "9%"
+      ).length;
+      const tier90Count = realUsers.filter(
+        (u) => u.current_tier === "90%"
+      ).length;
 
       // Calculate weekly stats
-      const oneWeekAgo = new Date()
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      const newUsersThisWeek = realUsers.filter(u => 
-        new Date(u.created_at) > oneWeekAgo
-      ).length
+      const newUsersThisWeek = realUsers.filter(
+        (u) => new Date(u.created_at) > oneWeekAgo
+      ).length;
 
-      const assessmentsThisWeek = realUsers.filter(u => 
-        u.assessment_date && new Date(u.assessment_date) > oneWeekAgo
-      ).length
+      const assessmentsThisWeek = realUsers.filter(
+        (u) => u.assessment_date && new Date(u.assessment_date) > oneWeekAgo
+      ).length;
 
       setStats({
         totalUsers,
@@ -225,22 +254,22 @@ export default function AdminDashboard() {
         tier9Count,
         tier90Count,
         newUsersThisWeek,
-        assessmentsThisWeek
-      })
+        assessmentsThisWeek,
+      });
 
-      console.log('Dashboard stats:', {
+      console.log("Dashboard stats:", {
         totalUsers,
         completedAssessments,
         processedUsersLength: processedUsers.length,
-        rawDataLength: userData?.length
-      })
+        rawDataLength: userData?.length,
+      });
 
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      console.error('Error loading dashboard data:', error)
+      console.error("Error loading dashboard data:", error);
       // Set empty data instead of failing completely
-      setUsers([])
-      setFilteredUsers([])
+      setUsers([]);
+      setFilteredUsers([]);
       setStats({
         totalUsers: 0,
         completedAssessments: 0,
@@ -249,53 +278,66 @@ export default function AdminDashboard() {
         tier9Count: 0,
         tier90Count: 0,
         newUsersThisWeek: 0,
-        assessmentsThisWeek: 0
-      })
-      setLoading(false)
+        assessmentsThisWeek: 0,
+      });
+      setLoading(false);
     }
-  }
+  };
 
   // Filter and sort users
   useEffect(() => {
-    let filtered = [...users]
+    let filtered = [...users];
 
     // Apply test user filter
     if (!showTestUsers) {
-      filtered = filtered.filter(user => !user.is_test_user)
+      filtered = filtered.filter((user) => !user.is_test_user);
     }
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(user => 
+      filtered = filtered.filter((user) =>
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      );
     }
 
     // Apply tier filter
-    if (filterTier !== 'all') {
-      filtered = filtered.filter(user => user.current_tier === filterTier)
+    if (filterTier !== "all") {
+      filtered = filtered.filter((user) => user.current_tier === filterTier);
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'score':
-          return b.spi_score - a.spi_score
-        case 'date':
-          return new Date(b.assessment_date || 0).getTime() - new Date(a.assessment_date || 0).getTime()
-        case 'email':
-          return a.email.localeCompare(b.email)
+        case "score":
+          return b.spi_score - a.spi_score;
+        case "date":
+          return (
+            new Date(b.assessment_date || 0).getTime() -
+            new Date(a.assessment_date || 0).getTime()
+          );
+        case "email":
+          return a.email.localeCompare(b.email);
         default:
-          return 0
+          return 0;
       }
-    })
+    });
 
-    setFilteredUsers(filtered)
-  }, [searchTerm, sortBy, filterTier, users, showTestUsers])
+    setFilteredUsers(filtered);
+  }, [searchTerm, sortBy, filterTier, users, showTestUsers]);
 
   const exportToCSV = () => {
-    const headers = ['Email', 'SPI Score', 'Tier', 'Financial', 'Market Intel', 'Risk Mgmt', 'Support', 'Strengths', 'Assessment Date']
-    const rows = filteredUsers.map(user => [
+    const headers = [
+      "Email",
+      "SPI Score",
+      "Tier",
+      "Financial",
+      "Market Intel",
+      "Risk Mgmt",
+      "Support",
+      "Strengths",
+      "Assessment Date",
+    ];
+    const rows = filteredUsers.map((user) => [
       user.email,
       user.spi_score,
       user.current_tier,
@@ -304,84 +346,91 @@ export default function AdminDashboard() {
       user.risk_management_score,
       user.support_systems_score,
       `${user.standout_strength_1} + ${user.standout_strength_2}`,
-      user.assessment_date || 'Not completed'
-    ])
+      user.assessment_date || "Not completed",
+    ]);
 
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `spi-users-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-  }
+    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `spi-users-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+  };
 
   const deleteUser = async (userId: string) => {
     try {
-      console.log('Deleting user:', userId)
-      
+      console.log("Deleting user:", userId);
+
       // Call the API endpoint to delete the user
-      const response = await fetch('/api/admin/delete-user', {
-        method: 'DELETE',
+      const response = await fetch("/api/admin/delete-user", {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ userId }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete user')
+        throw new Error(data.error || "Failed to delete user");
       }
 
       // Show success message
-      alert('User deleted successfully')
-      
+      alert("User deleted successfully");
+
       // Reload the dashboard data
-      await loadDashboardData()
+      await loadDashboardData();
     } catch (error) {
-      console.error('Error deleting user:', error)
-      alert(`Failed to delete user: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error("Error deleting user:", error);
+      alert(
+        `Failed to delete user: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
-  }
+  };
 
   const toggleTestUser = async (userId: string, isTestUser: boolean) => {
     try {
-      console.log('Toggling test user status:', userId, isTestUser)
-      const response = await fetch('/api/admin/toggle-test-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      console.log("Toggling test user status:", userId, isTestUser);
+      const response = await fetch("/api/admin/toggle-test-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, isTestUser }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to update user status')
+        throw new Error(data.error || "Failed to update user status");
       }
 
       // Show success message
-      alert(data.message || `User ${isTestUser ? 'excluded from' : 'included in'} statistics`)
-      
+      alert(
+        data.message ||
+          `User ${isTestUser ? "excluded from" : "included in"} statistics`
+      );
+
       // Reload data to update statistics
-      await loadDashboardData()
+      await loadDashboardData();
     } catch (error) {
-      console.error('Error toggling test user:', error)
-      alert(`Failed to update user: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error("Error toggling test user:", error);
+      alert(
+        `Failed to update user: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
-    )
+    );
   }
 
   if (!isAdmin) {
-    return null
+    return null;
   }
 
   return (
@@ -392,7 +441,9 @@ export default function AdminDashboard() {
           <div className="py-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Admin Dashboard
+                </h1>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Monitor user progress and system metrics
                 </p>
@@ -401,12 +452,12 @@ export default function AdminDashboard() {
                 {/* Primary Actions */}
                 <button
                   onClick={() => {
-                    console.log('View Assessments button clicked');
+                    console.log("View Assessments button clicked");
                     try {
-                      router.push('/admin/view-assessment');
+                      router.push("/admin/view-assessment");
                     } catch (error) {
-                      console.error('Router error:', error);
-                      window.location.href = '/admin/view-assessment';
+                      console.error("Router error:", error);
+                      window.location.href = "/admin/view-assessment";
                     }
                   }}
                   className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
@@ -414,7 +465,7 @@ export default function AdminDashboard() {
                   <FileText className="h-4 w-4 mr-2" />
                   View Assessments
                 </button>
-                
+
                 <button
                   onClick={exportToCSV}
                   className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
@@ -422,24 +473,24 @@ export default function AdminDashboard() {
                   <Download className="h-4 w-4 mr-2" />
                   Export CSV
                 </button>
-                
+
                 {/* Navigation Actions */}
                 <button
-                  onClick={() => router.push('/dashboard')}
+                  onClick={() => router.push("/dashboard")}
                   className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </button>
-                
+
                 <button
                   onClick={async () => {
                     console.log("Admin logout clicked");
                     try {
                       await supabase.auth.signOut();
-                      window.location.href = '/login';
+                      window.location.href = "/login";
                     } catch (error) {
-                      console.error('Logout error:', error);
+                      console.error("Logout error:", error);
                     }
                   }}
                   className="flex items-center px-4 py-2 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
@@ -460,15 +511,29 @@ export default function AdminDashboard() {
             <div className="flex items-start">
               <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-3" />
               <div>
-                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">No User Data Found</h3>
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  No User Data Found
+                </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                  <p>The dashboard is working, but there's no user data to display. This could be because:</p>
+                  <p>
+                    The dashboard is working, but there's no user data to
+                    display. This could be because:
+                  </p>
                   <ul className="list-disc list-inside mt-2 space-y-1">
                     <li>No users have registered yet</li>
-                    <li>Row Level Security (RLS) policies might be blocking data access</li>
+                    <li>
+                      Row Level Security (RLS) policies might be blocking data
+                      access
+                    </li>
                     <li>Database tables might be empty</li>
                   </ul>
-                  <p className="mt-3">Check the browser console for detailed logs, or run the test queries in <code className="bg-yellow-100 dark:bg-yellow-800 px-1 rounded">test_admin_data.sql</code></p>
+                  <p className="mt-3">
+                    Check the browser console for detailed logs, or run the test
+                    queries in{" "}
+                    <code className="bg-yellow-100 dark:bg-yellow-800 px-1 rounded">
+                      test_admin_data.sql
+                    </code>
+                  </p>
                 </div>
               </div>
             </div>
@@ -481,8 +546,12 @@ export default function AdminDashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalUsers}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Total Users
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {stats.totalUsers}
+                </p>
                 <p className="text-xs text-green-600 dark:text-green-400 mt-2">
                   +{stats.newUsersThisWeek} this week
                 </p>
@@ -497,10 +566,17 @@ export default function AdminDashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Assessments</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.completedAssessments}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Assessments
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {stats.completedAssessments}
+                </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {Math.round((stats.completedAssessments / stats.totalUsers) * 100)}% completion
+                  {Math.round(
+                    (stats.completedAssessments / stats.totalUsers) * 100
+                  )}
+                  % completion
                 </p>
               </div>
               <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
@@ -513,8 +589,12 @@ export default function AdminDashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg SPI Score</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.averageSPIScore}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Avg SPI Score
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {stats.averageSPIScore}
+                </p>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
                   Out of 100 points
                 </p>
@@ -529,8 +609,12 @@ export default function AdminDashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Weekly Activity</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.assessmentsThisWeek}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Weekly Activity
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {stats.assessmentsThisWeek}
+                </p>
                 <p className="text-xs text-purple-600 dark:text-purple-400 mt-2">
                   New assessments
                 </p>
@@ -544,14 +628,25 @@ export default function AdminDashboard() {
 
         {/* Tier Distribution */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tier Distribution</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Tier Distribution
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="relative inline-flex items-center justify-center w-32 h-32">
                 <svg className="w-32 h-32 transform -rotate-90">
-                  <circle cx="64" cy="64" r="56" stroke="#e5e7eb" strokeWidth="8" fill="none" />
                   <circle
-                    cx="64" cy="64" r="56"
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
                     stroke="#dc2626"
                     strokeWidth="8"
                     fill="none"
@@ -562,16 +657,29 @@ export default function AdminDashboard() {
                   {stats.tier1Count}
                 </span>
               </div>
-              <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Top 1%</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Elite Performers</p>
+              <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                Top 1%
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Elite Performers
+              </p>
             </div>
 
             <div className="text-center">
               <div className="relative inline-flex items-center justify-center w-32 h-32">
                 <svg className="w-32 h-32 transform -rotate-90">
-                  <circle cx="64" cy="64" r="56" stroke="#e5e7eb" strokeWidth="8" fill="none" />
                   <circle
-                    cx="64" cy="64" r="56"
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
                     stroke="#3b82f6"
                     strokeWidth="8"
                     fill="none"
@@ -582,16 +690,29 @@ export default function AdminDashboard() {
                   {stats.tier9Count}
                 </span>
               </div>
-              <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Top 9%</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">High Performers</p>
+              <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                Top 9%
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                High Performers
+              </p>
             </div>
 
             <div className="text-center">
               <div className="relative inline-flex items-center justify-center w-32 h-32">
                 <svg className="w-32 h-32 transform -rotate-90">
-                  <circle cx="64" cy="64" r="56" stroke="#e5e7eb" strokeWidth="8" fill="none" />
                   <circle
-                    cx="64" cy="64" r="56"
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
                     stroke="#6b7280"
                     strokeWidth="8"
                     fill="none"
@@ -602,8 +723,12 @@ export default function AdminDashboard() {
                   {stats.tier90Count}
                 </span>
               </div>
-              <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Bottom 90%</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Building Foundation</p>
+              <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                Bottom 90%
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Building Foundation
+              </p>
             </div>
           </div>
         </div>
@@ -612,8 +737,10 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">User Details</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                User Details
+              </h2>
+
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Search */}
                 <div className="relative">
@@ -697,7 +824,10 @@ export default function AdminDashboard() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <tr
+                    key={user.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="flex items-center gap-2">
@@ -712,7 +842,8 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          Joined {new Date(user.created_at).toLocaleDateString()}
+                          Joined{" "}
+                          {new Date(user.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     </td>
@@ -721,15 +852,21 @@ export default function AdminDashboard() {
                         <span className="text-lg font-semibold text-gray-900 dark:text-white">
                           {user.spi_score}
                         </span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/100</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
+                          /100
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.current_tier === '1%' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                        user.current_tier === '9%' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          user.current_tier === "1%"
+                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                            : user.current_tier === "9%"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                        }`}
+                      >
                         {user.current_tier}
                       </span>
                     </td>
@@ -744,31 +881,41 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400 dark:text-gray-500">Not selected</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          Not selected
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="grid grid-cols-2 gap-1 text-xs">
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">F:</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            F:
+                          </span>
                           <span className="font-medium text-gray-900 dark:text-white ml-1">
                             {user.financial_foundation_score}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">M:</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            M:
+                          </span>
                           <span className="font-medium text-gray-900 dark:text-white ml-1">
                             {user.market_intelligence_score}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">R:</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            R:
+                          </span>
                           <span className="font-medium text-gray-900 dark:text-white ml-1">
                             {user.risk_management_score}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">S:</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            S:
+                          </span>
                           <span className="font-medium text-gray-900 dark:text-white ml-1">
                             {user.support_systems_score}
                           </span>
@@ -791,19 +938,27 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => toggleTestUser(user.id, !user.is_test_user)}
+                          onClick={() =>
+                            toggleTestUser(user.id, !user.is_test_user)
+                          }
                           className={`${
-                            user.is_test_user 
-                              ? 'text-amber-600 hover:text-amber-900 dark:text-amber-400' 
-                              : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
+                            user.is_test_user
+                              ? "text-amber-600 hover:text-amber-900 dark:text-amber-400"
+                              : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                           } transition-colors`}
-                          title={user.is_test_user ? 'Include in statistics' : 'Exclude from statistics'}
+                          title={
+                            user.is_test_user
+                              ? "Include in statistics"
+                              : "Exclude from statistics"
+                          }
                         >
                           <TestTube className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => {
-                            const confirmed = window.confirm(`Are you sure you want to delete user ${user.email}? This action cannot be undone.`);
+                            const confirmed = window.confirm(
+                              `Are you sure you want to delete user ${user.email}? This action cannot be undone.`
+                            );
                             if (confirmed) {
                               deleteUser(user.id);
                             }
@@ -825,13 +980,20 @@ export default function AdminDashboard() {
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">{filteredUsers.length}</span> of{' '}
-                <span className="font-medium">{showTestUsers ? users.length : users.filter(u => !u.is_test_user).length}</span> {showTestUsers ? 'total' : 'real'} users
+                Showing{" "}
+                <span className="font-medium">{filteredUsers.length}</span> of{" "}
+                <span className="font-medium">
+                  {showTestUsers
+                    ? users.length
+                    : users.filter((u) => !u.is_test_user).length}
+                </span>{" "}
+                {showTestUsers ? "total" : "real"} users
               </p>
-              {users.filter(u => u.is_test_user).length > 0 && (
+              {users.filter((u) => u.is_test_user).length > 0 && (
                 <p className="text-sm text-amber-600 dark:text-amber-400">
                   <TestTube className="inline h-4 w-4 mr-1" />
-                  {users.filter(u => u.is_test_user).length} test users {showTestUsers ? 'included' : 'excluded from statistics'}
+                  {users.filter((u) => u.is_test_user).length} test users{" "}
+                  {showTestUsers ? "included" : "excluded from statistics"}
                 </p>
               )}
             </div>
@@ -839,5 +1001,5 @@ export default function AdminDashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }

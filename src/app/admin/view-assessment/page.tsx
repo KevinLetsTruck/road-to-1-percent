@@ -75,7 +75,7 @@ export default function ViewAssessment() {
   const viewClientResults = (userId: string) => {
     // Open the client's results page in a new tab with admin context
     const resultsUrl = `/results?admin=true&userId=${userId}`;
-    window.open(resultsUrl, '_blank');
+    window.open(resultsUrl, "_blank");
   };
 
   const exportUserPdf = async (userId: string) => {
@@ -932,7 +932,7 @@ export default function ViewAssessment() {
                       <p className="text-gray-600 dark:text-gray-400">
                         This user hasn't completed their assessment yet.
                       </p>
-                      
+
                       {/* Action Buttons for users without assessments */}
                       <div className="mt-6">
                         <button

@@ -352,7 +352,11 @@ export default function AdminDashboard() {
 
   const deleteUser = async (userId: string) => {
     try {
-      console.log("Deleting user:", userId);
+      console.log("Starting user deletion for:", userId);
+      
+      // Find the user email for better logging
+      const userToDelete = users.find(u => u.id === userId);
+      console.log("User to delete:", userToDelete?.email);
 
       // Call the API endpoint to delete the user
       const response = await fetch("/api/admin/delete-user", {
@@ -363,17 +367,22 @@ export default function AdminDashboard() {
         body: JSON.stringify({ userId }),
       });
 
+      console.log("Delete API response status:", response.status);
       const data = await response.json();
+      console.log("Delete API response data:", data);
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to delete user");
       }
 
       // Show success message
-      alert("User deleted successfully");
+      alert(`User ${userToDelete?.email || userId} deleted successfully`);
 
+      console.log("Reloading dashboard data after deletion...");
       // Reload the dashboard data
       await loadDashboardData();
+      console.log("Dashboard data reloaded. New user count:", users.length);
+      
     } catch (error) {
       console.error("Error deleting user:", error);
       alert(

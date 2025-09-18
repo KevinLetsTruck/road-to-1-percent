@@ -52,45 +52,53 @@ export async function DELETE(request: NextRequest) {
     // Delete user data from all tables in the correct order (due to foreign key constraints)
     
     // 1. Delete assessment responses
-    const { error: assessmentError } = await supabase
+    const { data: deletedResponses, error: assessmentError } = await supabase
       .from('assessment_responses')
       .delete()
       .eq('user_id', userId)
+      .select()
 
+    console.log('Deleted assessment responses:', deletedResponses?.length || 0)
     if (assessmentError) {
       console.error('Error deleting assessment responses:', assessmentError)
     }
 
     // 2. Delete comprehensive assessments
-    const { error: comprehensiveError } = await supabase
+    const { data: deletedAssessments, error: comprehensiveError } = await supabase
       .from('comprehensive_assessments')
       .delete()
       .eq('user_id', userId)
+      .select()
 
+    console.log('Deleted comprehensive assessments:', deletedAssessments?.length || 0)
     if (comprehensiveError) {
       console.error('Error deleting comprehensive assessments:', comprehensiveError)
     }
 
     // 3. Delete user progress
-    const { error: progressError } = await supabase
+    const { data: deletedProgress, error: progressError } = await supabase
       .from('user_progress')
       .delete()
       .eq('user_id', userId)
+      .select()
 
+    console.log('Deleted user progress records:', deletedProgress?.length || 0)
     if (progressError) {
       console.error('Error deleting user progress:', progressError)
     }
 
     // 4. Delete profile
-    const { error: profileError } = await supabase
+    const { data: deletedProfile, error: profileError } = await supabase
       .from('profiles')
       .delete()
       .eq('id', userId)
+      .select()
 
+    console.log('Deleted profile:', deletedProfile?.length || 0)
     if (profileError) {
       console.error('Error deleting profile:', profileError)
       return NextResponse.json(
-        { error: 'Failed to delete user profile' },
+        { error: 'Failed to delete user profile', details: profileError },
         { status: 500 }
       )
     }
@@ -111,6 +119,12 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'User data deleted successfully',
+      deletedRecords: {
+        assessmentResponses: deletedResponses?.length || 0,
+        comprehensiveAssessments: deletedAssessments?.length || 0,
+        userProgress: deletedProgress?.length || 0,
+        profile: deletedProfile?.length || 0
+      },
       note: 'Auth record remains for security. User cannot login without profile.'
     })
 

@@ -48,29 +48,33 @@ export default function ViewAssessment() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [preselectedUserId, setPreselectedUserId] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    loadUsers();
-    
     // Check if a specific user was selected via URL parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const selectedUserId = urlParams.get('selectedUserId');
+    const selectedUserId = urlParams.get("selectedUserId");
     
     if (selectedUserId) {
-      // Find and select the user once users are loaded
-      const timer = setTimeout(() => {
-        const user = users.find(u => u.id === selectedUserId);
-        if (user) {
-          setSelectedUser(user);
-          fetchUserDetails(user.id);
-        }
-      }, 500); // Small delay to ensure users are loaded
-      
-      return () => clearTimeout(timer);
+      setPreselectedUserId(selectedUserId);
     }
-  }, [users]);
+    
+    loadUsers();
+  }, []);
+
+  // Handle user selection when users are loaded
+  useEffect(() => {
+    if (preselectedUserId && users.length > 0) {
+      const user = users.find((u) => u.id === preselectedUserId);
+      if (user) {
+        setSelectedUser(user);
+        fetchUserDetails(user.id);
+        setPreselectedUserId(null); // Clear after selection
+      }
+    }
+  }, [users, preselectedUserId]);
 
   const fetchUserDetails = async (userId: string) => {
     try {
@@ -463,7 +467,7 @@ export default function ViewAssessment() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading users...
+            {preselectedUserId ? "Loading assessment..." : "Loading users..."}
           </p>
         </div>
       </div>
@@ -520,9 +524,10 @@ export default function ViewAssessment() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* User List */}
-          <div className="lg:col-span-1">
+        <div className={`grid grid-cols-1 ${selectedUser ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-8`}>
+          {/* User List - Hide when user is selected from dashboard */}
+          {!selectedUser && (
+            <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
               <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="relative">
@@ -588,10 +593,11 @@ export default function ViewAssessment() {
                 ))}
               </div>
             </div>
-          </div>
+            </div>
+          )}
 
           {/* Assessment Details */}
-          <div className="lg:col-span-2">
+          <div className={selectedUser ? "lg:col-span-1" : "lg:col-span-2"}>
             {selectedUser ? (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
                 <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -603,6 +609,14 @@ export default function ViewAssessment() {
                       <p className="text-gray-600 dark:text-gray-400">
                         {selectedUser.email}
                       </p>
+                      {preselectedUserId === null && (
+                        <button
+                          onClick={() => setSelectedUser(null)}
+                          className="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                        >
+                          ← Show User List
+                        </button>
+                      )}
                     </div>
                     <div className="flex items-center space-x-3">
                       {selectedUser.is_test_user && (

@@ -39,6 +39,7 @@ export default function ViewAssessment() {
   const [selectedUser, setSelectedUser] = useState<UserAssessment | null>(null);
   const [selectedUserDetails, setSelectedUserDetails] = useState<any>(null);
   const [loadingUserDetails, setLoadingUserDetails] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -541,7 +542,7 @@ export default function ViewAssessment() {
                 </div>
 
                 <div className="max-h-96 overflow-y-auto">
-                  {filteredUsers.map((user: UserAssessment) => (
+                  {(filteredUsers as UserAssessment[]).map((user: UserAssessment) => (
                     <div
                       key={user.id}
                       onClick={() => {

@@ -62,12 +62,12 @@ export default function RegisterPage() {
 
       if (signInData.user) {
         // Create profile
-        const { error: profileError } = await supabase.from("profiles").insert({
+        const { error: profileError } = await supabase.from("profiles").insert([{
           id: signInData.user.id,
           email: formData.email,
           first_name: formData.firstName,
           last_name: formData.lastName,
-        });
+        }]);
 
         if (profileError) {
           console.error('Profile creation error:', profileError);

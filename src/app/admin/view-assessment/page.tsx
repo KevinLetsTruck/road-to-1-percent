@@ -431,12 +431,12 @@ export default function ViewAssessment() {
     }
   };
 
-  const filteredUsers: UserAssessment[] = users.filter(
+  const filteredUsers = users.filter(
     (user: UserAssessment) =>
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) as UserAssessment[];
 
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -542,54 +542,57 @@ export default function ViewAssessment() {
                 </div>
 
                 <div className="max-h-96 overflow-y-auto">
-                  {(filteredUsers as UserAssessment[]).map((user: UserAssessment) => (
-                    <div
-                      key={user.id}
-                      onClick={() => {
-                        setSelectedUser(user);
-                        fetchUserDetails(user.id);
-                      }}
-                      className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                        selectedUser?.id === user.id
-                          ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {user.email}
+                  {filteredUsers.map((user: UserAssessment) => {
+                    const userTyped = user as UserAssessment;
+                    return (
+                      <div
+                        key={userTyped.id}
+                        onClick={() => {
+                          setSelectedUser(userTyped);
+                          fetchUserDetails(userTyped.id);
+                        }}
+                        className={`p-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                          selectedUser?.id === (userTyped as any).id
+                            ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700"
+                            : ""
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              <User className="h-4 w-4 text-gray-400" />
+                              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                {userTyped.email}
+                              </p>
+                              {userTyped.is_test_user && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                                  Test
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {userTyped.first_name} {userTyped.last_name}
                             </p>
-                            {user.is_test_user && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
-                                Test
-                              </span>
+                            {userTyped.spi_score > 0 && (
+                              <div className="flex items-center mt-2">
+                                <TrendingUp className="h-3 w-3 text-gray-400 mr-1" />
+                                <span
+                                  className={`text-xs font-medium ${getScoreColor(userTyped.spi_score)}`}
+                                >
+                                  SPI: {userTyped.spi_score}
+                                </span>
+                              </div>
                             )}
                           </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {user.first_name} {user.last_name}
-                          </p>
-                          {user.spi_score > 0 && (
-                            <div className="flex items-center mt-2">
-                              <TrendingUp className="h-3 w-3 text-gray-400 mr-1" />
-                              <span
-                                className={`text-xs font-medium ${getScoreColor(user.spi_score)}`}
-                              >
-                                SPI: {user.spi_score}
-                              </span>
-                            </div>
+                          {userTyped.spi_score > 0 ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <XCircle className="h-4 w-4 text-gray-400" />
                           )}
                         </div>
-                        {user.spi_score > 0 ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-gray-400" />
-                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

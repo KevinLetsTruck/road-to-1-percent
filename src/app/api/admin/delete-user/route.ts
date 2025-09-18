@@ -77,33 +77,43 @@ export async function DELETE(request: NextRequest) {
     let useManualDeletion = false;
 
     try {
-      const { data: dbFunctionResult, error: dbFunctionError } = await supabase.rpc(
-        "delete_user_completely",
-        { user_id: userId }
-      );
+      const { data: dbFunctionResult, error: dbFunctionError } =
+        await supabase.rpc("delete_user_completely", { user_id: userId });
 
       console.log("Database function result:", dbFunctionResult);
-      
+
       if (dbFunctionError) {
-        console.log("Database function not available, using manual deletion:", dbFunctionError);
+        console.log(
+          "Database function not available, using manual deletion:",
+          dbFunctionError
+        );
         useManualDeletion = true;
       } else if (dbFunctionResult && !dbFunctionResult.success) {
-        console.error("Database function returned error:", dbFunctionResult.error);
-        return NextResponse.json({ error: dbFunctionResult.error }, { status: 400 });
+        console.error(
+          "Database function returned error:",
+          dbFunctionResult.error
+        );
+        return NextResponse.json(
+          { error: dbFunctionResult.error },
+          { status: 400 }
+        );
       } else {
         deleteResult = dbFunctionResult;
       }
     } catch (error) {
-      console.log("Database function call failed, using manual deletion:", error);
+      console.log(
+        "Database function call failed, using manual deletion:",
+        error
+      );
       useManualDeletion = true;
     }
 
     // Manual deletion if database function is not available
     if (useManualDeletion) {
       console.log("Performing manual deletion...");
-      
+
       // Delete user data from all tables in the correct order (due to foreign key constraints)
-      
+
       // 1. Delete assessment responses
       const { data: deletedResponses, error: assessmentError } = await supabase
         .from("assessment_responses")
@@ -111,21 +121,33 @@ export async function DELETE(request: NextRequest) {
         .eq("user_id", userId)
         .select();
 
-      console.log("Deleted assessment responses:", deletedResponses?.length || 0);
+      console.log(
+        "Deleted assessment responses:",
+        deletedResponses?.length || 0
+      );
       if (assessmentError) {
         console.error("Error deleting assessment responses:", assessmentError);
+        console.error("Assessment error details:", JSON.stringify(assessmentError, null, 2));
       }
 
       // 2. Delete comprehensive assessments
-      const { data: deletedAssessments, error: comprehensiveError } = await supabase
-        .from("comprehensive_assessments")
-        .delete()
-        .eq("user_id", userId)
-        .select();
+      const { data: deletedAssessments, error: comprehensiveError } =
+        await supabase
+          .from("comprehensive_assessments")
+          .delete()
+          .eq("user_id", userId)
+          .select();
 
-      console.log("Deleted comprehensive assessments:", deletedAssessments?.length || 0);
+      console.log(
+        "Deleted comprehensive assessments:",
+        deletedAssessments?.length || 0
+      );
       if (comprehensiveError) {
-        console.error("Error deleting comprehensive assessments:", comprehensiveError);
+        console.error(
+          "Error deleting comprehensive assessments:",
+          comprehensiveError
+        );
+        console.error("Comprehensive error details:", JSON.stringify(comprehensiveError, null, 2));
       }
 
       // 3. Delete user progress
@@ -135,9 +157,13 @@ export async function DELETE(request: NextRequest) {
         .eq("user_id", userId)
         .select();
 
-      console.log("Deleted user progress records:", deletedProgress?.length || 0);
+      console.log(
+        "Deleted user progress records:",
+        deletedProgress?.length || 0
+      );
       if (progressError) {
         console.error("Error deleting user progress:", progressError);
+        console.error("Progress error details:", JSON.stringify(progressError, null, 2));
       }
 
       // 4. Delete profile
@@ -150,6 +176,7 @@ export async function DELETE(request: NextRequest) {
       console.log("Deleted profile:", deletedProfile?.length || 0);
       if (profileError) {
         console.error("Error deleting profile:", profileError);
+        console.error("Profile error details:", JSON.stringify(profileError, null, 2));
         return NextResponse.json(
           { error: "Failed to delete user profile", details: profileError },
           { status: 500 }
@@ -165,7 +192,7 @@ export async function DELETE(request: NextRequest) {
           comprehensiveAssessments: deletedAssessments?.length || 0,
           userProgress: deletedProgress?.length || 0,
           profile: deletedProfile?.length || 0,
-        }
+        },
       };
     }
 
@@ -199,7 +226,7 @@ export async function DELETE(request: NextRequest) {
       deleteResult: deleteResult,
       userStillExistsInProfiles: !!verifyUser,
       userStillExistsInAuth: !!verifyAuthUser,
-      note: useManualDeletion 
+      note: useManualDeletion
         ? "User data deleted from application tables. Auth record may remain for security."
         : "User has been completely removed from all tables including auth.users",
     });

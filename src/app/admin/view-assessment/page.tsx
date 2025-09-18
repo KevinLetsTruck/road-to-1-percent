@@ -913,7 +913,10 @@ export default function ViewAssessment() {
                             View Dashboard
                           </button>
                           <div className="text-sm text-gray-400 flex items-center">
-                            <span>💡 Use "Print PDF" button on the dashboard for reliable PDF export</span>
+                            <span>
+                              💡 Use "Print PDF" button on the dashboard for
+                              reliable PDF export
+                            </span>
                           </div>
                         </div>
                       </div>

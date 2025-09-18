@@ -496,21 +496,21 @@ export default function DashboardPage() {
           .card-dark { background: white !important; border: 1px solid #ccc !important; }
           .text-white, .text-gray-100, .text-gray-200, .text-gray-300 { color: black !important; }
           .text-gray-400, .text-gray-500 { color: #666 !important; }
-          button { display: none !important; }
+          button:not(.print-allowed) { display: none !important; }
           .admin-header { display: none !important; }
         }
         .print-only { display: none; }
       </style>
     `;
-    
+
     // Add styles to head temporarily
-    const styleElement = document.createElement('style');
+    const styleElement = document.createElement("style");
     styleElement.innerHTML = printStyles;
     document.head.appendChild(styleElement);
-    
+
     // Trigger print
     window.print();
-    
+
     // Remove styles after print
     setTimeout(() => {
       document.head.removeChild(styleElement);
@@ -595,54 +595,36 @@ export default function DashboardPage() {
                 {user?.email || "Entrepreneur"}
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => {
-                  console.log("Test button clicked!");
-                  alert("Test button works!");
-                }}
-                className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700"
-              >
-                Test Click
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="border-2 border-gray-600 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-gray-500 hover:text-white transition-all flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-              <button
-                onClick={async () => {
-                  console.log("Direct logout clicked!");
-                  alert("Direct logout clicked - check console");
-                  try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) {
-                      console.error("Direct logout error:", error);
-                      alert(`Error: ${error.message}`);
-                    } else {
-                      console.log("Direct logout success!");
-                      window.location.href = "/login";
-                    }
-                  } catch (err) {
-                    console.error("Direct logout exception:", err);
-                    alert(`Exception: ${err}`);
-                  }
-                }}
-                className="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-700"
-              >
-                Direct Logout
-              </button>
+            <div className="flex items-center space-x-3">
+              {/* Admin Dashboard Button - Only show for non-admin views */}
+              {!isAdminView && (
+                <Link
+                  href="/admin/view-assessment"
+                  className="bg-purple-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-purple-700 transition-all flex items-center gap-2 no-print"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  Admin Dashboard
+                </Link>
+              )}
+              
+              {/* Retake Assessment Button */}
               <button
                 onClick={() =>
                   router.push("/dashboard/comprehensive-assessment")
                 }
-                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 px-6 transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg flex items-center justify-center gap-2"
-                style={{ borderRadius: "16px" }}
+                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium px-4 py-2 rounded-xl transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg flex items-center gap-2 text-sm no-print"
               >
                 <RefreshCw className="w-4 h-4" />
                 Retake Assessment
+              </button>
+              
+              {/* Logout Button */}
+              <button
+                onClick={handleSignOut}
+                className="border-2 border-gray-600 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-gray-500 hover:text-white transition-all flex items-center gap-2 no-print"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
               </button>
             </div>
           </div>
@@ -692,9 +674,15 @@ export default function DashboardPage() {
               Success Probability Index (SPI) Dashboard
             </h1>
             <div className="text-center text-gray-600">
-              <p><strong>Client:</strong> {clientInfo.name}</p>
-              <p><strong>Email:</strong> {clientInfo.email}</p>
-              <p><strong>Generated:</strong> {new Date().toLocaleDateString()}</p>
+              <p>
+                <strong>Client:</strong> {clientInfo.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {clientInfo.email}
+              </p>
+              <p>
+                <strong>Generated:</strong> {new Date().toLocaleDateString()}
+              </p>
             </div>
           </div>
         )}

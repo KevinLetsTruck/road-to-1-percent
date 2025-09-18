@@ -1,0 +1,7 @@
+{
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "cursor.ai.autoCommit": true,
+  "cursor.ai.autoPush": true
+}

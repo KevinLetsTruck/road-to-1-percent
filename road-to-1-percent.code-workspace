@@ -8,7 +8,12 @@
   "settings": {
     "typescript.preferences.includePackageJsonAutoImports": "on",
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "cursor.ai.autoCommit": true,
+    "cursor.ai.autoPush": true
   },
   "extensions": {
     "recommendations": [

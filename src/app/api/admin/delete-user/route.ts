@@ -127,7 +127,10 @@ export async function DELETE(request: NextRequest) {
       );
       if (assessmentError) {
         console.error("Error deleting assessment responses:", assessmentError);
-        console.error("Assessment error details:", JSON.stringify(assessmentError, null, 2));
+        console.error(
+          "Assessment error details:",
+          JSON.stringify(assessmentError, null, 2)
+        );
       }
 
       // 2. Delete comprehensive assessments
@@ -147,7 +150,10 @@ export async function DELETE(request: NextRequest) {
           "Error deleting comprehensive assessments:",
           comprehensiveError
         );
-        console.error("Comprehensive error details:", JSON.stringify(comprehensiveError, null, 2));
+        console.error(
+          "Comprehensive error details:",
+          JSON.stringify(comprehensiveError, null, 2)
+        );
       }
 
       // 3. Delete user progress
@@ -163,7 +169,10 @@ export async function DELETE(request: NextRequest) {
       );
       if (progressError) {
         console.error("Error deleting user progress:", progressError);
-        console.error("Progress error details:", JSON.stringify(progressError, null, 2));
+        console.error(
+          "Progress error details:",
+          JSON.stringify(progressError, null, 2)
+        );
       }
 
       // 4. Delete profile
@@ -176,7 +185,10 @@ export async function DELETE(request: NextRequest) {
       console.log("Deleted profile:", deletedProfile?.length || 0);
       if (profileError) {
         console.error("Error deleting profile:", profileError);
-        console.error("Profile error details:", JSON.stringify(profileError, null, 2));
+        console.error(
+          "Profile error details:",
+          JSON.stringify(profileError, null, 2)
+        );
         return NextResponse.json(
           { error: "Failed to delete user profile", details: profileError },
           { status: 500 }

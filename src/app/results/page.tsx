@@ -190,10 +190,10 @@ export default function ResultsPage() {
 
       // Fetch user profile for display
       if (!targetUserId) {
-        console.error('No target user ID available');
+        console.error("No target user ID available");
         return;
       }
-      
+
       const { data: profile } = await (supabase as any)
         .from("profiles")
         .select("first_name, last_name, email")

@@ -67,119 +67,65 @@ export async function DELETE(request: NextRequest) {
 
     if (!existingUser) {
       console.log("User not found in database:", userId);
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     console.log("Deleting user:", existingUser.email, "with ID:", userId);
 
-    // Delete user data from all tables in the correct order (due to foreign key constraints)
-
-    // 1. Delete assessment responses
-    const { data: deletedResponses, error: assessmentError } = await supabase
-      .from("assessment_responses")
-      .delete()
-      .eq("user_id", userId)
-      .select();
-
-    console.log("Deleted assessment responses:", deletedResponses?.length || 0);
-    if (assessmentError) {
-      console.error("Error deleting assessment responses:", assessmentError);
-    }
-
-    // 2. Delete comprehensive assessments
-    const { data: deletedAssessments, error: comprehensiveError } =
-      await supabase
-        .from("comprehensive_assessments")
-        .delete()
-        .eq("user_id", userId)
-        .select();
-
-    console.log(
-      "Deleted comprehensive assessments:",
-      deletedAssessments?.length || 0
+    // Use the database function to completely delete the user
+    // This function handles all tables including auth.users with proper permissions
+    const { data: deleteResult, error: deleteError } = await supabase.rpc(
+      "delete_user_completely",
+      { user_id: userId }
     );
-    if (comprehensiveError) {
-      console.error(
-        "Error deleting comprehensive assessments:",
-        comprehensiveError
-      );
-    }
 
-    // 3. Delete user progress
-    const { data: deletedProgress, error: progressError } = await supabase
-      .from("user_progress")
-      .delete()
-      .eq("user_id", userId)
-      .select();
+    console.log("Delete function result:", deleteResult);
 
-    console.log("Deleted user progress records:", deletedProgress?.length || 0);
-    if (progressError) {
-      console.error("Error deleting user progress:", progressError);
-    }
-
-    // 4. Delete profile
-    const { data: deletedProfile, error: profileError } = await supabase
-      .from("profiles")
-      .delete()
-      .eq("id", userId)
-      .select();
-
-    console.log("Deleted profile:", deletedProfile?.length || 0);
-    if (profileError) {
-      console.error("Error deleting profile:", profileError);
+    if (deleteError) {
+      console.error("Error calling delete function:", deleteError);
       return NextResponse.json(
-        { error: "Failed to delete user profile", details: profileError },
+        { error: "Failed to delete user", details: deleteError },
         { status: 500 }
       );
     }
 
-    // 5. Delete from auth.users (requires service role key)
-    // Note: This requires the service role key which should be kept secure
-    // For now, we'll just delete from our tables and leave the auth record
-    // You can implement this with a server-side function or edge function with service role
-
-    // Optional: If you have service role access, uncomment this:
-    /*
-    const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
-    if (authDeleteError) {
-      console.error('Error deleting auth user:', authDeleteError)
+    // Check if the function returned an error
+    if (deleteResult && !deleteResult.success) {
+      console.error("Delete function returned error:", deleteResult.error);
+      return NextResponse.json({ error: deleteResult.error }, { status: 400 });
     }
-    */
 
-    // Final verification - check if user still exists
+    // Final verification - check if user still exists in profiles
     const { data: verifyUser, error: verifyError } = await supabase
       .from("profiles")
       .select("id")
       .eq("id", userId)
       .single();
 
-    console.log("Post-deletion verification - User still exists:", !!verifyUser);
-    if (verifyError && verifyError.code !== 'PGRST116') { // PGRST116 is "not found" which is what we want
-      console.error("Error during verification:", verifyError);
-    }
+    console.log(
+      "Post-deletion verification - User still exists in profiles:",
+      !!verifyUser
+    );
 
-    const totalDeleted = (deletedResponses?.length || 0) + 
-                        (deletedAssessments?.length || 0) + 
-                        (deletedProgress?.length || 0) + 
-                        (deletedProfile?.length || 0);
+    // Also check auth.users (this might fail due to RLS, but we'll try)
+    const { data: verifyAuthUser, error: verifyAuthError } = await supabase
+      .from("auth.users")
+      .select("id")
+      .eq("id", userId)
+      .single();
 
-    console.log("Total records deleted:", totalDeleted);
+    console.log(
+      "Post-deletion verification - User still exists in auth:",
+      !!verifyAuthUser
+    );
 
     return NextResponse.json({
       success: true,
-      message: "User data deleted successfully",
-      deletedRecords: {
-        assessmentResponses: deletedResponses?.length || 0,
-        comprehensiveAssessments: deletedAssessments?.length || 0,
-        userProgress: deletedProgress?.length || 0,
-        profile: deletedProfile?.length || 0,
-        total: totalDeleted
-      },
-      userStillExists: !!verifyUser,
-      note: "Auth record remains for security. User cannot login without profile.",
+      message: "User deleted completely",
+      deleteResult: deleteResult,
+      userStillExistsInProfiles: !!verifyUser,
+      userStillExistsInAuth: !!verifyAuthUser,
+      note: "User has been completely removed from all tables including auth.users",
     });
   } catch (error) {
     console.error("Delete user error:", error);

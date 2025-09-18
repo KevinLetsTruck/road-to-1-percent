@@ -383,7 +383,8 @@ export default function AdminDashboard() {
   };
 
   const viewUserAssessment = (userId: string) => {
-    router.push(`/admin/view-assessment?selectedUserId=${userId}`);
+    // Navigate directly to the client's dashboard with admin context
+    router.push(`/dashboard?admin=true&userId=${userId}`);
   };
 
   if (loading) {
@@ -861,10 +862,10 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => viewUserAssessment(user.id)}
                           className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs"
-                          title="View user assessment"
+                          title="View client's dashboard"
                         >
                           <Eye className="h-3 w-3 mr-1" />
-                          View Assessment
+                          View Dashboard
                         </button>
                         <button
                           onClick={() => {

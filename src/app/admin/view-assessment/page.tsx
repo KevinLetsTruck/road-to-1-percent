@@ -53,7 +53,24 @@ export default function ViewAssessment() {
 
   useEffect(() => {
     loadUsers();
-  }, []);
+    
+    // Check if a specific user was selected via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedUserId = urlParams.get('selectedUserId');
+    
+    if (selectedUserId) {
+      // Find and select the user once users are loaded
+      const timer = setTimeout(() => {
+        const user = users.find(u => u.id === selectedUserId);
+        if (user) {
+          setSelectedUser(user);
+          fetchUserDetails(user.id);
+        }
+      }, 500); // Small delay to ensure users are loaded
+      
+      return () => clearTimeout(timer);
+    }
+  }, [users]);
 
   const fetchUserDetails = async (userId: string) => {
     try {

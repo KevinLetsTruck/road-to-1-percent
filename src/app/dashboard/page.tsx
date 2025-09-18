@@ -121,7 +121,7 @@ export default function DashboardPage() {
       const adminParam = urlParams.get("admin");
       const userIdParam = urlParams.get("userId");
       const isAdminView = adminParam === "true";
-      
+
       // If user is admin and not in an admin view, redirect to admin dashboard
       if (userIsAdmin && !isAdminView) {
         router.push("/admin/dashboard");
@@ -631,7 +631,7 @@ export default function DashboardPage() {
                   </button>
                 </>
               )}
-              
+
               {/* Logout Button - Always show */}
               <button
                 onClick={handleSignOut}

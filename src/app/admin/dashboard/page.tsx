@@ -22,8 +22,9 @@ import {
   Gauge,
   LogOut,
   Trash2,
-  TestTube,
   FileText,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 
 interface UserMetrics {
@@ -40,7 +41,6 @@ interface UserMetrics {
   assessment_date: string;
   standout_strength_1: string;
   standout_strength_2: string;
-  is_test_user?: boolean;
 }
 
 interface DashboardStats {
@@ -74,7 +74,6 @@ export default function AdminDashboard() {
   const [filterTier, setFilterTier] = useState<"all" | "1%" | "9%" | "90%">(
     "all"
   );
-  const [showTestUsers, setShowTestUsers] = useState(false);
 
   const router = useRouter();
   const supabase = createClient();
@@ -131,7 +130,7 @@ export default function AdminDashboard() {
       // First, try to get basic user data without joins
       const { data: userData, error: userError } = await supabase
         .from("profiles")
-        .select("id, email, created_at, is_test_user");
+        .select("id, email, created_at");
 
       if (userError) {
         console.error("Error fetching basic user data:", userError);
@@ -203,34 +202,32 @@ export default function AdminDashboard() {
             assessment_date: assessment?.assessment_date || "",
             standout_strength_1: assessment?.standout_strength_1 || "",
             standout_strength_2: assessment?.standout_strength_2 || "",
-            is_test_user: user.is_test_user || false,
           };
         }) || [];
 
       setUsers(processedUsers);
       setFilteredUsers(processedUsers);
 
-      // Calculate stats (excluding test users)
-      const realUsers = processedUsers.filter((u) => !u.is_test_user);
-      const totalUsers = realUsers.length;
-      const completedAssessments = realUsers.filter(
+      // Calculate stats
+      const totalUsers = processedUsers.length;
+      const completedAssessments = processedUsers.filter(
         (u) => u.spi_score > 0
       ).length;
       const averageSPIScore =
         completedAssessments > 0
           ? Math.round(
-              realUsers.reduce((sum, u) => sum + u.spi_score, 0) /
+              processedUsers.reduce((sum, u) => sum + u.spi_score, 0) /
                 completedAssessments
             )
           : 0;
 
-      const tier1Count = realUsers.filter(
+      const tier1Count = processedUsers.filter(
         (u) => u.current_tier === "1%"
       ).length;
-      const tier9Count = realUsers.filter(
+      const tier9Count = processedUsers.filter(
         (u) => u.current_tier === "9%"
       ).length;
-      const tier90Count = realUsers.filter(
+      const tier90Count = processedUsers.filter(
         (u) => u.current_tier === "90%"
       ).length;
 
@@ -238,11 +235,11 @@ export default function AdminDashboard() {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      const newUsersThisWeek = realUsers.filter(
+      const newUsersThisWeek = processedUsers.filter(
         (u) => new Date(u.created_at) > oneWeekAgo
       ).length;
 
-      const assessmentsThisWeek = realUsers.filter(
+      const assessmentsThisWeek = processedUsers.filter(
         (u) => u.assessment_date && new Date(u.assessment_date) > oneWeekAgo
       ).length;
 
@@ -288,11 +285,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     let filtered = [...users];
 
-    // Apply test user filter
-    if (!showTestUsers) {
-      filtered = filtered.filter((user) => !user.is_test_user);
-    }
-
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter((user) =>
@@ -323,7 +315,7 @@ export default function AdminDashboard() {
     });
 
     setFilteredUsers(filtered);
-  }, [searchTerm, sortBy, filterTier, users, showTestUsers]);
+  }, [searchTerm, sortBy, filterTier, users]);
 
   const exportToCSV = () => {
     const headers = [
@@ -390,35 +382,8 @@ export default function AdminDashboard() {
     }
   };
 
-  const toggleTestUser = async (userId: string, isTestUser: boolean) => {
-    try {
-      console.log("Toggling test user status:", userId, isTestUser);
-      const response = await fetch("/api/admin/toggle-test-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, isTestUser }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to update user status");
-      }
-
-      // Show success message
-      alert(
-        data.message ||
-          `User ${isTestUser ? "excluded from" : "included in"} statistics`
-      );
-
-      // Reload data to update statistics
-      await loadDashboardData();
-    } catch (error) {
-      console.error("Error toggling test user:", error);
-      alert(
-        `Failed to update user: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    }
+  const viewUserAssessment = (userId: string) => {
+    router.push(`/admin/view-assessment?selectedUserId=${userId}`);
   };
 
   if (loading) {
@@ -450,22 +415,6 @@ export default function AdminDashboard() {
               </div>
               <div className="flex items-center gap-3">
                 {/* Primary Actions */}
-                <button
-                  onClick={() => {
-                    console.log("View Assessments button clicked");
-                    try {
-                      router.push("/admin/view-assessment");
-                    } catch (error) {
-                      console.error("Router error:", error);
-                      window.location.href = "/admin/view-assessment";
-                    }
-                  }}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  View Assessments
-                </button>
-
                 <button
                   onClick={exportToCSV}
                   className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
@@ -768,20 +717,6 @@ export default function AdminDashboard() {
                   <option value="date">Sort by Date</option>
                   <option value="email">Sort by Email</option>
                 </select>
-
-                {/* Test User Toggle */}
-                <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <input
-                    type="checkbox"
-                    checked={showTestUsers}
-                    onChange={(e) => setShowTestUsers(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                    <TestTube className="h-4 w-4" />
-                    Show Test Users
-                  </span>
-                </label>
               </div>
             </div>
           </div>
@@ -826,12 +761,6 @@ export default function AdminDashboard() {
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {user.email}
                           </span>
-                          {user.is_test_user && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-                              <TestTube className="h-3 w-3 mr-1" />
-                              Test User
-                            </span>
-                          )}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           Joined{" "}
@@ -930,21 +859,12 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() =>
-                            toggleTestUser(user.id, !user.is_test_user)
-                          }
-                          className={`${
-                            user.is_test_user
-                              ? "text-amber-600 hover:text-amber-900 dark:text-amber-400"
-                              : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                          } transition-colors`}
-                          title={
-                            user.is_test_user
-                              ? "Include in statistics"
-                              : "Exclude from statistics"
-                          }
+                          onClick={() => viewUserAssessment(user.id)}
+                          className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs"
+                          title="View user assessment"
                         >
-                          <TestTube className="h-4 w-4" />
+                          <Eye className="h-3 w-3 mr-1" />
+                          View Assessment
                         </button>
                         <button
                           onClick={() => {
@@ -955,10 +875,11 @@ export default function AdminDashboard() {
                               deleteUser(user.id);
                             }
                           }}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400"
+                          className="flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs"
                           title="Delete user permanently"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Delete
                         </button>
                       </div>
                     </td>
@@ -974,20 +895,8 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 Showing{" "}
                 <span className="font-medium">{filteredUsers.length}</span> of{" "}
-                <span className="font-medium">
-                  {showTestUsers
-                    ? users.length
-                    : users.filter((u) => !u.is_test_user).length}
-                </span>{" "}
-                {showTestUsers ? "total" : "real"} users
+                <span className="font-medium">{users.length}</span> users
               </p>
-              {users.filter((u) => u.is_test_user).length > 0 && (
-                <p className="text-sm text-amber-600 dark:text-amber-400">
-                  <TestTube className="inline h-4 w-4 mr-1" />
-                  {users.filter((u) => u.is_test_user).length} test users{" "}
-                  {showTestUsers ? "included" : "excluded from statistics"}
-                </p>
-              )}
             </div>
           </div>
         </div>

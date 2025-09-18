@@ -482,7 +482,7 @@ export default function ViewAssessment() {
                 className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
+                Back to Admin Dashboard
               </button>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 View User Assessments
@@ -659,7 +659,6 @@ export default function ViewAssessment() {
                         </div>
                       )}
 
-
                       {/* Detailed Assessment Data */}
                       {loadingUserDetails ? (
                         <div className="text-center py-8">
@@ -730,9 +729,10 @@ export default function ViewAssessment() {
                             )}
 
                             {/* Standout Strengths */}
-                            {(selectedUser.standout_strength_1 || 
+                            {(selectedUser.standout_strength_1 ||
                               selectedUser.standout_strength_2 ||
-                              selectedUserDetails.comprehensiveAssessment?.standout_strength_1) && (
+                              selectedUserDetails.comprehensiveAssessment
+                                ?.standout_strength_1) && (
                               <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                                 <div className="flex items-center mb-3">
                                   <Award className="h-5 w-5 text-gray-400 mr-2" />
@@ -741,33 +741,48 @@ export default function ViewAssessment() {
                                   </h4>
                                 </div>
                                 <div className="space-y-3">
-                                  {(selectedUser.standout_strength_1 || selectedUserDetails.comprehensiveAssessment?.standout_strength_1) && (
+                                  {(selectedUser.standout_strength_1 ||
+                                    selectedUserDetails.comprehensiveAssessment
+                                      ?.standout_strength_1) && (
                                     <div className="flex items-center">
                                       <span className="text-gray-500 dark:text-gray-400 w-20 text-sm">
                                         Primary:
                                       </span>
                                       <span className="text-gray-900 dark:text-white font-medium">
-                                        {selectedUser.standout_strength_1 || selectedUserDetails.comprehensiveAssessment?.standout_strength_1}
+                                        {selectedUser.standout_strength_1 ||
+                                          selectedUserDetails
+                                            .comprehensiveAssessment
+                                            ?.standout_strength_1}
                                       </span>
                                     </div>
                                   )}
-                                  {(selectedUser.standout_strength_2 || selectedUserDetails.comprehensiveAssessment?.standout_strength_2) && (
+                                  {(selectedUser.standout_strength_2 ||
+                                    selectedUserDetails.comprehensiveAssessment
+                                      ?.standout_strength_2) && (
                                     <div className="flex items-center">
                                       <span className="text-gray-500 dark:text-gray-400 w-20 text-sm">
                                         Secondary:
                                       </span>
                                       <span className="text-gray-900 dark:text-white font-medium">
-                                        {selectedUser.standout_strength_2 || selectedUserDetails.comprehensiveAssessment?.standout_strength_2}
+                                        {selectedUser.standout_strength_2 ||
+                                          selectedUserDetails
+                                            .comprehensiveAssessment
+                                            ?.standout_strength_2}
                                       </span>
                                     </div>
                                   )}
-                                  {selectedUserDetails.progress?.standout_score && (
+                                  {selectedUserDetails.progress
+                                    ?.standout_score && (
                                     <div className="flex items-center">
                                       <span className="text-gray-500 dark:text-gray-400 w-20 text-sm">
                                         Score:
                                       </span>
                                       <span className="text-gray-900 dark:text-white font-medium">
-                                        {selectedUserDetails.progress.standout_score}/10
+                                        {
+                                          selectedUserDetails.progress
+                                            .standout_score
+                                        }
+                                        /10
                                       </span>
                                     </div>
                                   )}
@@ -776,7 +791,8 @@ export default function ViewAssessment() {
                             )}
 
                             {/* Financial Assessment */}
-                            {(selectedUserDetails.comprehensiveAssessment || selectedUserDetails.spiAssessment) && (
+                            {(selectedUserDetails.comprehensiveAssessment ||
+                              selectedUserDetails.spiAssessment) && (
                               <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                                 <div className="flex items-center mb-3">
                                   <Target className="h-5 w-5 text-gray-400 mr-2" />
@@ -791,9 +807,15 @@ export default function ViewAssessment() {
                                     </span>
                                     <p className="text-gray-900 dark:text-white font-medium">
                                       {(() => {
-                                        const netWorth = selectedUserDetails.comprehensiveAssessment?.net_worth || 
-                                                        selectedUserDetails.spiAssessment?.net_worth;
-                                        return netWorth && netWorth > 0 ? `$${netWorth.toLocaleString()}` : "Not provided";
+                                        const netWorth =
+                                          selectedUserDetails
+                                            .comprehensiveAssessment
+                                            ?.net_worth ||
+                                          selectedUserDetails.spiAssessment
+                                            ?.net_worth;
+                                        return netWorth && netWorth > 0
+                                          ? `$${netWorth.toLocaleString()}`
+                                          : "Not provided";
                                       })()}
                                     </p>
                                   </div>
@@ -803,9 +825,15 @@ export default function ViewAssessment() {
                                     </span>
                                     <p className="text-gray-900 dark:text-white font-medium">
                                       {(() => {
-                                        const income = selectedUserDetails.comprehensiveAssessment?.monthly_income || 
-                                                      selectedUserDetails.spiAssessment?.monthly_income;
-                                        return income && income > 0 ? `$${income.toLocaleString()}` : "Not provided";
+                                        const income =
+                                          selectedUserDetails
+                                            .comprehensiveAssessment
+                                            ?.monthly_income ||
+                                          selectedUserDetails.spiAssessment
+                                            ?.monthly_income;
+                                        return income && income > 0
+                                          ? `$${income.toLocaleString()}`
+                                          : "Not provided";
                                       })()}
                                     </p>
                                   </div>
@@ -815,9 +843,15 @@ export default function ViewAssessment() {
                                     </span>
                                     <p className="text-gray-900 dark:text-white font-medium">
                                       {(() => {
-                                        const expenses = selectedUserDetails.comprehensiveAssessment?.monthly_expenses || 
-                                                        selectedUserDetails.spiAssessment?.monthly_expenses;
-                                        return expenses && expenses > 0 ? `$${expenses.toLocaleString()}` : "Not provided";
+                                        const expenses =
+                                          selectedUserDetails
+                                            .comprehensiveAssessment
+                                            ?.monthly_expenses ||
+                                          selectedUserDetails.spiAssessment
+                                            ?.monthly_expenses;
+                                        return expenses && expenses > 0
+                                          ? `$${expenses.toLocaleString()}`
+                                          : "Not provided";
                                       })()}
                                     </p>
                                   </div>
@@ -827,12 +861,21 @@ export default function ViewAssessment() {
                                     </span>
                                     <p className="text-gray-900 dark:text-white font-medium">
                                       {(() => {
-                                        const emergency = selectedUserDetails.comprehensiveAssessment?.emergency_fund || 
-                                                         selectedUserDetails.spiAssessment?.emergency_fund_months;
-                                        if (selectedUserDetails.spiAssessment?.emergency_fund_months) {
+                                        const emergency =
+                                          selectedUserDetails
+                                            .comprehensiveAssessment
+                                            ?.emergency_fund ||
+                                          selectedUserDetails.spiAssessment
+                                            ?.emergency_fund_months;
+                                        if (
+                                          selectedUserDetails.spiAssessment
+                                            ?.emergency_fund_months
+                                        ) {
                                           return `${emergency} months`;
                                         }
-                                        return emergency && emergency > 0 ? `$${emergency.toLocaleString()}` : "Not provided";
+                                        return emergency && emergency > 0
+                                          ? `$${emergency.toLocaleString()}`
+                                          : "Not provided";
                                       })()}
                                     </p>
                                   </div>
@@ -889,7 +932,8 @@ export default function ViewAssessment() {
 
                       <div className="mt-6">
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          💡 Use "View Dashboard" button above to see their current progress
+                          💡 Use "View Dashboard" button above to see their
+                          current progress
                         </p>
                       </div>
                     </div>

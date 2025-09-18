@@ -476,14 +476,6 @@ export default function AdminDashboard() {
 
                 {/* Navigation Actions */}
                 <button
-                  onClick={() => router.push("/dashboard")}
-                  className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
-                </button>
-
-                <button
                   onClick={async () => {
                     console.log("Admin logout clicked");
                     try {

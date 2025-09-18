@@ -100,43 +100,63 @@ export default function DashboardPage() {
   useEffect(() => {
     if (authLoading) return;
 
-    // Check if this is an admin view
-    const urlParams = new URLSearchParams(window.location.search);
-    const adminParam = urlParams.get("admin");
-    const userIdParam = urlParams.get("userId");
-    const isAdmin = adminParam === "true";
-    setIsAdminView(isAdmin);
+    const checkUserAndRedirect = async () => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
 
-    if (!user && !isAdmin) {
-      router.push("/login");
-      return;
-    }
+      // Check if current user is admin
+      const { data: adminProfile } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+
+      const userIsAdmin = adminProfile?.is_admin || false;
+      setIsAdmin(userIsAdmin);
+
+      // Check if this is an admin view
+      const urlParams = new URLSearchParams(window.location.search);
+      const adminParam = urlParams.get("admin");
+      const userIdParam = urlParams.get("userId");
+      const isAdminView = adminParam === "true";
+      
+      // If user is admin and not in an admin view, redirect to admin dashboard
+      if (userIsAdmin && !isAdminView) {
+        router.push("/admin/dashboard");
+        return;
+      }
+
+      setIsAdminView(isAdminView);
+
+      if (!user && !isAdminView) {
+        router.push("/login");
+        return;
+      }
+    };
+
+    checkUserAndRedirect();
 
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
 
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdParam = urlParams.get("userId");
+        const isAdminView = urlParams.get("admin") === "true";
+
         // Determine target user ID
         let targetUserId = userIdParam;
 
         // If not admin view or no userId specified, use current user
-        if (!isAdmin || !userIdParam) {
+        if (!isAdminView || !userIdParam) {
           if (!user) {
             router.push("/login");
             return;
           }
           targetUserId = user.id;
-        }
-
-        // Check if current user is admin (for admin views)
-        if (user) {
-          const { data: adminProfile } = await supabase
-            .from("profiles")
-            .select("is_admin")
-            .eq("id", user.id)
-            .single();
-
-          setIsAdmin(adminProfile?.is_admin || false);
         }
 
         // Fetch target user profile
@@ -147,7 +167,7 @@ export default function DashboardPage() {
           .single();
 
         // Set client info for admin view
-        if (isAdmin && profileData) {
+        if (isAdminView && profileData) {
           setClientInfo({
             name: `${profileData.first_name || ""} ${profileData.last_name || ""}`.trim(),
             email: profileData.email,
@@ -596,29 +616,23 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              {/* Admin Dashboard Button - Only show for non-admin views */}
-              {!isAdminView && (
-                <Link
-                  href="/admin/view-assessment"
-                  className="bg-purple-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-purple-700 transition-all flex items-center gap-2 no-print"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  Admin Dashboard
-                </Link>
+              {/* Only show assessment-related buttons for non-admin users */}
+              {!isAdmin && !isAdminView && (
+                <>
+                  {/* Retake Assessment Button */}
+                  <button
+                    onClick={() =>
+                      router.push("/dashboard/comprehensive-assessment")
+                    }
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium px-4 py-2 rounded-xl transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg flex items-center gap-2 text-sm no-print"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Retake Assessment
+                  </button>
+                </>
               )}
-
-              {/* Retake Assessment Button */}
-              <button
-                onClick={() =>
-                  router.push("/dashboard/comprehensive-assessment")
-                }
-                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium px-4 py-2 rounded-xl transition-all duration-300 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg flex items-center gap-2 text-sm no-print"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Retake Assessment
-              </button>
-
-              {/* Logout Button */}
+              
+              {/* Logout Button - Always show */}
               <button
                 onClick={handleSignOut}
                 className="border-2 border-gray-600 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-gray-500 hover:text-white transition-all flex items-center gap-2 no-print"

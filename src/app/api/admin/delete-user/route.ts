@@ -114,22 +114,22 @@ export async function DELETE(request: NextRequest) {
 
       // Delete user data from all tables in the correct order (due to foreign key constraints)
 
-      // 1. Delete assessment responses
-      const { data: deletedResponses, error: assessmentError } = await supabase
-        .from("assessment_responses")
+      // 1. Delete SPI assessments
+      const { data: deletedSpiAssessments, error: spiAssessmentError } = await supabase
+        .from("spi_assessments")
         .delete()
         .eq("user_id", userId)
         .select();
 
       console.log(
-        "Deleted assessment responses:",
-        deletedResponses?.length || 0
+        "Deleted SPI assessments:",
+        deletedSpiAssessments?.length || 0
       );
-      if (assessmentError) {
-        console.error("Error deleting assessment responses:", assessmentError);
+      if (spiAssessmentError) {
+        console.error("Error deleting SPI assessments:", spiAssessmentError);
         console.error(
-          "Assessment error details:",
-          JSON.stringify(assessmentError, null, 2)
+          "SPI assessment error details:",
+          JSON.stringify(spiAssessmentError, null, 2)
         );
       }
 
@@ -200,7 +200,7 @@ export async function DELETE(request: NextRequest) {
         success: true,
         message: "User deleted successfully (manual deletion)",
         deletedRecords: {
-          assessmentResponses: deletedResponses?.length || 0,
+          spiAssessments: deletedSpiAssessments?.length || 0,
           comprehensiveAssessments: deletedAssessments?.length || 0,
           userProgress: deletedProgress?.length || 0,
           profile: deletedProfile?.length || 0,

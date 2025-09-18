@@ -15,8 +15,8 @@ WHERE id = auth.uid();
 -- Drop existing DELETE policies first (if they exist)
 DROP POLICY IF EXISTS "Users and admins can delete profiles" ON profiles;
 DROP POLICY IF EXISTS "Users and admins can delete progress" ON user_progress;
-DROP POLICY IF EXISTS "Users and admins can delete assessments" ON comprehensive_assessments;
-DROP POLICY IF EXISTS "Users and admins can delete assessment responses" ON assessment_responses;
+DROP POLICY IF EXISTS "Users and admins can delete comprehensive assessments" ON comprehensive_assessments;
+DROP POLICY IF EXISTS "Users and admins can delete spi assessments" ON spi_assessments;
 
 -- 1. Profiles table - Allow admins to delete any profile, users can delete their own
 CREATE POLICY "Users and admins can delete profiles" 
@@ -47,7 +47,7 @@ USING (
 );
 
 -- 3. Comprehensive Assessments table - Allow admins to delete any assessment
-CREATE POLICY "Users and admins can delete assessments" 
+CREATE POLICY "Users and admins can delete comprehensive assessments" 
 ON comprehensive_assessments FOR DELETE 
 TO authenticated
 USING (
@@ -60,9 +60,9 @@ USING (
   )
 );
 
--- 4. Assessment Responses table - Allow admins to delete any response
-CREATE POLICY "Users and admins can delete assessment responses" 
-ON assessment_responses FOR DELETE 
+-- 4. SPI Assessments table - Allow admins to delete any assessment
+CREATE POLICY "Users and admins can delete spi assessments" 
+ON spi_assessments FOR DELETE 
 TO authenticated
 USING (
   auth.uid() = user_id 

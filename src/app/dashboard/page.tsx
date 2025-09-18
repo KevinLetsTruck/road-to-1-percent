@@ -671,7 +671,7 @@ export default function DashboardPage() {
                   Print PDF
                 </button>
                 <button
-                  onClick={() => router.push("/admin/view-assessment")}
+                  onClick={() => router.push("/admin/dashboard")}
                   className="text-blue-400 hover:text-blue-300 text-sm underline"
                 >
                   Back to Admin

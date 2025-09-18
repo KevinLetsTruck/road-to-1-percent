@@ -79,7 +79,7 @@ export default function AdminDashboard() {
 
       // Check if user is admin
       console.log('Admin check - Checking admin status for user:', currentUser.id)
-      const { data: userData, error } = await supabase
+      const { data: userData, error } = await (supabase as any)
         .from('profiles')
         .select('*')  // Select all fields to see what we get
         .eq('id', currentUser.id)
@@ -109,13 +109,13 @@ export default function AdminDashboard() {
   const loadAdminData = async () => {
     try {
       // Load all users
-      const { data: usersData } = await supabase
+      const { data: usersData } = await (supabase as any)
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false })
 
       // Load all user progress
-      const { data: progressData } = await supabase
+      const { data: progressData } = await (supabase as any)
         .from('user_progress')
         .select('*')
 

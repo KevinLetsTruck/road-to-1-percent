@@ -115,11 +115,12 @@ export async function DELETE(request: NextRequest) {
       // Delete user data from all tables in the correct order (due to foreign key constraints)
 
       // 1. Delete SPI assessments
-      const { data: deletedSpiAssessments, error: spiAssessmentError } = await supabase
-        .from("spi_assessments")
-        .delete()
-        .eq("user_id", userId)
-        .select();
+      const { data: deletedSpiAssessments, error: spiAssessmentError } =
+        await supabase
+          .from("spi_assessments")
+          .delete()
+          .eq("user_id", userId)
+          .select();
 
       console.log(
         "Deleted SPI assessments:",

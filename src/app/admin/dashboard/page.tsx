@@ -100,7 +100,7 @@ export default function AdminDashboard() {
 
     // Check if user is admin from database
     console.log("Admin Dashboard - Checking admin status for user:", user.id);
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await (supabase as any)
       .from("profiles")
       .select("*") // Select all fields to see what we get
       .eq("id", user.id)
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       console.log("Loading dashboard data...");
 
       // First, try to get basic user data without joins
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: userError } = await (supabase as any)
         .from("profiles")
         .select("id, email, created_at");
 
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
       console.log("Basic user data fetched:", userData?.length, "users");
 
       // Then try to get user progress data
-      const { data: progressData, error: progressError } = await supabase
+      const { data: progressData, error: progressError } = await (supabase as any)
         .from("user_progress")
         .select("*");
 
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
       console.log("Progress data fetched:", progressData?.length, "records");
 
       // Try to get comprehensive assessments data
-      const { data: assessmentData, error: assessmentError } = await supabase
+      const { data: assessmentData, error: assessmentError } = await (supabase as any)
         .from("comprehensive_assessments")
         .select("*");
 
@@ -174,15 +174,15 @@ export default function AdminDashboard() {
 
       // Process user data by combining separate queries
       const processedUsers: UserMetrics[] =
-        userData?.map((user) => {
+        userData?.map((user: any) => {
           // Find matching progress data
-          const progress = progressData?.find((p) => p.user_id === user.id);
+          const progress = progressData?.find((p: any) => p.user_id === user.id);
 
           // Find matching assessment data (most recent)
           const userAssessments =
-            assessmentData?.filter((a) => a.user_id === user.id) || [];
+            assessmentData?.filter((a: any) => a.user_id === user.id) || [];
           const assessment = userAssessments.sort(
-            (a, b) =>
+            (a: any, b: any) =>
               new Date(b.assessment_date || 0).getTime() -
               new Date(a.assessment_date || 0).getTime()
           )[0];

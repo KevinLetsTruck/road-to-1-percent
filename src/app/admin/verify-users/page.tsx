@@ -24,7 +24,7 @@ export default function VerifyUsersPage() {
     }
 
     const checkAdminAccess = async () => {
-      const { data: profile } = await supabase
+      const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('is_admin')
         .eq('id', user.id)

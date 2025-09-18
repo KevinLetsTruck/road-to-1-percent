@@ -353,9 +353,9 @@ export default function AdminDashboard() {
   const deleteUser = async (userId: string) => {
     try {
       console.log("Starting user deletion for:", userId);
-      
+
       // Find the user email for better logging
-      const userToDelete = users.find(u => u.id === userId);
+      const userToDelete = users.find((u) => u.id === userId);
       console.log("User to delete:", userToDelete?.email);
 
       // Call the API endpoint to delete the user
@@ -370,6 +370,7 @@ export default function AdminDashboard() {
       console.log("Delete API response status:", response.status);
       const data = await response.json();
       console.log("Delete API response data:", data);
+      console.log("Deleted records breakdown:", data.deletedRecords);
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to delete user");
@@ -382,7 +383,6 @@ export default function AdminDashboard() {
       // Reload the dashboard data
       await loadDashboardData();
       console.log("Dashboard data reloaded. New user count:", users.length);
-      
     } catch (error) {
       console.error("Error deleting user:", error);
       alert(

@@ -135,7 +135,7 @@ export default function QuarterlyAssessmentPage() {
       try {
         if (isSupabaseConfigured) {
           // Get user progress
-          const { data: progressData } = await supabase
+          const { data: progressData } = await (supabase as any)
             .from('user_progress')
             .select('*')
             .eq('user_id', user.id)
@@ -252,7 +252,7 @@ export default function QuarterlyAssessmentPage() {
 
       if (supabaseAvailable) {
         // Save quarterly assessment
-        const { error: assessmentError } = await supabase
+        const { error: assessmentError } = await (supabase as any)
           .from('quarterly_assessments')
           .insert({
             user_id: user.id,
@@ -267,7 +267,7 @@ export default function QuarterlyAssessmentPage() {
         if (assessmentError) throw assessmentError
 
         // Update user progress
-        const { error: progressError } = await supabase
+        const { error: progressError } = await (supabase as any)
           .from('user_progress')
           .update({
             last_assessment_date: currentDate.toISOString(),

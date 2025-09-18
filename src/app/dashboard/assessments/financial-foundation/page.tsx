@@ -124,7 +124,7 @@ export default function SPIAssessmentPage() {
       const category = financialScore >= 28 ? 'Excellent' : financialScore >= 21 ? 'Good' : financialScore >= 14 ? 'Fair' : 'Needs Improvement'
 
       // Save assessment data to spi_assessments table
-      const { error: assessmentError } = await supabase
+      const { error: assessmentError } = await (supabase as any)
         .from('spi_assessments')
         .insert({
           user_id: user.id,

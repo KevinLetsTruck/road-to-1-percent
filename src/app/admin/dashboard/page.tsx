@@ -140,7 +140,9 @@ export default function AdminDashboard() {
       console.log("Basic user data fetched:", userData?.length, "users");
 
       // Then try to get user progress data
-      const { data: progressData, error: progressError } = await (supabase as any)
+      const { data: progressData, error: progressError } = await (
+        supabase as any
+      )
         .from("user_progress")
         .select("*");
 
@@ -152,7 +154,9 @@ export default function AdminDashboard() {
       console.log("Progress data fetched:", progressData?.length, "records");
 
       // Try to get comprehensive assessments data
-      const { data: assessmentData, error: assessmentError } = await (supabase as any)
+      const { data: assessmentData, error: assessmentError } = await (
+        supabase as any
+      )
         .from("comprehensive_assessments")
         .select("*");
 
@@ -176,7 +180,9 @@ export default function AdminDashboard() {
       const processedUsers: UserMetrics[] =
         userData?.map((user: any) => {
           // Find matching progress data
-          const progress = progressData?.find((p: any) => p.user_id === user.id);
+          const progress = progressData?.find(
+            (p: any) => p.user_id === user.id
+          );
 
           // Find matching assessment data (most recent)
           const userAssessments =

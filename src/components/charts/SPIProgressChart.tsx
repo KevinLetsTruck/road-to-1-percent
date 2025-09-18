@@ -43,7 +43,7 @@ export default function SPIProgressChart({ timeframe }: SPIProgressChartProps) {
         const allData: ChartData[] = []
 
         // Add comprehensive assessments
-        assessments?.forEach(assessment => {
+        assessments?.forEach((assessment: any) => {
           allData.push({
             date: assessment.assessment_date,
             score: assessment.total_spi_score,
@@ -52,7 +52,7 @@ export default function SPIProgressChart({ timeframe }: SPIProgressChartProps) {
         })
 
         // Add quarterly assessments
-        quarterlyAssessments?.forEach(assessment => {
+        quarterlyAssessments?.forEach((assessment: any) => {
           allData.push({
             date: assessment.assessment_date,
             score: assessment.total_score,

@@ -186,7 +186,7 @@ export default function SupportSystemsAssessment() {
       const overallScore = Math.round((totalScore / questionsAnswered) * 2) // Convert to percentage of 10%
 
       // Save to database
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_progress')
         .upsert({
           user_id: user.id,

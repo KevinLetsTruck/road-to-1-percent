@@ -66,7 +66,7 @@ export default function ProgressPage() {
       setUser(user)
 
       // Fetch assessment history
-      const { data: history, error } = await supabase
+      const { data: history, error } = await (supabase as any)
         .from('assessment_history')
         .select('*')
         .eq('user_id', user.id)
@@ -75,7 +75,7 @@ export default function ProgressPage() {
       if (!error && history) {
         setAssessmentHistory(history)
         // Set the current version as selected by default
-        const currentVersion = history.find(h => h.is_current)
+        const currentVersion = history.find((h: any) => h.is_current)
         if (currentVersion) {
           setSelectedVersion(currentVersion.version_number)
         }

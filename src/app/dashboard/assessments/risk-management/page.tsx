@@ -188,7 +188,7 @@ export default function RiskManagementAssessment() {
       const overallScore = Math.round((totalScore / questionsAnswered) * 3.75) // Convert to percentage of 15%
 
       // Save to database
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_progress')
         .upsert({
           user_id: user.id,

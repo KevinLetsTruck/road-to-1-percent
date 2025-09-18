@@ -35,7 +35,7 @@ function TruckDashboardResultsContent() {
       setUser(user)
       
       // Check if user is admin from database
-      const { data: profile } = await supabase
+      const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('is_admin')
         .eq('id', user.id)
@@ -44,7 +44,7 @@ function TruckDashboardResultsContent() {
       setIsAdmin(profile?.is_admin || false)
 
       // Get user progress
-      const { data: progress } = await supabase
+      const { data: progress } = await (supabase as any)
         .from('user_progress')
         .select('*')
         .eq('user_id', user.id)

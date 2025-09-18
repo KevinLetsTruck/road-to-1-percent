@@ -189,7 +189,12 @@ export default function ResultsPage() {
       }
 
       // Fetch user profile for display
-      const { data: profile } = await supabase
+      if (!targetUserId) {
+        console.error('No target user ID available');
+        return;
+      }
+      
+      const { data: profile } = await (supabase as any)
         .from("profiles")
         .select("first_name, last_name, email")
         .eq("id", targetUserId)
@@ -202,7 +207,7 @@ export default function ResultsPage() {
         });
       }
 
-      const { data: progress, error: progressError } = await supabase
+      const { data: progress, error: progressError } = await (supabase as any)
         .from("user_progress")
         .select("*")
         .eq("user_id", targetUserId)

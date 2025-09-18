@@ -107,7 +107,7 @@ export default function DashboardPage() {
       }
 
       // Check if current user is admin
-      const { data: adminProfile } = await supabase
+      const { data: adminProfile } = await (supabase as any)
         .from("profiles")
         .select("is_admin")
         .eq("id", user.id)
@@ -160,7 +160,7 @@ export default function DashboardPage() {
         }
 
         // Fetch target user profile
-        const { data: profileData } = await supabase
+        const { data: profileData } = await (supabase as any)
           .from("profiles")
           .select("first_name, last_name, email")
           .eq("id", targetUserId)
@@ -175,7 +175,7 @@ export default function DashboardPage() {
         }
 
         // Fetch user progress
-        const { data: progressData } = await supabase
+        const { data: progressData } = await (supabase as any)
           .from("user_progress")
           .select("*")
           .eq("user_id", targetUserId)
@@ -193,7 +193,7 @@ export default function DashboardPage() {
         }
 
         // Fetch latest assessment for standout strengths
-        const { data: assessmentData } = await supabase
+        const { data: assessmentData } = await (supabase as any)
           .from("comprehensive_assessments")
           .select("*")
           .eq("user_id", targetUserId)

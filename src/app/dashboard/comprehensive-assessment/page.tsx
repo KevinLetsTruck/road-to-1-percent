@@ -965,7 +965,7 @@ export default function ComprehensiveAssessmentPage() {
 
       // Load existing assessment data if available
       try {
-        const { data: existingAssessment } = await supabase
+        const { data: existingAssessment } = await (supabase as any)
           .from("comprehensive_assessments")
           .select("*")
           .eq("user_id", user.id)
@@ -1129,7 +1129,7 @@ export default function ComprehensiveAssessmentPage() {
       );
 
       // Get next version number
-      const { data: versionData, error: versionError } = await supabase.rpc(
+      const { data: versionData, error: versionError } = await (supabase as any).rpc(
         "get_next_version_number",
         { p_user_id: user.id }
       );
@@ -1138,7 +1138,7 @@ export default function ComprehensiveAssessmentPage() {
       const versionNumber = versionData || 1;
 
       // Save to assessment history
-      const { error: historyError } = await supabase
+      const { error: historyError } = await (supabase as any)
         .from("assessment_history")
         .insert({
           user_id: user.id,
@@ -1159,14 +1159,14 @@ export default function ComprehensiveAssessmentPage() {
       if (historyError) throw historyError;
 
       // Set this version as current
-      await supabase.rpc("set_current_assessment", {
+      await (supabase as any).rpc("set_current_assessment", {
         p_user_id: user.id,
         p_version_number: versionNumber,
       });
 
       // Update or insert comprehensive assessment (for backward compatibility)
       if (hasExistingData) {
-        const { error: assessmentError } = await supabase
+        const { error: assessmentError } = await (supabase as any)
           .from("comprehensive_assessments")
           .update({
             ...formData,
@@ -1179,7 +1179,7 @@ export default function ComprehensiveAssessmentPage() {
 
         if (assessmentError) throw assessmentError;
       } else {
-        const { error: assessmentError } = await supabase
+        const { error: assessmentError } = await (supabase as any)
           .from("comprehensive_assessments")
           .insert({
             user_id: user.id,

@@ -115,20 +115,50 @@ export default function ResultsPage() {
   const [scores, setScores] = useState<Record<string, number> | null>(null)
   const [category, setCategory] = useState<{ label: string; color: string; desc: string } | null>(null)
   const [actionPlan, setActionPlan] = useState<Array<{ label: string; goal: string; actions: string[]; timeline: string; score: number }>>([])
+  const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null)
+  const [isAdminView, setIsAdminView] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
     const fetchScores = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
+      // Check if this is an admin view
+      const urlParams = new URLSearchParams(window.location.search)
+      const adminParam = urlParams.get('admin')
+      const userIdParam = urlParams.get('userId')
+      const isAdmin = adminParam === 'true'
+      setIsAdminView(isAdmin)
+
+      let targetUserId = userIdParam
+      
+      // If not admin view or no userId specified, use current user
+      if (!isAdmin || !userIdParam) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
+        targetUserId = user.id
       }
+
+      // Fetch user profile for display
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, email')
+        .eq('id', targetUserId)
+        .single()
+
+      if (profile) {
+        setUserInfo({
+          name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+          email: profile.email
+        })
+      }
+
       const { data: progress } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .single()
       if (!progress) {
         setLoading(false)
@@ -184,20 +214,31 @@ export default function ResultsPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <TrendingUp className="h-8 w-8 text-indigo-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">Results & Recommendations</span>
+              <div>
+                <span className="text-xl font-bold text-gray-900">
+                  {isAdminView ? 'Client Results' : 'Results & Recommendations'}
+                </span>
+                {isAdminView && userInfo && (
+                  <div className="text-sm text-gray-600">
+                    Viewing results for: {userInfo.name} ({userInfo.email})
+                  </div>
+                )}
+              </div>
             </div>
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push(isAdminView ? '/admin/view-assessment' : '/dashboard')}
               className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700"
             >
-              Back to Dashboard
+              {isAdminView ? 'Back to Admin' : 'Back to Dashboard'}
             </button>
           </div>
         </div>
       </nav>
       <main className="max-w-4xl mx-auto py-8 px-4">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h1 className="text-3xl font-bold mb-2">Your Overall Score: <span className={`text-${category?.color}-600`}>{scores.overall}</span></h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {isAdminView ? 'Client' : 'Your'} Overall Score: <span className={`text-${category?.color}-600`}>{scores.overall}</span>
+          </h1>
           <div className={`text-lg font-semibold mb-2 text-${category?.color}-700`}>{category?.label}</div>
           <div className="mb-4 text-gray-700">{category?.desc}</div>
           <div className="flex flex-wrap gap-4 mb-4">
@@ -232,7 +273,9 @@ export default function ResultsPage() {
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <h2 className="text-2xl font-bold mb-4">Your Personalized Action Plan</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            {isAdminView ? 'Client' : 'Your'} Personalized Action Plan
+          </h2>
           {actionPlan.map((area, idx) => (
             <div key={idx} className="mb-6">
               <div className="flex items-center mb-2">

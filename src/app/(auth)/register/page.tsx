@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { Database } from "@/types/database";
 import { CheckCircle, ArrowRight, Mail, Lock, User } from "lucide-react";
 
 export default function RegisterPage() {
@@ -62,25 +63,28 @@ export default function RegisterPage() {
 
       if (signInData.user) {
         // Create profile
-        const { error: profileError } = await supabase.from("profiles").insert([{
+        const profileData: Database['public']['Tables']['profiles']['Insert'] = {
           id: signInData.user.id,
           email: formData.email,
           first_name: formData.firstName,
           last_name: formData.lastName,
-        }]);
+        };
+        const { error: profileError } = await supabase.from("profiles").insert(profileData);
 
         if (profileError) {
-          console.error('Profile creation error:', profileError);
+          console.error("Profile creation error:", profileError);
           // Continue even if profile creation fails
         }
 
         // Create user progress record
-        const { error: progressError } = await supabase.from("user_progress").insert({
-          user_id: signInData.user.id,
-        });
+        const { error: progressError } = await supabase
+          .from("user_progress")
+          .insert({
+            user_id: signInData.user.id,
+          });
 
         if (progressError) {
-          console.error('Progress creation error:', progressError);
+          console.error("Progress creation error:", progressError);
           // Continue even if progress creation fails
         }
 

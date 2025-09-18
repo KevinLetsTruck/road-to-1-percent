@@ -912,14 +912,9 @@ export default function ViewAssessment() {
                             <ExternalLink className="h-4 w-4 mr-2" />
                             View Dashboard
                           </button>
-                          <button
-                            onClick={() => exportUserPdf(selectedUser.id)}
-                            disabled={exportingPdf}
-                            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            {exportingPdf ? "Exporting..." : "Export PDF"}
-                          </button>
+                          <div className="text-sm text-gray-400 flex items-center">
+                            <span>💡 Use "Print PDF" button on the dashboard for reliable PDF export</span>
+                          </div>
                         </div>
                       </div>
                     </div>

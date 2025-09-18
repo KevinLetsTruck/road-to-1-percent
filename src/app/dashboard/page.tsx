@@ -35,6 +35,7 @@ import {
   LogOut,
   ShieldCheck,
   ArrowRight,
+  Printer,
 } from "lucide-react";
 import Link from "next/link";
 import PDFDownloadButton from "@/components/PDFDownloadButton";
@@ -67,7 +68,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [userProgress, setUserProgress] = useState<any>(null);
-  const [clientInfo, setClientInfo] = useState<{ name: string; email: string } | null>(null);
+  const [clientInfo, setClientInfo] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
   const [isAdminView, setIsAdminView] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -98,9 +102,9 @@ export default function DashboardPage() {
 
     // Check if this is an admin view
     const urlParams = new URLSearchParams(window.location.search);
-    const adminParam = urlParams.get('admin');
-    const userIdParam = urlParams.get('userId');
-    const isAdmin = adminParam === 'true';
+    const adminParam = urlParams.get("admin");
+    const userIdParam = urlParams.get("userId");
+    const isAdmin = adminParam === "true";
     setIsAdminView(isAdmin);
 
     if (!user && !isAdmin) {
@@ -114,7 +118,7 @@ export default function DashboardPage() {
 
         // Determine target user ID
         let targetUserId = userIdParam;
-        
+
         // If not admin view or no userId specified, use current user
         if (!isAdmin || !userIdParam) {
           if (!user) {
@@ -145,8 +149,8 @@ export default function DashboardPage() {
         // Set client info for admin view
         if (isAdmin && profileData) {
           setClientInfo({
-            name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim(),
-            email: profileData.email
+            name: `${profileData.first_name || ""} ${profileData.last_name || ""}`.trim(),
+            email: profileData.email,
           });
         }
 
@@ -236,7 +240,8 @@ export default function DashboardPage() {
           const totalScore = baseScore + standoutBonus;
 
           // Check if user has completed any assessments
-          const hasCompletedAssessments = progressData.financial_foundation_completed ||
+          const hasCompletedAssessments =
+            progressData.financial_foundation_completed ||
             progressData.market_intelligence_completed ||
             progressData.risk_management_completed ||
             progressData.support_systems_completed;
@@ -369,52 +374,94 @@ export default function DashboardPage() {
 
   const getStrengthInsights = (combo: string) => {
     // Check if this is a combination
-    if (combo.includes(' + ')) {
+    if (combo.includes(" + ")) {
       const combinationKey = combo.trim();
       const dynamicInsights = strengthCombinationInsights[combinationKey];
-      
+
       if (dynamicInsights) {
         // Parse the combination to get individual strengths
-        const [first, second] = combo.split(' + ').map(s => s.trim());
-        
+        const [first, second] = combo.split(" + ").map((s) => s.trim());
+
         // Get individual strength descriptions for the title
-        const strengthDescriptions: Record<string, { title: string; description: string }> = {
-          Pioneer: { title: "The Trailblazer", description: "visionary innovation" },
-          Influencer: { title: "The Leader", description: "charismatic leadership" },
-          Creator: { title: "The Innovator", description: "creative problem-solving" },
+        const strengthDescriptions: Record<
+          string,
+          { title: string; description: string }
+        > = {
+          Pioneer: {
+            title: "The Trailblazer",
+            description: "visionary innovation",
+          },
+          Influencer: {
+            title: "The Leader",
+            description: "charismatic leadership",
+          },
+          Creator: {
+            title: "The Innovator",
+            description: "creative problem-solving",
+          },
           Advisor: { title: "The Strategist", description: "strategic wisdom" },
-          Connector: { title: "The Network Builder", description: "relationship building" },
-          Stimulator: { title: "The Energizer", description: "motivational energy" },
-          Teacher: { title: "The Mentor", description: "educational expertise" },
-          Provider: { title: "The Reliable One", description: "dependable support" },
-          Equalizer: { title: "The Fair Dealer", description: "balanced fairness" }
+          Connector: {
+            title: "The Network Builder",
+            description: "relationship building",
+          },
+          Stimulator: {
+            title: "The Energizer",
+            description: "motivational energy",
+          },
+          Teacher: {
+            title: "The Mentor",
+            description: "educational expertise",
+          },
+          Provider: {
+            title: "The Reliable One",
+            description: "dependable support",
+          },
+          Equalizer: {
+            title: "The Fair Dealer",
+            description: "balanced fairness",
+          },
         };
-        
-        const firstDesc = strengthDescriptions[first] || { title: first, description: first.toLowerCase() };
-        const secondDesc = strengthDescriptions[second] || { title: second, description: second.toLowerCase() };
-        
+
+        const firstDesc = strengthDescriptions[first] || {
+          title: first,
+          description: first.toLowerCase(),
+        };
+        const secondDesc = strengthDescriptions[second] || {
+          title: second,
+          description: second.toLowerCase(),
+        };
+
         // Get the unique combination title
-        const uniqueTitle = strengthCombinationTitles[combinationKey] || `${firstDesc.title} + ${secondDesc.title}`;
-        
+        const uniqueTitle =
+          strengthCombinationTitles[combinationKey] ||
+          `${firstDesc.title} + ${secondDesc.title}`;
+
         return {
           title: uniqueTitle,
           description: `Your combination of ${first} and ${second} creates a powerful synergy. This pairing merges ${firstDesc.description} with ${secondDesc.description}, giving you unique advantages in the trucking industry.`,
           strengths: dynamicInsights.strengths,
           watchOuts: dynamicInsights.watchOuts,
           leverageTips: dynamicInsights.leverageTips,
-          successProfile: `As ${uniqueTitle}, you're positioned to leverage both ${first} and ${second} strengths for exceptional results.`
+          successProfile: `As ${uniqueTitle}, you're positioned to leverage both ${first} and ${second} strengths for exceptional results.`,
         };
       }
     }
-    
+
     // Return default if no combination found
     return {
       title: "Balanced Leader",
       description: "You have a balanced approach to business ownership.",
       strengths: ["Adaptable to various situations", "Well-rounded skill set"],
-      watchOuts: ["May lack specialized expertise", "Could be overlooked for specific roles"],
-      leverageTips: ["Identify your strongest area to specialize", "Build a team with complementary strengths"],
-      successProfile: "Balanced leaders succeed through consistency and adaptability."
+      watchOuts: [
+        "May lack specialized expertise",
+        "Could be overlooked for specific roles",
+      ],
+      leverageTips: [
+        "Identify your strongest area to specialize",
+        "Build a team with complementary strengths",
+      ],
+      successProfile:
+        "Balanced leaders succeed through consistency and adaptability.",
     };
   };
 
@@ -437,6 +484,39 @@ export default function DashboardPage() {
     }
   };
 
+  const handlePrintDashboard = () => {
+    // Add print styles and trigger browser print
+    const printStyles = `
+      <style>
+        @media print {
+          body { background: white !important; }
+          .no-print { display: none !important; }
+          .print-only { display: block !important; }
+          .bg-navy-gradient { background: white !important; }
+          .card-dark { background: white !important; border: 1px solid #ccc !important; }
+          .text-white, .text-gray-100, .text-gray-200, .text-gray-300 { color: black !important; }
+          .text-gray-400, .text-gray-500 { color: #666 !important; }
+          button { display: none !important; }
+          .admin-header { display: none !important; }
+        }
+        .print-only { display: none; }
+      </style>
+    `;
+    
+    // Add styles to head temporarily
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = printStyles;
+    document.head.appendChild(styleElement);
+    
+    // Trigger print
+    window.print();
+    
+    // Remove styles after print
+    setTimeout(() => {
+      document.head.removeChild(styleElement);
+    }, 1000);
+  };
+
   // Define dimension data with dynamic insights based on scores
   const dimensionsData: DimensionData[] = [
     {
@@ -448,7 +528,11 @@ export default function DashboardPage() {
       ),
       icon: <DollarSign className="w-6 h-6 text-white" />,
       color: "green",
-      ...getDimensionInsights("Financial Foundation", userProgress?.financial_foundation_score || 0, 35)
+      ...getDimensionInsights(
+        "Financial Foundation",
+        userProgress?.financial_foundation_score || 0,
+        35
+      ),
     },
     {
       name: "Market Intelligence",
@@ -459,7 +543,11 @@ export default function DashboardPage() {
       ),
       icon: <Globe className="w-6 h-6 text-white" />,
       color: "blue",
-      ...getDimensionInsights("Market Intelligence", userProgress?.market_intelligence_score || 0, 20)
+      ...getDimensionInsights(
+        "Market Intelligence",
+        userProgress?.market_intelligence_score || 0,
+        20
+      ),
     },
     {
       name: "Risk Management",
@@ -470,7 +558,11 @@ export default function DashboardPage() {
       ),
       icon: <Shield className="w-6 h-6 text-white" />,
       color: "orange",
-      ...getDimensionInsights("Risk Management", userProgress?.risk_management_score || 0, 15)
+      ...getDimensionInsights(
+        "Risk Management",
+        userProgress?.risk_management_score || 0,
+        15
+      ),
     },
     {
       name: "Support Systems",
@@ -481,7 +573,11 @@ export default function DashboardPage() {
       ),
       icon: <Users2 className="w-6 h-6 text-white" />,
       color: "orange",
-      ...getDimensionInsights("Support Systems", userProgress?.support_systems_score || 0, 10)
+      ...getDimensionInsights(
+        "Support Systems",
+        userProgress?.support_systems_score || 0,
+        10
+      ),
     },
   ];
 
@@ -557,7 +653,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Admin View Header */}
         {isAdminView && clientInfo && (
-          <div className="mb-6 bg-blue-900/20 border border-blue-500 rounded-lg p-4">
+          <div className="mb-6 bg-blue-900/20 border border-blue-500 rounded-lg p-4 admin-header">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -565,16 +661,40 @@ export default function DashboardPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-blue-400">
-                    Admin View - Viewing dashboard for: {clientInfo.name} ({clientInfo.email})
+                    Admin View - Viewing dashboard for: {clientInfo.name} (
+                    {clientInfo.email})
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => router.push('/admin/view-assessment')}
-                className="text-blue-400 hover:text-blue-300 text-sm underline"
-              >
-                Back to Admin
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handlePrintDashboard}
+                  className="flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                >
+                  <Printer className="h-4 w-4 mr-1.5" />
+                  Print PDF
+                </button>
+                <button
+                  onClick={() => router.push("/admin/view-assessment")}
+                  className="text-blue-400 hover:text-blue-300 text-sm underline"
+                >
+                  Back to Admin
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Print-only header for admin views */}
+        {isAdminView && clientInfo && (
+          <div className="print-only mb-6 p-4 border-b-2 border-gray-300">
+            <h1 className="text-2xl font-bold text-center mb-2">
+              Success Probability Index (SPI) Dashboard
+            </h1>
+            <div className="text-center text-gray-600">
+              <p><strong>Client:</strong> {clientInfo.name}</p>
+              <p><strong>Email:</strong> {clientInfo.email}</p>
+              <p><strong>Generated:</strong> {new Date().toLocaleDateString()}</p>
             </div>
           </div>
         )}
@@ -596,56 +716,60 @@ export default function DashboardPage() {
         )}
 
         {/* Standout Strengths Reminder */}
-        {stats?.hasCompletedAssessments && (!stats?.standoutStrength1 || !stats?.standoutStrength2) && (
-          <div className="mb-8 p-6 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-800 rounded-xl">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-purple-400" />
+        {stats?.hasCompletedAssessments &&
+          (!stats?.standoutStrength1 || !stats?.standoutStrength2) && (
+            <div className="mb-8 p-6 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-800 rounded-xl">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-purple-400" />
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-purple-100 mb-2">
-                  Complete Your Standout Assessment
-                </h3>
-                <p className="text-purple-200 mb-4">
-                  You haven't selected your standout strengths yet. These strengths provide valuable insights 
-                  and can add up to 20 bonus points to your SPI score.
-                </p>
-                <div className="space-y-3">
-                  <p className="text-sm text-purple-300">
-                    <strong>What to do:</strong>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-purple-100 mb-2">
+                    Complete Your Standout Assessment
+                  </h3>
+                  <p className="text-purple-200 mb-4">
+                    You haven't selected your standout strengths yet. These
+                    strengths provide valuable insights and can add up to 20
+                    bonus points to your SPI score.
                   </p>
-                  <ol className="list-decimal list-inside space-y-2 text-sm text-purple-200">
-                    <li>
-                      Take the free assessment at{" "}
-                      <a
-                        href="https://www.marcusbuckingham.com/the-standout-assessment"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-purple-400 hover:text-purple-300 underline"
-                      >
-                        StandOut Assessment
-                      </a>
-                    </li>
-                    <li>Complete the 15-minute questionnaire</li>
-                    <li>Get your top 2 strengths from the report</li>
-                    <li>Return here to update your profile</li>
-                  </ol>
-                </div>
-                <div className="mt-4">
-                  <button
-                    onClick={() => router.push("/dashboard/comprehensive-assessment")}
-                    className="inline-flex items-center px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-all"
-                  >
-                    Update Your Strengths
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </button>
+                  <div className="space-y-3">
+                    <p className="text-sm text-purple-300">
+                      <strong>What to do:</strong>
+                    </p>
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-purple-200">
+                      <li>
+                        Take the free assessment at{" "}
+                        <a
+                          href="https://www.marcusbuckingham.com/the-standout-assessment"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-400 hover:text-purple-300 underline"
+                        >
+                          StandOut Assessment
+                        </a>
+                      </li>
+                      <li>Complete the 15-minute questionnaire</li>
+                      <li>Get your top 2 strengths from the report</li>
+                      <li>Return here to update your profile</li>
+                    </ol>
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      onClick={() =>
+                        router.push("/dashboard/comprehensive-assessment")
+                      }
+                      className="inline-flex items-center px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-all"
+                    >
+                      Update Your Strengths
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Success Probability Section */}
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
@@ -686,7 +810,8 @@ export default function DashboardPage() {
                       Take Your First Assessment
                     </p>
                     <p className="text-gray-400 mb-6">
-                      Complete the comprehensive assessment to calculate your Success Probability Index
+                      Complete the comprehensive assessment to calculate your
+                      Success Probability Index
                     </p>
                     <Link
                       href="/dashboard/comprehensive-assessment"
@@ -789,122 +914,139 @@ export default function DashboardPage() {
         </div>
 
         {/* Standout Strength Profile */}
-        {stats?.standoutStrength1 && stats?.standoutStrength2 && (() => {
-          const actualStrengthCombo = `${stats.standoutStrength1} + ${stats.standoutStrength2}`;
-          const insights = getStrengthInsights(actualStrengthCombo);
-          const standoutScore = calculateStandoutScore(stats.standoutStrength1, stats.standoutStrength2).score;
-          const standoutTier = getStandoutTier(standoutScore);
-          
-          return (
-            <div className="card-dark mb-8">
-              <h2 className="section-header">
-                <Lightbulb className="w-6 h-6 text-yellow-400" />
-                Your Standout Strength Profile
-              </h2>
+        {stats?.standoutStrength1 &&
+          stats?.standoutStrength2 &&
+          (() => {
+            const actualStrengthCombo = `${stats.standoutStrength1} + ${stats.standoutStrength2}`;
+            const insights = getStrengthInsights(actualStrengthCombo);
+            const standoutScore = calculateStandoutScore(
+              stats.standoutStrength1,
+              stats.standoutStrength2
+            ).score;
+            const standoutTier = getStandoutTier(standoutScore);
 
-              <div className="text-center mb-6">
-                {/* Show actual strength names prominently */}
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="bg-[#1e293b] border border-orange-500/50 px-5 py-3 rounded-xl">
-                    <p className="text-xl font-bold text-orange-400">{stats.standoutStrength1}</p>
+            return (
+              <div className="card-dark mb-8">
+                <h2 className="section-header">
+                  <Lightbulb className="w-6 h-6 text-yellow-400" />
+                  Your Standout Strength Profile
+                </h2>
+
+                <div className="text-center mb-6">
+                  {/* Show actual strength names prominently */}
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="bg-[#1e293b] border border-orange-500/50 px-5 py-3 rounded-xl">
+                      <p className="text-xl font-bold text-orange-400">
+                        {stats.standoutStrength1}
+                      </p>
+                    </div>
+                    <span className="text-2xl text-gray-500">+</span>
+                    <div className="bg-[#1e293b] border border-orange-500/50 px-5 py-3 rounded-xl">
+                      <p className="text-xl font-bold text-orange-400">
+                        {stats.standoutStrength2}
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-2xl text-gray-500">+</span>
-                  <div className="bg-[#1e293b] border border-orange-500/50 px-5 py-3 rounded-xl">
-                    <p className="text-xl font-bold text-orange-400">{stats.standoutStrength2}</p>
+                  {/* Show unique combination title */}
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">
+                    {insights.title}
+                  </h3>
+                  <div className="flex items-center justify-center gap-4 mb-4">
+                    <span
+                      className={`px-4 py-2 rounded-full text-sm font-medium ${
+                        standoutTier.includes("Elite")
+                          ? "bg-purple-900/30 text-purple-400 border border-purple-700"
+                          : standoutTier.includes("Strong")
+                            ? "bg-blue-900/30 text-blue-400 border border-blue-700"
+                            : standoutTier.includes("Good")
+                              ? "bg-green-900/30 text-green-400 border border-green-700"
+                              : "bg-amber-900/30 text-amber-400 border border-amber-700"
+                      }`}
+                    >
+                      {standoutTier}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Score: {standoutScore}/10
+                    </span>
+                  </div>
+                  <p className="text-gray-400 max-w-3xl mx-auto">
+                    {insights.description}
+                  </p>
+                </div>
+
+                {/* Success Profile Card */}
+                <div className="mb-6 p-4 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-lg border border-indigo-800/30">
+                  <div className="flex items-start">
+                    <Target className="w-5 h-5 text-indigo-400 mt-0.5 mr-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-indigo-300 mb-1">
+                        Your Success Profile
+                      </h4>
+                      <p className="text-sm text-indigo-200/80">
+                        {insights.successProfile}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                {/* Show unique combination title */}
-                <h3 className="text-2xl font-bold text-gray-100 mb-4">
-                  {insights.title}
-                </h3>
-                <div className="flex items-center justify-center gap-4 mb-4">
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    standoutTier.includes("Elite")
-                      ? "bg-purple-900/30 text-purple-400 border border-purple-700"
-                      : standoutTier.includes("Strong")
-                        ? "bg-blue-900/30 text-blue-400 border border-blue-700"
-                        : standoutTier.includes("Good")
-                          ? "bg-green-900/30 text-green-400 border border-green-700"
-                          : "bg-amber-900/30 text-amber-400 border border-amber-700"
-                  }`}>
-                    {standoutTier}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    Score: {standoutScore}/10
-                  </span>
-                </div>
-                <p className="text-gray-400 max-w-3xl mx-auto">
-                  {insights.description}
-                </p>
-              </div>
 
-              {/* Success Profile Card */}
-              <div className="mb-6 p-4 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-lg border border-indigo-800/30">
-                <div className="flex items-start">
-                  <Target className="w-5 h-5 text-indigo-400 mt-0.5 mr-2 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-indigo-300 mb-1">
-                      Your Success Profile
-                    </h4>
-                    <p className="text-sm text-indigo-200/80">
-                      {insights.successProfile}
-                    </p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Strengths */}
+                  <div className="card-dark-gradient">
+                    <h3 className="text-green-400 font-semibold mb-4 flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Your Strengths
+                    </h3>
+                    <ul className="space-y-3 text-gray-300">
+                      {insights.strengths.map(
+                        (strength: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-green-400 mt-1">✓</span>
+                            <span>{strength}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Watch Out For */}
+                  <div className="card-dark-gradient border-orange-500/30">
+                    <h3 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" />
+                      Watch Out For
+                    </h3>
+                    <ul className="space-y-3 text-gray-300">
+                      {insights.watchOuts.map(
+                        (watchOut: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-orange-400 mt-1">!</span>
+                            <span>{watchOut}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* How to Leverage */}
+                  <div className="card-dark-gradient">
+                    <h3 className="text-blue-400 font-semibold mb-4 flex items-center gap-2">
+                      <Zap className="w-5 h-5" />
+                      How to Leverage
+                    </h3>
+                    <ul className="space-y-3 text-gray-300">
+                      {insights.leverageTips.map(
+                        (tip: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-blue-400 mt-1">→</span>
+                            <span>{tip}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
                   </div>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Strengths */}
-                <div className="card-dark-gradient">
-                  <h3 className="text-green-400 font-semibold mb-4 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    Your Strengths
-                  </h3>
-                  <ul className="space-y-3 text-gray-300">
-                    {insights.strengths.map((strength: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-green-400 mt-1">✓</span>
-                        <span>{strength}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Watch Out For */}
-                <div className="card-dark-gradient border-orange-500/30">
-                  <h3 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5" />
-                    Watch Out For
-                  </h3>
-                  <ul className="space-y-3 text-gray-300">
-                    {insights.watchOuts.map((watchOut: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-orange-400 mt-1">!</span>
-                        <span>{watchOut}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* How to Leverage */}
-                <div className="card-dark-gradient">
-                  <h3 className="text-blue-400 font-semibold mb-4 flex items-center gap-2">
-                    <Zap className="w-5 h-5" />
-                    How to Leverage
-                  </h3>
-                  <ul className="space-y-3 text-gray-300">
-                    {insights.leverageTips.map((tip: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-blue-400 mt-1">→</span>
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
 
         {/* Dimension Breakdown */}
         <div className="space-y-6">

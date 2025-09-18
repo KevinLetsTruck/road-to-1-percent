@@ -67,6 +67,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [userProgress, setUserProgress] = useState<any>(null);
+  const [clientInfo, setClientInfo] = useState<{ name: string; email: string } | null>(null);
+  const [isAdminView, setIsAdminView] = useState(false);
   const router = useRouter();
   const supabase = createClient();
   const [showSPIDetails, setShowSPIDetails] = useState(false);
@@ -94,7 +96,14 @@ export default function DashboardPage() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!user) {
+    // Check if this is an admin view
+    const urlParams = new URLSearchParams(window.location.search);
+    const adminParam = urlParams.get('admin');
+    const userIdParam = urlParams.get('userId');
+    const isAdmin = adminParam === 'true';
+    setIsAdminView(isAdmin);
+
+    if (!user && !isAdmin) {
       router.push("/login");
       return;
     }
@@ -103,27 +112,49 @@ export default function DashboardPage() {
       try {
         setLoading(true);
 
-        // Check if user is admin
-        const { data: adminProfile } = await supabase
-          .from("profiles")
-          .select("is_admin")
-          .eq("id", user.id)
-          .single();
+        // Determine target user ID
+        let targetUserId = userIdParam;
+        
+        // If not admin view or no userId specified, use current user
+        if (!isAdmin || !userIdParam) {
+          if (!user) {
+            router.push("/login");
+            return;
+          }
+          targetUserId = user.id;
+        }
 
-        setIsAdmin(adminProfile?.is_admin || false);
+        // Check if current user is admin (for admin views)
+        if (user) {
+          const { data: adminProfile } = await supabase
+            .from("profiles")
+            .select("is_admin")
+            .eq("id", user.id)
+            .single();
 
-        // Fetch user profile for name
+          setIsAdmin(adminProfile?.is_admin || false);
+        }
+
+        // Fetch target user profile
         const { data: profileData } = await supabase
           .from("profiles")
-          .select("first_name, last_name")
-          .eq("id", user.id)
+          .select("first_name, last_name, email")
+          .eq("id", targetUserId)
           .single();
+
+        // Set client info for admin view
+        if (isAdmin && profileData) {
+          setClientInfo({
+            name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim(),
+            email: profileData.email
+          });
+        }
 
         // Fetch user progress
         const { data: progressData } = await supabase
           .from("user_progress")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .single();
 
         // Merge profile data with progress data
@@ -141,7 +172,7 @@ export default function DashboardPage() {
         const { data: assessmentData } = await supabase
           .from("comprehensive_assessments")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .order("assessment_date", { ascending: false })
           .limit(1)
           .single();
@@ -524,6 +555,30 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Admin View Header */}
+        {isAdminView && clientInfo && (
+          <div className="mb-6 bg-blue-900/20 border border-blue-500 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <ShieldCheck className="h-5 w-5 text-blue-400" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-blue-400">
+                    Admin View - Viewing dashboard for: {clientInfo.name} ({clientInfo.email})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => router.push('/admin/view-assessment')}
+                className="text-blue-400 hover:text-blue-300 text-sm underline"
+              >
+                Back to Admin
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Success Message */}
         {successMessage && (
           <div className="mb-6 bg-green-900/20 border border-green-500 rounded-lg p-4">

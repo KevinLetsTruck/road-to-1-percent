@@ -207,9 +207,9 @@ export default function ResultsPage() {
         .select("*")
         .eq("user_id", targetUserId)
         .maybeSingle();
-      
+
       console.log("Progress query result:", { progress, progressError });
-      
+
       if (!progress) {
         console.log("No progress data found for user:", targetUserId);
         setLoading(false);
@@ -301,12 +301,15 @@ export default function ResultsPage() {
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <h1 className="text-3xl font-bold mb-2">
             {isAdminView ? "Client" : "Your"} Overall Score:{" "}
-            <span 
+            <span
               className={
-                category?.color === 'green' ? 'text-green-600' :
-                category?.color === 'yellow' ? 'text-yellow-600' :
-                category?.color === 'orange' ? 'text-orange-600' :
-                'text-red-600'
+                category?.color === "green"
+                  ? "text-green-600"
+                  : category?.color === "yellow"
+                    ? "text-yellow-600"
+                    : category?.color === "orange"
+                      ? "text-orange-600"
+                      : "text-red-600"
               }
             >
               {scores.overall}
@@ -314,10 +317,13 @@ export default function ResultsPage() {
           </h1>
           <div
             className={
-              category?.color === 'green' ? 'text-lg font-semibold mb-2 text-green-700' :
-              category?.color === 'yellow' ? 'text-lg font-semibold mb-2 text-yellow-700' :
-              category?.color === 'orange' ? 'text-lg font-semibold mb-2 text-orange-700' :
-              'text-lg font-semibold mb-2 text-red-700'
+              category?.color === "green"
+                ? "text-lg font-semibold mb-2 text-green-700"
+                : category?.color === "yellow"
+                  ? "text-lg font-semibold mb-2 text-yellow-700"
+                  : category?.color === "orange"
+                    ? "text-lg font-semibold mb-2 text-orange-700"
+                    : "text-lg font-semibold mb-2 text-red-700"
             }
           >
             {category?.label}

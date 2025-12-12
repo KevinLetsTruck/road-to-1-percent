@@ -9,7 +9,7 @@ import { BarChart3, Target, TrendingUp, Calendar } from 'lucide-react'
 import ShieldLogo from '@/components/ui/ShieldLogo'
 import SPIRadarChart from '@/components/charts/SPIRadarChart'
 import ProgressTimeline from '@/components/charts/ProgressTimeline'
-import ActionPlanGenerator from '@/components/planning/ActionPlanGenerator'
+import AIActionPlanGenerator from '@/components/planning/AIActionPlanGenerator'
 
 type UserProgress = Database['public']['Tables']['user_progress']['Row']
 
@@ -199,7 +199,7 @@ export default function InsightsPage() {
 
           {/* Action Plan Generator */}
           <div className="mt-8">
-            <ActionPlanGenerator 
+            <AIActionPlanGenerator
               assessmentScores={{
                 financial: currentScores.financial_foundation,
                 business: currentScores.market_intelligence,
@@ -208,9 +208,10 @@ export default function InsightsPage() {
                 overall: Math.round((currentScores.financial_foundation + currentScores.market_intelligence + currentScores.personal_strengths + currentScores.risk_management + currentScores.support_systems) / 5)
               }}
               userTier={currentTier}
-              onGeneratePlan={(plans) => {
-                console.log('Action plan generated:', plans)
-                // Here you could save the plan to the database
+              onGeneratePlan={(plan) => {
+                console.log('AI Action plan generated:', plan)
+                // Here you could display the plan or save it to the database
+                alert(`AI Action Plan Generated: ${plan.title}`)
               }}
             />
           </div>

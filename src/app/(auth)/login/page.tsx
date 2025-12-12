@@ -142,6 +142,32 @@ export default function LoginPage() {
               </div>
             )}
 
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!email) {
+                    setError("Please enter your email address first");
+                    return;
+                  }
+                  setLoading(true);
+                  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/dashboard`,
+                  });
+                  setLoading(false);
+                  if (error) {
+                    setError(error.message);
+                  } else {
+                    setError("");
+                    alert("Password reset email sent! Check your inbox.");
+                  }
+                }}
+                className="text-sm text-orange-500 hover:text-orange-400 transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={loading}

@@ -1,109 +1,81 @@
--- Create a test user manually (Fixed version)
--- This version doesn't insert into generated columns
+-- Fixed test user creation with proper profile data
+-- First check if user exists
+SELECT 'Checking for existing test user:' as info;
+SELECT id, email, created_at, email_confirmed_at 
+FROM auth.users 
+WHERE email = 'manual-test@example.com';
 
--- First, create the user in auth.users
+-- Create user using a simpler approach
 DO $$
 DECLARE
   test_user_id uuid;
 BEGIN
-  -- Generate a UUID for the test user
-  test_user_id := gen_random_uuid();
+  -- Check if user already exists
+  SELECT id INTO test_user_id 
+  FROM auth.users 
+  WHERE email = 'manual-test@example.com';
   
-  -- Insert into auth.users (only non-generated columns)
-  INSERT INTO auth.users (
-    id,
-    instance_id,
-    email,
-    encrypted_password,
-    email_confirmed_at,
-    raw_app_meta_data,
-    raw_user_meta_data,
-    aud,
-    role,
-    created_at,
-    updated_at
-  ) VALUES (
-    test_user_id,
-    '00000000-0000-0000-0000-000000000000',
-    'manual-test@example.com',
-    crypt('password123', gen_salt('bf')), -- Password: password123
-    NOW(), -- This confirms the email immediately
-    '{"provider": "email", "providers": ["email"]}',
-    '{"first_name": "Test", "last_name": "User"}',
-    'authenticated',
-    'authenticated',
-    NOW(),
-    NOW()
-  )
-  ON CONFLICT (email) DO NOTHING;
+  IF test_user_id IS NULL THEN
+    -- Generate new UUID
+    test_user_id := gen_random_uuid();
+    
+    -- Create user with minimal required fields
+    INSERT INTO auth.users (
+      id,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      created_at,
+      updated_at,
+      instance_id,
+      aud,
+      role
+    ) VALUES (
+      test_user_id,
+      'manual-test@example.com',
+      crypt('password123', gen_salt('bf')),
+      NOW(), -- Auto-confirm email
+      NOW(),
+      NOW(),
+      '00000000-0000-0000-0000-000000000000',
+      'authenticated',
+      'authenticated'
+    );
+    
+    RAISE NOTICE 'User created successfully';
+  ELSE
+    RAISE NOTICE 'User already exists with ID: %', test_user_id;
+  END IF;
   
-  -- Get the user ID (in case it already existed)
-  SELECT id INTO test_user_id FROM auth.users WHERE email = 'manual-test@example.com';
+  -- Ensure profile exists with required fields
+  INSERT INTO profiles (id, email, first_name, last_name)
+  VALUES (test_user_id, 'manual-test@example.com', 'Test', 'User')
+  ON CONFLICT (id) DO NOTHING;
   
-  -- Create profile
-  INSERT INTO profiles (id, email, first_name, last_name, created_at, updated_at)
-  VALUES (
-    test_user_id,
-    'manual-test@example.com',
-    'Test',
-    'User',
-    NOW(),
-    NOW()
-  )
-  ON CONFLICT (id) DO UPDATE SET
-    email = EXCLUDED.email,
-    first_name = EXCLUDED.first_name,
-    last_name = EXCLUDED.last_name,
-    updated_at = NOW();
+  -- Ensure user_progress exists
+  INSERT INTO user_progress (user_id)
+  VALUES (test_user_id)
+  ON CONFLICT (user_id) DO NOTHING;
   
-  -- Create user_progress
-  INSERT INTO user_progress (
-    user_id,
-    current_tier,
-    spi_completed,
-    standout_completed,
-    leadership_completed,
-    customer_service_completed,
-    operational_completed,
-    health_completed,
-    business_track_progress,
-    personal_track_progress,
-    health_track_progress,
-    milestones_achieved,
-    program_start_date,
-    created_at,
-    updated_at
-  ) VALUES (
-    test_user_id,
-    '90%',
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    0,
-    0,
-    0,
-    '[]'::jsonb,
-    NOW(),
-    NOW()
-  )
-  ON CONFLICT (user_id) DO UPDATE SET
-    updated_at = NOW();
+  -- Ensure AI preferences exist
+  INSERT INTO user_ai_preferences (user_id)
+  VALUES (test_user_id)
+  ON CONFLICT (user_id) DO NOTHING;
   
-  RAISE NOTICE 'Test user created/updated with email: manual-test@example.com and password: password123';
 END $$;
 
--- Verify the user was created
+-- Verify creation
+SELECT 'Final check:' as info;
 SELECT 
   u.id,
   u.email,
   u.created_at,
   u.email_confirmed_at,
   CASE WHEN p.id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_profile,
-  CASE WHEN up.user_id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_progress
+  CASE WHEN up.user_id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_progress,
+  CASE WHEN uap.user_id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_ai_prefs
 FROM auth.users u
 LEFT JOIN profiles p ON u.id = p.id
 LEFT JOIN user_progress up ON u.id = up.user_id
-WHERE u.email = 'manual-test@example.com'; 
+LEFT JOIN user_ai_preferences uap ON u.id = uap.user_id
+WHERE u.email = 'manual-test@example.com';

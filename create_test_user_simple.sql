@@ -47,13 +47,18 @@ BEGIN
     RAISE NOTICE 'User already exists with ID: %', test_user_id;
   END IF;
   
-  -- Ensure profile exists
-  INSERT INTO profiles (id)
-  VALUES (test_user_id)
+  -- Ensure profile exists with required fields
+  INSERT INTO profiles (id, email, first_name, last_name)
+  VALUES (test_user_id, 'manual-test@example.com', 'Test', 'User')
   ON CONFLICT (id) DO NOTHING;
   
   -- Ensure user_progress exists
   INSERT INTO user_progress (user_id)
+  VALUES (test_user_id)
+  ON CONFLICT (user_id) DO NOTHING;
+
+  -- Ensure AI preferences exist
+  INSERT INTO user_ai_preferences (user_id)
   VALUES (test_user_id)
   ON CONFLICT (user_id) DO NOTHING;
   
@@ -61,14 +66,16 @@ END $$;
 
 -- Verify creation
 SELECT 'Final check:' as info;
-SELECT 
+SELECT
   u.id,
   u.email,
   u.created_at,
   u.email_confirmed_at,
   CASE WHEN p.id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_profile,
-  CASE WHEN up.user_id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_progress
+  CASE WHEN up.user_id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_progress,
+  CASE WHEN uap.user_id IS NOT NULL THEN 'Yes' ELSE 'No' END as has_ai_prefs
 FROM auth.users u
 LEFT JOIN profiles p ON u.id = p.id
 LEFT JOIN user_progress up ON u.id = up.user_id
+LEFT JOIN user_ai_preferences uap ON u.id = uap.user_id
 WHERE u.email = 'manual-test@example.com'; 

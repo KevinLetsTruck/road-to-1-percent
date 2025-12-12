@@ -39,6 +39,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import PDFDownloadButton from "@/components/PDFDownloadButton";
+import AICoach from "@/components/ai/AICoach";
+import { MessageCircle, Sparkles } from "lucide-react";
 
 interface DashboardStats {
   successProbability: number;
@@ -78,6 +80,7 @@ export default function DashboardPage() {
   const [showSPIDetails, setShowSPIDetails] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showAICoach, setShowAICoach] = useState(false);
 
   useEffect(() => {
     // Check for success message in URL parameters
@@ -1156,6 +1159,28 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* AI Coach Floating Action Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          onClick={() => setShowAICoach(true)}
+          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group"
+          title="Chat with your AI Business Coach"
+        >
+          <MessageCircle className="w-6 h-6" />
+          <div className="hidden group-hover:flex items-center gap-2 ml-2">
+            <Sparkles className="w-4 h-4" />
+            <span className="text-sm font-medium whitespace-nowrap">AI Coach</span>
+          </div>
+        </button>
+      </div>
+
+      {/* AI Coach Modal */}
+      <AICoach
+        isOpen={showAICoach}
+        onClose={() => setShowAICoach(false)}
+        userName={user?.email?.split('@')[0] || 'Entrepreneur'}
+      />
     </div>
   );
 }

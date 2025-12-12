@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
-import { BarChart3, Target, TrendingUp, Calendar } from 'lucide-react'
+import { BarChart3, Target, TrendingUp } from 'lucide-react'
 import ShieldLogo from '@/components/ui/ShieldLogo'
 import SPIRadarChart from '@/components/charts/SPIRadarChart'
 import ProgressTimeline from '@/components/charts/ProgressTimeline'
@@ -40,7 +40,7 @@ export default function InsightsPage() {
         if (progressData) {
           setProgress(progressData)
         }
-      } catch (error) {
+      } catch {
         console.log('No progress data found, user may be new')
       }
       
@@ -207,7 +207,6 @@ export default function InsightsPage() {
                 health: currentScores.risk_management,
                 overall: Math.round((currentScores.financial_foundation + currentScores.market_intelligence + currentScores.personal_strengths + currentScores.risk_management + currentScores.support_systems) / 5)
               }}
-              userTier={currentTier}
               onGeneratePlan={(plan) => {
                 console.log('AI Action plan generated:', plan)
                 // Here you could display the plan or save it to the database
